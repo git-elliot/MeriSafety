@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "165861330286",
+    "project_id": "merisafety-173404"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165861330286:android:1c934ca87dae4a63",
+        "android_client_info": {
+          "package_name": "com.developers.droidteam.merisafety"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "165861330286-bet681ilog8ok9bps51tl8qddeks9ipk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.developers.droidteam.merisafety",
+            "certificate_hash": "ccc8434463af23ca99721dae01c04935857422ce"
+          }
+        },
+        {
+          "client_id": "165861330286-h91ha8u70a1kvbqri01kft0c7dg99g7l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2-p7PvLHR-EvUeNgr4Ig10QhVAxOnis4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

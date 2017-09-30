@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/homebl"
+            android:title="Home" />
+        <item
+            android:id="@+id/nav_gaudian"
+            android:icon="@drawable/acc"
+            android:title="Gaurdian" />
+        <item
+            android:id="@+id/nav_police"
+            android:icon="@drawable/ic_security_black_48dp"
+            android:title="All Police Station" />
+        <item
+            android:id="@+id/nav_contact"
+            android:icon="@drawable/ic_contact_mail_black_48dp"
+            android:title="Helpine Nos" />
+
+    </group>
+
+    <item android:title="More">
+        <menu>
+           <!-- <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_settings_black_48dp"
+                android:title="Settings" />-->
+            <item
+                android:id="@+id/nav_feedback"
+                android:icon="@drawable/ic_feedback_black_48dp"
+                android:title="Feedback" />
+
+            <item android:id="@+id/aboutapp"
+                android:icon="@drawable/ic_details_black_24dp"
+                android:title="About the App"/>
+            <item android:id="@+id/team"
+                android:icon="@drawable/ic_group_black_24dp"
+                android:title="Team"/>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@android:drawable/ic_lock_power_off"
+                android:title="Logout" />
+        </menu>
+    </item>
+
+</menu>
