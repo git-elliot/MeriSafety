@@ -100,4 +100,18 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         SQ.close();
     }
 
+    public void removeUser(DatabaseOperations dop) {
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        try
+        {
+            SQ.execSQL("DELETE FROM "+TableData.TableInfo.TABLE_NAME);
+
+        }
+        catch(SQLException s)
+        {
+            Log.d("Database Operations", s.getMessage());
+        }
+        SQ.close();
+    }
+
 }

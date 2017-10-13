@@ -211,6 +211,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             startActivity(email);
 
         } else if (id == R.id.nav_contact) {
+            Toast.makeText(this, "Click on each item to generate call", Toast.LENGTH_LONG).show();
               FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.newfraglayout,new FragHelpLine());
             ft.addToBackStack("stack6");
@@ -248,6 +249,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

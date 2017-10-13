@@ -61,6 +61,8 @@ public class Frag_login extends Fragment {
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getActivity(),"Please wait.......",Toast.LENGTH_SHORT).show();
+
 /*
                 if(e1.getText().toString().trim().length()!=10){
                     e1.setError("Phone Number is invalid");
@@ -83,7 +85,6 @@ public class Frag_login extends Fragment {
                 try{
 
 
-                    Toast.makeText(getActivity(),"Please wait.......",Toast.LENGTH_SHORT).show();
                     username = e1.getText().toString();
                     userpass = e2.getText().toString();
                     DatabaseOperations DOP = new DatabaseOperations(getActivity());
