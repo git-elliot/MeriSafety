@@ -60,6 +60,7 @@ public class Frag_guardian extends Fragment {
                     DatabaseOperations DB = new DatabaseOperations(getActivity());
                     DB.putInformationGaur(DB,et1.getText().toString(),et2.getText().toString(),et3.getText().toString());
 
+                    Toast.makeText(getContext(), "Guardian added successfully", Toast.LENGTH_SHORT).show();
                     Intent it3=new Intent(getContext(),NavigationDrawerActivity.class);
                     startActivity(it3);
                 }

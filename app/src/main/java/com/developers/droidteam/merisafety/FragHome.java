@@ -1,5 +1,7 @@
 package com.developers.droidteam.merisafety;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -30,16 +33,33 @@ import android.widget.Toast;
 public class FragHome extends Fragment {
 
     private static final int REQUEST_PHONE =1889 ;
+    View v;
+    Context con;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        con=context;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_frag_home,container,false);
+        v= inflater.inflate(R.layout.activity_frag_home,container,false);
+        return v;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        SharedPreferences sp = con.getSharedPreferences("currentloc",con.MODE_PRIVATE);
+        String loc = sp.getString("curloc",null);
+
+        if(loc!=null)
+        {
+            TextView cur_loc = (TextView) v.findViewById(R.id.current_location);
+            cur_loc.setText(loc);
+        }
         if(ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.CALL_PHONE)== PackageManager.PERMISSION_GRANTED){
 
         }

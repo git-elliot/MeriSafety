@@ -4,6 +4,7 @@ package com.developers.droidteam.merisafety;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -63,7 +64,10 @@ public class TravelFragment extends Fragment {
         final PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.sent"), 0);
         final PendingIntent pin = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
         final SmsManager smss = SmsManager.getDefault();
-        final String sms = number+" Help me!, i'm in emergency. You received this email because you are the guardian of "+number;
+         SharedPreferences sp = con.getSharedPreferences("currentloc",con.MODE_PRIVATE);
+        String loc = sp.getString("curloc",null);
+
+        final String sms = number+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian of "+number;
 
 
         new Thread(){

@@ -3,6 +3,7 @@ package com.developers.droidteam.merisafety;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -83,6 +84,20 @@ public class DatabaseOperations extends SQLiteOpenHelper {
         String args[] = {user};
         Cursor CR = SQ.query(TableData.TableInfo.TABLE_NAME, coloumns, selection, args, null, null, null);
         return CR;
+    }
+
+    public void removeGuardian(DatabaseOperations dop) {
+        SQLiteDatabase SQ = dop.getWritableDatabase();
+        try
+        {
+            SQ.execSQL("DELETE FROM "+TableData.TableInfo.TABLE_NAME_GAUR);
+
+        }
+        catch(SQLException s)
+        {
+            Log.d("Database Operations", s.getMessage());
+        }
+        SQ.close();
     }
 
 }

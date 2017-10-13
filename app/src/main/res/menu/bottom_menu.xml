@@ -1,28 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/Home1"
-        android:title="Home"
-        android:icon="@drawable/ic_settings_black_48dp"
+    <item android:id="@+id/like"
+        android:title="Like Us"
+        android:icon="@drawable/ic_thumb_up_black_24dp"
+        app:showAsAction="ifRoom"
         ></item>
 
-    <item android:id="@+id/Home2"
+    <item android:id="@+id/settings"
         android:title="Home"
         android:icon="@drawable/ic_settings_black_48dp"
+        app:showAsAction="ifRoom"
         ></item>
 
-    <item android:id="@+id/Home3"
-        android:title="Home"
-        android:icon="@drawable/ic_settings_black_48dp"
-        ></item>
-
-    <item android:id="@+id/Home4"
-        android:title="Home"
-        android:icon="@drawable/ic_settings_black_48dp"
-        ></item>
-
-    <item android:id="@+id/Home5"
-        android:title="Home"
-        android:icon="@drawable/ic_settings_black_48dp"
-        ></item>
 </menu>
