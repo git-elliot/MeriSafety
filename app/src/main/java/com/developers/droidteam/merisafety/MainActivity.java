@@ -1,9 +1,12 @@
 package com.developers.droidteam.merisafety;
 
 import android.*;
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -23,10 +26,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
-
+    private static final int REQUEST_PERMISSIONS = 10;
+    private static final int REQUEST_PHONE =1889 ;
     private static final int REQUEST_MSG =1880 ;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final int CORSE_LOCATION_PERMISSION_REQUEST_CODE = 2;
+
     FragmentManager fm = getSupportFragmentManager();
 
     GoogleApiClient mGoogleApiClient;
@@ -61,19 +73,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
-        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)+ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)+ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)+ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED){
 
         }
         else{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if(shouldShowRequestPermissionRationale(android.Manifest.permission.SEND_SMS)){
+                if(shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)||shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE)||shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)||shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)){
                     Toast.makeText(this, "you need to check permission", Toast.LENGTH_SHORT).show();
                 }
             }
         }
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-            requestPermissions(new String[]{android.Manifest.permission.SEND_SMS},REQUEST_MSG);
+            requestPermissions(new String[]{Manifest.permission.SEND_SMS,Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_PERMISSIONS);
         }
+
 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -123,7 +136,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             bs.putString("name",acct.getDisplayName());
             bs.putString("email",acct.getEmail());
             bs.putString("purl",acct.getPhotoUrl().toString());
+
 //           tv.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
+            String name = acct.getDisplayName();
+            String email = acct.getEmail();
+            Uri purl = acct.getPhotoUrl();
+
+            SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
+            SharedPreferences.Editor et = sp.edit();
+            et.putString("email",email);
+            et.commit();
+
+            createUser(name,email,purl);
+
+
 
         } else {
             // Signed out, show unauthenticated UI.
@@ -131,17 +157,47 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
 
     }
+    public void createUser(String name, String email, Uri purl)
+    {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        // Create a storage reference from our app
+        StorageReference storageRef = storage.getReference();
+
+
+        StorageReference photoRef = storageRef.child("images/"+email+".jpg");
+
+        photoRef.putFile(purl)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        Toast.makeText(con, "Upload successfull", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+                        Toast.makeText(con, "Upload unsucessfull", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
 
-        if(requestCode==REQUEST_MSG){
-            if(grantResults[0]==PackageManager.PERMISSION_GRANTED){
+        if(requestCode==REQUEST_PERMISSIONS){
+            if((grantResults.length>0)&&(grantResults[0]+grantResults[1]+grantResults[2]+grantResults[3])==PackageManager.PERMISSION_GRANTED){
 
             }else {
                 Toast.makeText(this, "permission was not granted", Toast.LENGTH_SHORT).show();
             }
-        }else{
+        }
+        else
+        {
             super.onRequestPermissionsResult(requestCode,permissions,grantResults);
         }
     }

@@ -18,7 +18,10 @@
             android:id="@+id/nav_contact"
             android:icon="@drawable/ic_contact_mail_black_48dp"
             android:title="Helpine Nos" />
-
+        <item
+            android:id="@+id/nav_nearby"
+            android:icon="@drawable/ic_location_on_black_48dp"
+            android:title="Nearby" />
     </group>
 
     <item android:title="More">

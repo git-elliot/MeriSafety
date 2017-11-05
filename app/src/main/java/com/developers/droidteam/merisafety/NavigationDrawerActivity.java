@@ -4,9 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,27 +25,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.support.v4.app.ActivityCompat;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 public class NavigationDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
     private static final int REQUEST_MSG =1880 ;
-    GoogleApiClient client;
+    private static final int REQUEST_CHECK_SETTINGS = 2;
+
     LocationRequest locationRequest = null;
 
     @Override
@@ -54,12 +52,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
 
+
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         FragHome obj = new FragHome();
-        ft.add(R.id.newfraglayout,obj,"homepage");
+        ft.add(R.id.newfraglayout, obj, "homepage");
         ft.commit();
-
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -72,13 +70,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View hView =  navigationView.getHeaderView(0);
+        View hView = navigationView.getHeaderView(0);
         navigationView.setNavigationItemSelectedListener(this);
 
-     //**************************havigation drawer data**********************
+        //**************************havigation drawer data**********************
 
         SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
-        final String user =sp.getString("login_key",null);
+        final String user = sp.getString("login_key", null);
 
         TextView tv_name = (TextView) hView.findViewById(R.id.nav_drawer_name);
         tv_name.setText("Welcome");
@@ -86,16 +84,50 @@ public class NavigationDrawerActivity extends AppCompatActivity
         TextView tv_user = (TextView) hView.findViewById(R.id.nav_drawer_user);
         tv_user.setText(user);
 
-        //***************************Retrieving the current location of user and storing in shared preference******************
+        final ImageView iv = (ImageView) findViewById(R.id.imageView);
 
-        client = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-        client.connect();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        // Create a storage reference from our app
+        StorageReference storageRef = storage.getReference();
 
 
+       String email = sp.getString("email",null);
+        if(email!=null)
+        {
+            StorageReference photoRef = storageRef.child("images/"+email+".jpg");
+
+            File localFile = null;
+            try {
+                localFile = File.createTempFile("images", "jpg");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            final File finalLocalFile = localFile;
+            photoRef.getFile(localFile)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            // Successfully downloaded data to local file
+                            // ...
+                            File imgFile = new  File(String.valueOf(finalLocalFile));
+
+                            if(imgFile.exists()){
+
+                                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+                                iv.setImageBitmap(myBitmap);
+
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle failed download
+                    // ...
+                }
+            });
+        }
     }
 
 
@@ -199,7 +231,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ft.commit();
 
 
-        } else if (id == R.id.nav_feedback) {
+        }else if(id == R.id.nav_nearby)
+        {
+         startActivity(new Intent(NavigationDrawerActivity.this,MapsActivity.class));
+        }
+        else if (id == R.id.nav_feedback) {
 
             Intent email = new Intent(Intent.ACTION_SEND);
             String[] s ={"merisafety@gmail.com","khandelwalparas8@gmail.com"};
@@ -275,64 +311,4 @@ public class NavigationDrawerActivity extends AppCompatActivity
     return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        locationRequest = locationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(1000);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                double lat = location.getLatitude();
-                double lng = location.getLongitude();
-                LatLng mylatlng = new LatLng(lat, lng);
-
-                if (ActivityCompat.checkSelfPermission(NavigationDrawerActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(NavigationDrawerActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                List<Address> list2 = null;
-                Geocoder geocoder1 = new Geocoder(NavigationDrawerActivity.this);
-                try {
-                    list2 = geocoder1.getFromLocation(lat, lng, 1);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                Address address1 = list2.get(0);
-                SharedPreferences sp = getSharedPreferences("currentloc",MODE_PRIVATE);
-                SharedPreferences.Editor et = sp.edit();
-                et.putString("curloc",address1.getAddressLine(0)+address1.getAddressLine(1)+address1.getAddressLine(2));
-                et.commit();
-
-            }
-    });
-
-}
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
 }

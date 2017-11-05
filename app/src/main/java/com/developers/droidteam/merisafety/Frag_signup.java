@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,9 +35,12 @@ public class Frag_signup extends Fragment {
         View v2 = l.inflate(R.layout.activity_frag_signup, container, false);
         final SharedPreferences sp = getActivity().getSharedPreferences("account_db", Context.MODE_PRIVATE);
         final EditText e1 = (EditText) v2.findViewById(R.id.e1);
+
+        // automatically filling edittext of mobile number from android phone
         TelephonyManager tmgr = (TelephonyManager) con.getSystemService(con.TELEPHONY_SERVICE);
         String number = tmgr.getLine1Number();
         e1.setText(number);
+
         final EditText e2 = (EditText) v2.findViewById(R.id.e2);
         final EditText e3 = (EditText) v2.findViewById(R.id.e3);
         Button btn = (Button) v2.findViewById(R.id.btt);

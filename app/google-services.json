@@ -1,7 +1,9 @@
 {
   "project_info": {
     "project_number": "165861330286",
-    "project_id": "merisafety-173404"
+    "firebase_url": "https://merisafety-173404.firebaseio.com",
+    "project_id": "merisafety-173404",
+    "storage_bucket": "merisafety-173404.appspot.com"
   },
   "client": [
     {
@@ -12,6 +14,10 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "165861330286-ja2b9c1riu1d3uaj99kbuesnijd64ufg.apps.googleusercontent.com",
+          "client_type": 3
+        },
         {
           "client_id": "165861330286-bet681ilog8ok9bps51tl8qddeks9ipk.apps.googleusercontent.com",
           "client_type": 1,
@@ -35,11 +41,16 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "165861330286-ja2b9c1riu1d3uaj99kbuesnijd64ufg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }

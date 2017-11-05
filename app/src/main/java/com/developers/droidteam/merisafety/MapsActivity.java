@@ -12,11 +12,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -33,16 +36,21 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.nearby.Nearby;
 
 import java.io.IOException;
 import java.util.List;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener, LocationListener {
+
+    private static final String GOOGLE_API_KEY = "AIzaSyDQ94rd1-xHgj_sSBNbusWx4QQl8A56cik";
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
@@ -52,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int PLACE_PICKER_REQUEST = 3;
     // 2
     private static final int REQUEST_CHECK_SETTINGS = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,15 +78,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loadPlacePicker();
-            }
-        });
         createLocationRequest();
     }
+
+
+    public void performSearch(String type, double latitude, double longitude, int PROXIMITY_RADIUS, GoogleMap googleMap)
+    {
+
+
+        //show error dialog if GoolglePlayServices not available
+        if (!isGooglePlayServicesAvailable()) {
+            finish();
+        }
+        StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        googlePlacesUrl.append("location=" + latitude + "," + longitude);
+        googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
+        googlePlacesUrl.append("&types=" + type);
+        googlePlacesUrl.append("&sensor=true");
+        googlePlacesUrl.append("&key=" + GOOGLE_API_KEY);
+
+        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask();
+        Object[] toPass = new Object[2];
+        toPass[0] = googleMap;
+        toPass[1] = googlePlacesUrl.toString();
+        googlePlacesReadTask.execute(toPass);
+    }
+
+    private boolean isGooglePlayServicesAvailable() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (ConnectionResult.SUCCESS == status) {
+            return true;
+        } else {
+            GooglePlayServicesUtil.getErrorDialog(status, this, 0).show();
+            return false;
+        }
+    }
+
 
 
     /**
@@ -92,7 +128,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         // Add a marker in Sydney and move the camera
         // LatLng sydney = new LatLng(-34, 151);
         //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
@@ -112,6 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -174,6 +210,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLastLocation = location;
         if (null != mLastLocation) {
             placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+            performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+
+
         }
 
     }
@@ -182,10 +222,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // 1
         MarkerOptions markerOptions = new MarkerOptions().position(location);
         String titleStr = getAddress(location);  // add these two lines
-        markerOptions.title(titleStr);
+        markerOptions.title("You are here").snippet(titleStr);
         // 2
         mMap.addMarker(markerOptions);
     }
+
 
     private String getAddress(LatLng latLng) {
         // 1
@@ -220,6 +261,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,
                 this);
     }
+
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         // 2
@@ -249,6 +291,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         try {
                             status.startResolutionForResult(MapsActivity.this, REQUEST_CHECK_SETTINGS);
+
                         } catch (IntentSender.SendIntentException e) {
                         }
                         break;
