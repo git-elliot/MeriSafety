@@ -241,13 +241,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                     }
                                     else
                                     {
-                                        Toast.makeText(MainActivity.this, "Welcome back to MeriSafey, you are signed in as "+dataSnapshot.child("email").getValue().toString(), Toast.LENGTH_LONG).show();
 
                                         if(dataSnapshot.child(user.getUid()).exists())
                                         {
                                             et.putString("login_key",user.getUid());
                                             et.apply();
-
+                                            Toast.makeText(MainActivity.this, "Welcome back to MeriSafey, you are signed in as "+dataSnapshot.child("email").getValue().toString(), Toast.LENGTH_LONG).show();
                                             Intent it3=new Intent(MainActivity.this,NavigationDrawerActivity.class);
                                             startActivity(it3);
 
@@ -392,6 +391,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
 
+                    l.removeAllViews();;
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction ft = fm.beginTransaction();
                     Frag_verification obj = new Frag_verification();
