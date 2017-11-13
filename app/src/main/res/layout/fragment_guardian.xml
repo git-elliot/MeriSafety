@@ -17,27 +17,33 @@
         android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/text_background"
         android:text="Guardian info"
         android:layout_gravity="center"
         android:textAlignment="center"
         android:textSize="30sp"
         />
-    <ImageView
-        android:layout_margin="5dp"
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/guar_photo"
         android:layout_width="match_parent"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:layout_height="100dp"
-        android:layout_gravity="center"
         android:src="@drawable/acc"
-        />
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FF000000"/>
+
     <TextView
         android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="name"
+        android:textColor="@color/Light_green_layouts"
         android:id="@+id/guar_name"
         android:layout_gravity="center"
         android:textAlignment="center"
         android:textSize="30sp"
+
         />
     <TextView
         android:layout_margin="5dp"
@@ -48,12 +54,14 @@
         android:layout_gravity="center"
         android:textAlignment="center"
         android:textSize="30sp"
+        android:textColor="@color/Light_green_layouts"
         />
     <TextView
         android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="email"
+        android:textColor="@color/Light_green_layouts"
         android:id="@+id/guar_email"
         android:layout_gravity="center"
         android:textAlignment="center"

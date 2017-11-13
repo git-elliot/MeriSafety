@@ -1,19 +1,36 @@
 package com.developers.droidteam.merisafety;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.Image;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -38,13 +55,21 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.nearby.Nearby;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.List;
 
 
@@ -61,11 +86,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // 2
     private static final int REQUEST_CHECK_SETTINGS = 2;
 
+    private DatabaseReference mDatabase;
+    private DatabaseReference peopleEnd ;
+    private DatabaseReference userEnd ;
+
+    private boolean nearbySet=false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -198,7 +233,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .getLongitude());
                     //add pin at user's location
                     placeMarkerOnMap(currentLocation);
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 12));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,13));
                 }
             }
         }
@@ -207,26 +242,178 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
+
         mLastLocation = location;
-        if (null != mLastLocation) {
+
+        if(mLastLocation!=null)
+        {
+            mMap.clear();
             placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-            performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
-            performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
-
-
+            placeNearbyPeoples();
+            performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),2000,mMap);
+            performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),2000,mMap);
         }
+    }
+
+    public void placeNearbyPeoples()
+    {
+        SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
+        final String user = sp.getString("login_key", null);
+        final String currentpin = sp.getString("pincode",null);
+
+
+        peopleEnd = mDatabase.child("users");
+
+        peopleEnd.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
+                {
+                   Log.d("uid","uid : "+ currentsnapshot.getKey());
+                    if(!currentsnapshot.getKey().equals(user))
+                    {
+                      String pincode =currentsnapshot.child("pincode").getValue().toString();
+                        Log.d("uid","uid different, pincode : "+pincode);
+
+                        if(pincode.equals(currentpin))
+                        {
+                            Log.d("pincode","pincode match");
+                            placePeopleWindow(currentsnapshot.child("name").getValue().toString(),currentsnapshot.child("mobile").getValue().toString(),currentsnapshot.child("lat").getValue().toString(),currentsnapshot.child("lng").getValue().toString(),currentsnapshot.child("photoUrl").getValue().toString());
+                            Log.d("people",currentsnapshot.child("pincode").getValue().toString());
+
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
+    public void placePeopleWindow(String name, String mobile,String lat, String lng,String pUrl)
+    {
+        double mylat = Double.parseDouble(lat);
+        double mylng = Double.parseDouble(lng);
+        LatLng mylatlng = new LatLng(mylat,mylng);
+        placeMarkerOnMapPeople(name,mobile,mylatlng,pUrl);
+    }
+
+    private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
+        String imageURL;
+        LatLng loc ;
+        String myName;
+        GoogleMap myMap;
+        public FetchBitmap(String imgURL, GoogleMap mMap, LatLng location, String name) {
+            imageURL = imgURL;
+            loc = location;
+            myName = name;
+            myMap = mMap;
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+
+            MarkerOptions markerOptions = new MarkerOptions().position(loc).icon(BitmapDescriptorFactory.fromBitmap(result
+));
+            String titleStr = getAddress(loc);  // add these two lines
+            markerOptions.title(myName).snippet(titleStr);
+            // 2
+            myMap.addMarker(markerOptions);
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            return getBitmapFromURL(imageURL);
+        }
+    }
+
+    public Bitmap getBitmapFromURL(String src) {
+        try {
+            java.net.URL url = new java.net.URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url
+                    .openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return getResizedBitmap(myBitmap,100,100);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static Bitmap createDrawableFromView(Context context, View view, Bitmap bitmap) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        view.setLayoutParams(new LinearLayout.LayoutParams(100,100));
+        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.buildDrawingCache();
+
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
+        return bitmap;
+    }
+
+    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
+                matrix, false);
+        return resizedBitmap;
+    }
+
 
     protected void placeMarkerOnMap(LatLng location) {
         // 1
-        MarkerOptions markerOptions = new MarkerOptions().position(location);
-        String titleStr = getAddress(location);  // add these two lines
-        markerOptions.title("You are here").snippet(titleStr);
-        // 2
-        mMap.addMarker(markerOptions);
+        final LatLng loc = location;
+        final SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
+        String userid = sp.getString("login_key",null);
+
+        userEnd = mDatabase.child("users").child(userid).child("photoUrl");
+
+        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+                    FetchBitmap task = new FetchBitmap(dataSnapshot.getValue().toString(),mMap,loc,"You");
+                    task.execute();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 
+
+    protected void placeMarkerOnMapPeople(String name, String mobile, LatLng location, String pUrl) {
+        // 1
+        FetchBitmap task = new FetchBitmap(pUrl,mMap,location,name);
+        task.execute();
+
+    }
 
     private String getAddress(LatLng latLng) {
         // 1
@@ -265,7 +452,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         // 2
-        mLocationRequest.setInterval(10000);
+        mLocationRequest.setInterval(100000);
         // 3
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);

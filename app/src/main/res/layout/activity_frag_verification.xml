@@ -12,89 +12,74 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="100"
+        android:layout_weight="9"
         android:layout_gravity="center_vertical"
         android:orientation="vertical"
         >
         <TextView
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:id="@+id/tv1"
-            android:layout_marginBottom="30dp"
             android:textAlignment="center"
             android:elevation="2dp"
+            android:layout_weight="1"
             android:background="@drawable/myrect"
-            android:text="Verification"
+            android:text="Contact Details"
             android:textSize="25dp"/>
 
-        <android.support.design.widget.TextInputLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Phone Number"
-            android:textColorHint="#fff"
-            android:id="@+id/textinputlayout"
-            android:layout_below="@+id/securitytext"
-            android:layout_alignStart="@+id/securitytext"
-            android:layout_marginTop="47dp">
+            android:id="@+id/tv1"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:elevation="2dp"
+            android:textColor="@color/Light_green_layouts"
+            android:text="We need some extra information"
+            android:textSize="25dp"/>
 
-        <EditText
-            android:layout_gravity="center_horizontal"
-            android:layout_width="wrap_content"
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="9"
+                android:textColorHint="#fff">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/enternum"
+                    android:layout_width="300dp"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:hint="Enter mobile number here"
+                    android:textSize="20dp"
+                    android:layout_margin="10dp"
+                    />
+            </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColorHint="#fff"
-            android:inputType="number"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:elevation="2dp"
+            android:textColor="@color/Light_green_layouts"
+            android:text="We don't share your information with any third party organizations."
+           />
+        <Button
+            android:layout_weight="1"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Proceed"
             android:textSize="20dp"
-            android:hint="Enter OTP here"
-            android:id="@+id/et1"
+            android:id="@+id/proceed1"
+            android:layout_margin="5dp"
+            android:typeface="sans"
+            android:textStyle="bold"
+            android:textColor="@color/Light_grey_text"
+            android:background="@drawable/buttons_background"
             />
-        </android.support.design.widget.TextInputLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_marginTop="10dp"
-            android:layout_height="wrap_content">
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:text="Resend Code"
-                android:layout_margin="5dp"
-                android:typeface="sans"
-                android:textStyle="bold"
-                android:textColor="@color/Light_grey_text"
-                android:id="@+id/resend_code"
-                android:background="@drawable/buttons_background"
-                />
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
-                android:text="Edit number"
-                android:layout_margin="5dp"
-                android:typeface="sans"
-                android:textStyle="bold"
-                android:textColor="@color/Light_grey_text"
-                android:onClick="fun"
-                android:background="@drawable/buttons_background"
-                />
-        </LinearLayout>
-
-
     </LinearLayout>
-    <Button
-        android:layout_weight="1"
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Proceed"
-        android:textSize="20dp"
-        android:id="@+id/proceed1"
-        android:layout_margin="5dp"
-        android:typeface="sans"
-        android:textStyle="bold"
-        android:textColor="@color/Light_grey_text"
-        android:onClick="fun"
-        android:background="@drawable/buttons_background"
-        />
+
 </LinearLayout>
 
 

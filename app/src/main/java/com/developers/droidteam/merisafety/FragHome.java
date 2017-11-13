@@ -9,6 +9,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +44,13 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.List;
@@ -53,6 +62,11 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class FragHome extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    private DatabaseReference mDatabase;
+    private DatabaseReference userEndlat ;
+    private DatabaseReference userEndlng ;
+    private DatabaseReference userPincode;
 
     private static final int REQUEST_PHONE =1889 ;
     private GoogleApiClient mGoogleApiClient;
@@ -187,8 +201,27 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                 SharedPreferences sp = con.getSharedPreferences("currentloc",con.MODE_PRIVATE);
                 SharedPreferences.Editor et = sp.edit();
                 et.putString("curloc",address1.getAddressLine(0));
-                et.commit();
+                et.apply();
+
                 cur_loc.setText(address1.getAddressLine(0));
+                SharedPreferences sp1 = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
+                mDatabase = FirebaseDatabase.getInstance().getReference();
+
+                String uid =  sp1.getString("uid",null);
+                if(uid!=null)
+                {
+                    userEndlat = mDatabase.child("users").child(uid).child("lat");
+                    userEndlat.setValue(lat);
+                    userEndlng = mDatabase.child("users").child(uid).child("lng");
+                    userEndlng.setValue(lng);
+                    userPincode = mDatabase.child("users").child(uid).child("pincode");
+                    userPincode.setValue(address1.getPostalCode());
+                    SharedPreferences.Editor et1 = sp1.edit();
+                    et1.putString("pincode",address1.getPostalCode());
+                    et1.apply();
+
+                }
+
             }
         });
 

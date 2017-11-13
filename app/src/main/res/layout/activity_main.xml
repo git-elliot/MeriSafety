@@ -6,23 +6,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/Dark_green_bg"
+    android:background="@drawable/main_gradient"
     tools:context="com.developers.droidteam.merisafety.MainActivity">
 
-    <ImageView
+    <ViewFlipper
+        android:layout_margin="20dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
-        android:src="@drawable/round_safety_launcher"/>
-    <TextView
+        android:layout_weight="5"
+        android:id="@+id/main_view_pager"></ViewFlipper>
+    <LinearLayout
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:text="Meri Safety"
-        android:textSize="50sp"
-        android:fontFamily="cursive"
-        android:textColor="#fff"
-        android:gravity="center"
-        android:layout_weight="1"/>
+        android:layout_weight="1">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:id="@+id/progress_bar"
+            android:visibility="invisible"
+            />
+    </LinearLayout>
     <LinearLayout
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
@@ -36,33 +45,9 @@
             android:id="@+id/sign_in_button"
             android:layout_gravity="center"
             android:layout_margin="10dp"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <Button
-            android:layout_width="0dp"
-            android:id="@+id/b1"
-            android:layout_height="wrap_content"
-            android:textSize="30sp"
-            android:text="Login"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/buttons_background"
-            android:layout_weight="1"/>
-        <Button
-            android:layout_width="0dp"
-            android:id="@+id/b2"
-            android:layout_height="wrap_content"
-            android:textSize="30sp"
-            android:text="Signup"
-            android:background="@drawable/buttons_background"
-            android:layout_weight="1"/></LinearLayout>
 </LinearLayout>

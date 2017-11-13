@@ -1,12 +1,16 @@
 package com.developers.droidteam.merisafety;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +19,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -32,19 +37,28 @@ import android.widget.Toast;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.List;
 
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final int REQUEST_MSG =1880 ;
     private static final int REQUEST_CHECK_SETTINGS = 2;
-
+    private DatabaseReference mDatabase;
+    private DatabaseReference userEnd ;
+    ImageView iv;
     LocationRequest locationRequest = null;
 
     @Override
@@ -74,18 +88,81 @@ public class NavigationDrawerActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //**************************havigation drawer data**********************
+        final TextView tv_name = (TextView) hView.findViewById(R.id.nav_drawer_name);
 
-        SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
+        final TextView tv_user = (TextView) hView.findViewById(R.id.nav_drawer_user);
+
+        iv = (ImageView) hView.findViewById(R.id.imageView);
+
+        final SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
         final String user = sp.getString("login_key", null);
 
-        TextView tv_name = (TextView) hView.findViewById(R.id.nav_drawer_name);
-        tv_name.setText("Welcome");
+        String name;
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        TextView tv_user = (TextView) hView.findViewById(R.id.nav_drawer_user);
-        tv_user.setText(user);
+        userEnd = mDatabase.child("users").child(user).child("name");
 
-        final ImageView iv = (ImageView) findViewById(R.id.imageView);
+        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+                    tv_name.setText(dataSnapshot.getValue().toString());
 
+                    SharedPreferences.Editor et = sp.edit();
+                    et.putString("name",dataSnapshot.getValue().toString());
+                    et.apply();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        userEnd = mDatabase.child("users").child(user).child("email");
+
+        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+                    tv_user.setText(dataSnapshot.getValue().toString());
+                    SharedPreferences.Editor et = sp.edit();
+                    et.putString("email",dataSnapshot.getValue().toString());
+                    et.apply();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        userEnd = mDatabase.child("users").child(user).child("photoUrl");
+
+        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+
+                    String imageURL = dataSnapshot.getValue().toString();
+                    FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,imageURL,iv);
+                    task.execute();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+/*
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
         // Create a storage reference from our app
@@ -128,10 +205,70 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 }
             });
         }
+        */
+
     }
 
 
-    public void fun(View v)
+    private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
+        String imageURL;
+        ImageView imgView;
+
+        public FetchBitmap(Activity activity, String imgURL, ImageView imageView) {
+            imageURL = imgURL;
+            imgView = imageView;
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            imgView.setImageBitmap(result);
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            return getBitmapFromURL(imageURL);
+        }
+    }
+
+    public Bitmap getBitmapFromURL(String src) {
+        try {
+            java.net.URL url = new java.net.URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url
+                    .openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return getResizedBitmap(myBitmap,70,70);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
+                matrix, false);
+
+        return resizedBitmap;
+    }
+
+
+        public void fun(View v)
     {
         if(R.id.medical==v.getId()){
 
