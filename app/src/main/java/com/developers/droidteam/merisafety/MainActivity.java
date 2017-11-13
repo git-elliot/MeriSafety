@@ -219,11 +219,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
                             SharedPreferences.Editor et = sp.edit();
                             et.putString("uid",user.getUid().toString());
-                            et.putString("login_key",user.getUid().toString());
                             et.putString("name",name);
                             et.apply();
 
-                            et.apply();
 
                             mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -243,7 +241,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                     {
                                         Toast.makeText(MainActivity.this, "Welcome back to MeriSafey, you are signed in as "+dataSnapshot.child("email").getValue().toString(), Toast.LENGTH_LONG).show();
                                         Intent it3=new Intent(MainActivity.this,NavigationDrawerActivity.class);
-                                        startActivity(it3);
+
+                                        FragmentManager fm = getSupportFragmentManager();
+                                        FragmentTransaction ft = fm.beginTransaction();
+                                        Frag_verification obj = new Frag_verification();
+                                        ft.addToBackStack("stack2");
+                                        ft.replace(R.id.l2,obj,"verify");
+                                        ft.commit();
 
                                     }
                                 }
@@ -315,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         } else {
             // Signed out, show unauthenticated UI.
-            Toast.makeText(this, "OUT", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Unable to sign in, Maybe internet problem.", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -404,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         if(requestCode==REQUEST_PERMISSIONS){
             if((grantResults.length>0)&&(grantResults[0]+grantResults[1]+grantResults[2]+grantResults[3])==PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(con, "Permissions successfully granted.", Toast.LENGTH_SHORT).show();
 
             }else {
                 Toast.makeText(this, "permission was not granted", Toast.LENGTH_SHORT).show();

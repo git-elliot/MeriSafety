@@ -4,23 +4,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:gravity="center_vertical"
     android:orientation="vertical"
     android:layout_height="match_parent"
     android:background="@color/Dark_green_bg"
     android:padding="5dp"
     tools:context="com.developers.droidteam.merisafety.Frag_verification">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="9"
-        android:layout_gravity="center_vertical"
-        android:orientation="vertical"
-        >
         <TextView
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:textAlignment="center"
-            android:elevation="2dp"
             android:layout_weight="1"
             android:background="@drawable/myrect"
             android:text="Contact Details"
@@ -32,7 +25,6 @@
             android:id="@+id/tv1"
             android:layout_weight="1"
             android:textAlignment="center"
-            android:elevation="2dp"
             android:textColor="@color/Light_green_layouts"
             android:text="We need some extra information"
             android:textSize="25dp"/>
@@ -60,7 +52,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textAlignment="center"
-            android:elevation="2dp"
             android:textColor="@color/Light_green_layouts"
             android:text="We don't share your information with any third party organizations."
            />
@@ -78,8 +69,6 @@
             android:textColor="@color/Light_grey_text"
             android:background="@drawable/buttons_background"
             />
-    </LinearLayout>
-
 </LinearLayout>
 
 

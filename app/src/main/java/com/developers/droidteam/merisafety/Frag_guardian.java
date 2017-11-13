@@ -209,7 +209,7 @@ public class Frag_guardian extends Fragment {
                                     SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
                                     SharedPreferences.Editor et = sp.edit();
                                     et.putString("login_key",uid);
-                                    et.commit();
+                                    et.apply();
 
                                     Intent it3=new Intent(getContext(),NavigationDrawerActivity.class);
                                     startActivity(it3);
@@ -224,7 +224,7 @@ public class Frag_guardian extends Fragment {
                                     SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
                                     SharedPreferences.Editor et = sp.edit();
                                     et.putString("login_key",uid);
-                                    et.commit();
+                                    et.apply();
 
                                     Intent it3=new Intent(getContext(),NavigationDrawerActivity.class);
                                     startActivity(it3);

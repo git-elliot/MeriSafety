@@ -55,6 +55,7 @@ public class Frag_verification extends Fragment {
     }
 
     public View onCreateView(LayoutInflater l, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         v = l.inflate(R.layout.activity_frag_verification, container,false);
 
         editText = v.findViewById(R.id.enternum);

@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by siddharth on 6/28/2017.
@@ -150,7 +152,8 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                         try {
                             status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
 
-                        } catch (IntentSender.SendIntentException e) {
+                        }catch(IntentSender.SendIntentException e) {
+                         Log.d("sign in",e.getMessage());
                         }
                         break;
                     // 6
@@ -197,31 +200,34 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                     e.printStackTrace();
                 }
 
-                Address address1 = list2.get(0);
-                SharedPreferences sp = con.getSharedPreferences("currentloc",con.MODE_PRIVATE);
-                SharedPreferences.Editor et = sp.edit();
-                et.putString("curloc",address1.getAddressLine(0));
-                et.apply();
 
-                cur_loc.setText(address1.getAddressLine(0));
-                SharedPreferences sp1 = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
-                mDatabase = FirebaseDatabase.getInstance().getReference();
-
-                String uid =  sp1.getString("uid",null);
-                if(uid!=null)
+                if(list2 != null)
                 {
-                    userEndlat = mDatabase.child("users").child(uid).child("lat");
-                    userEndlat.setValue(lat);
-                    userEndlng = mDatabase.child("users").child(uid).child("lng");
-                    userEndlng.setValue(lng);
-                    userPincode = mDatabase.child("users").child(uid).child("pincode");
-                    userPincode.setValue(address1.getPostalCode());
-                    SharedPreferences.Editor et1 = sp1.edit();
-                    et1.putString("pincode",address1.getPostalCode());
-                    et1.apply();
+                    Address address1 = list2.get(0);
+                    SharedPreferences sp = con.getSharedPreferences("currentloc",MODE_PRIVATE);
+                    SharedPreferences.Editor et = sp.edit();
+                    et.putString("curloc",address1.getAddressLine(0));
+                    et.apply();
 
+                    cur_loc.setText(address1.getAddressLine(0));
+                    SharedPreferences sp1 = con.getSharedPreferences("account_db", MODE_PRIVATE);
+                    mDatabase = FirebaseDatabase.getInstance().getReference();
+
+                    String uid =  sp1.getString("uid",null);
+                    if(uid!=null)
+                    {
+                        userEndlat = mDatabase.child("users").child(uid).child("lat");
+                        userEndlat.setValue(lat);
+                        userEndlng = mDatabase.child("users").child(uid).child("lng");
+                        userEndlng.setValue(lng);
+                        userPincode = mDatabase.child("users").child(uid).child("pincode");
+                        userPincode.setValue(address1.getPostalCode());
+                        SharedPreferences.Editor et1 = sp1.edit();
+                        et1.putString("pincode",address1.getPostalCode());
+                        et1.apply();
+
+                    }
                 }
-
             }
         });
 
