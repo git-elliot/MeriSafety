@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             final FirebaseUser user = mAuth.getCurrentUser();
                           //  updateUI(user);
                             SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor et = sp.edit();
+                            final SharedPreferences.Editor et = sp.edit();
                             et.putString("uid",user.getUid().toString());
                             et.putString("name",name);
                             et.apply();
@@ -243,14 +243,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                     {
                                         Toast.makeText(MainActivity.this, "Welcome back to MeriSafey, you are signed in as "+dataSnapshot.child("email").getValue().toString(), Toast.LENGTH_LONG).show();
 
-                                        l.removeAllViews();;
-                                        FragmentManager fm = getSupportFragmentManager();
-                                        FragmentTransaction ft = fm.beginTransaction();
-                                        Frag_verification obj = new Frag_verification();
-                                        ft.addToBackStack("stack2");
-                                        ft.replace(R.id.l2,obj,"verify");
-                                        ft.commit();
+                                        if(dataSnapshot.child(user.getUid()).exists())
+                                        {
+                                            et.putString("login_key",user.getUid());
+                                            et.apply();
 
+                                            Intent it3=new Intent(MainActivity.this,NavigationDrawerActivity.class);
+                                            startActivity(it3);
+
+                                        }
+                                        else
+                                        {
+                                            l.removeAllViews();;
+                                            FragmentManager fm = getSupportFragmentManager();
+                                            FragmentTransaction ft = fm.beginTransaction();
+                                            Frag_verification obj = new Frag_verification();
+                                            ft.addToBackStack("stack2");
+                                            ft.replace(R.id.l2,obj,"verify");
+                                            ft.commit();
+
+                                        }
                                     }
                                 }
 
@@ -302,21 +314,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
             FirebaseUser currentUser = mAuth.getCurrentUser();
 
-           if(currentUser!=null)
-           {
-               Toast.makeText(this, "Already logged in", Toast.LENGTH_SHORT).show();
-               FragmentManager fm = getSupportFragmentManager();
-               FragmentTransaction ft = fm.beginTransaction();
-               Frag_verification obj = new Frag_verification();
-               ft.addToBackStack("stack2");
-               ft.replace(R.id.l2,obj,"verify");
-               ft.commit();
-           }
-           else
-           {
                BackgroundTask task = new BackgroundTask(MainActivity.this,acct,name,email,photoUrl);
                task.execute();
-           }
 
 
         } else {
