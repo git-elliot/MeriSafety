@@ -22,6 +22,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private DatabaseReference mDatabase;
     private DatabaseReference userEnd ;
      FragmentManager fm = getSupportFragmentManager();
-
+   LinearLayout l =null;
     private ViewFlipper simpleViewFlipper;
     int[] images = {R.drawable.round_safety_launcher,R.drawable.m1, R.drawable.m2, R.drawable.m3};
 //v
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         setContentView(R.layout.activity_main);
 
-
+        l = findViewById(R.id.l2);
         //        View Flipper
 
         simpleViewFlipper = (ViewFlipper) findViewById(R.id.main_view_pager);
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mAuth = FirebaseAuth.getInstance();
 
         // Inflate the layout for this fragment
+
 
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)+ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)+ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)+ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED){
 
@@ -240,8 +242,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                     else
                                     {
                                         Toast.makeText(MainActivity.this, "Welcome back to MeriSafey, you are signed in as "+dataSnapshot.child("email").getValue().toString(), Toast.LENGTH_LONG).show();
-                                        Intent it3=new Intent(MainActivity.this,NavigationDrawerActivity.class);
 
+                                        l.removeAllViews();;
                                         FragmentManager fm = getSupportFragmentManager();
                                         FragmentTransaction ft = fm.beginTransaction();
                                         Frag_verification obj = new Frag_verification();

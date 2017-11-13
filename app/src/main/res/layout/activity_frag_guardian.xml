@@ -3,7 +3,8 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="top"
         android:background="@color/Dark_green_bg"
         android:orientation="vertical"
     tools:context="com.developers.droidteam.merisafety.Frag_guardian">
@@ -23,7 +24,6 @@
                 android:textColor="#fff"
                 android:text="REGISTER GUARDIAN"/>
             <Button
-
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.7"
@@ -61,11 +61,8 @@
                 android:typeface="serif"
                 android:textSize="18dp"
                 android:layout_marginLeft="25dp"
-
                 android:layout_marginRight="25dp"
                 />
-
-
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -78,7 +75,6 @@
                 android:typeface="serif"
                 android:textSize="18dp"
                 android:layout_marginLeft="25dp"
-
                 android:layout_marginRight="25dp"
                 />
             <EditText
@@ -92,13 +88,10 @@
                 android:typeface="serif"
                 android:textSize="18dp"
                 android:layout_marginLeft="25dp"
-
                 android:layout_marginRight="25dp"
-                /></LinearLayout>
-
-
+                />
+        </LinearLayout>
         <LinearLayout
-
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.5"

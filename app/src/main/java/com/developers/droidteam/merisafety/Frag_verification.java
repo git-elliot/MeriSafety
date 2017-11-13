@@ -157,7 +157,7 @@ public class Frag_verification extends Fragment {
                        FragmentManager fm = getFragmentManager();
                        FragmentTransaction ft = fm.beginTransaction();
                        Frag_guardian obj = new Frag_guardian();
-                        ft.replace(R.id.l2,obj,"guardian");
+                       ft.replace(R.id.l2,obj,"guardian");
                        ft.commit();
 
                    }
