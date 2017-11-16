@@ -17,12 +17,20 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class TravelFragment extends Fragment {
+
+    private DatabaseReference mDatabase;
+    private DatabaseReference guarEnd ;
 
 
     View v;
@@ -56,18 +64,45 @@ public class TravelFragment extends Fragment {
                 startActivity(new Intent(con,MapsActivity.class));
             }
         }); */
-        DatabaseOperations DOP = new DatabaseOperations(getActivity());
-        Cursor CR= DOP.getInformationGaur(DOP);
-        CR.moveToNext();
-        final String number =CR.getString(1).trim();
-        final String mail =CR.getString(2).trim();
+
+        SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
+        final String user = sp.getString("login_key", null);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        guarEnd = mDatabase.child("users").child(user).child(user);
+
+        guarEnd.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
+                {
+                    sendAlert(dataSnapshot.child("name").getValue().toString(),dataSnapshot.child("mobile").getValue().toString(),dataSnapshot.child("email").getValue().toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public  void sendAlert(String name, final String mobile, String email)
+    {
+
+        SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
+
+
         final PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.sent"), 0);
         final PendingIntent pin = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
         final SmsManager smss = SmsManager.getDefault();
-         SharedPreferences sp = con.getSharedPreferences("currentloc",con.MODE_PRIVATE);
+        sp = con.getSharedPreferences("currentloc", con.MODE_PRIVATE);
         String loc = sp.getString("curloc",null);
 
-        final String sms = number+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian of "+number;
+        final String sms = name+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
 
 
         new Thread(){
@@ -79,7 +114,7 @@ public class TravelFragment extends Fragment {
                 try {
                     Thread.sleep(100);
 
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +number));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +mobile));
                     startActivity(intent);
 
                 } catch (InterruptedException e) {
@@ -90,7 +125,7 @@ public class TravelFragment extends Fragment {
 
         BackgroundMail.newBuilder(con).withUsername("merisafety@gmail.com")
                 .withPassword("WRTB@droid")
-                .withMailto(mail)
+                .withMailto(email)
                 .withType(BackgroundMail.TYPE_PLAIN)
                 .withSubject("Mail from MeriSafety")
                 .withBody(sms)
@@ -102,7 +137,7 @@ public class TravelFragment extends Fragment {
 //                        smsManager.sendTextMessage(number, null, "Help! Call me urgently. Please save me", null, null);
 //                        Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
 
-                        smss.sendTextMessage(number, null, sms, pi, pin);
+                        smss.sendTextMessage(mobile, null, sms, pi, pin);
 
 
 
@@ -118,15 +153,11 @@ public class TravelFragment extends Fragment {
                         Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
 */
 
-                        smss.sendTextMessage(number, null, sms, pi, pin);
+                        smss.sendTextMessage(mobile, null, sms, pi, pin);
 
                     }
                 })
                 .send();
-
-
-
-
 
     }
 }

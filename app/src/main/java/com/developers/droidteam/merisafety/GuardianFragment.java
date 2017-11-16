@@ -174,14 +174,20 @@ public class GuardianFragment extends Fragment {
                 {
                     if(!currentsnapshot.getKey().equals(user))
                     {
-                        String onEmail =currentsnapshot.child("email").getValue().toString();
-                        String onMobile =currentsnapshot.child("mobile").getValue().toString();
+                        try {
 
-                        if(onEmail.equals(email))
+                            String onEmail =dataSnapshot.child("email").getValue().toString();
+                            String onMobile =dataSnapshot.child("mobile").getValue().toString();
+
+                            if(onEmail.equals(email))
+                            {
+                                FetchBitmap task = new FetchBitmap((Activity) con,dataSnapshot.child("photoUrl").getValue().toString(),img);
+                                task.execute();
+
+                            }
+                        }catch(NullPointerException e)
                         {
-                            FetchBitmap task = new FetchBitmap((Activity) con,currentsnapshot.child("photoUrl").getValue().toString(),img);
-                            task.execute();
-
+                            Toast.makeText(con, "Unable to update picture.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }

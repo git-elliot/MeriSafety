@@ -20,6 +20,7 @@
         android:roundIcon="@drawable/round_safety_launcher"
         android:supportsRtl="true"
         android:screenOrientation="portrait"
+        android:testOnly="false"
         android:theme="@style/AppTheme">
         <activity android:name=".SaveMeActivity"
             android:screenOrientation="portrait"

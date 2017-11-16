@@ -409,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         if(requestCode==REQUEST_PERMISSIONS){
             if((grantResults.length>0)&&(grantResults[0]+grantResults[1]+grantResults[2]+grantResults[3])==PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(con, "Permissions successfully granted.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permissions successfully granted.", Toast.LENGTH_SHORT).show();
 
             }else {
                 Toast.makeText(this, "permission was not granted", Toast.LENGTH_SHORT).show();
