@@ -1,22 +1,17 @@
 package com.developers.droidteam.merisafety;
 
 
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,17 +22,18 @@ import com.google.firebase.database.ValueEventListener;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MedicalFragment extends Fragment {
+public class LowAlertFragment extends Fragment {
 
 
     private DatabaseReference mDatabase;
     private DatabaseReference guarEnd ;
 
     Context con;
-    public MedicalFragment() {
-        // Required empty public constructor
-    }
 
+    public LowAlertFragment()
+    {
+        //required empty constructor
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -48,7 +44,7 @@ public class MedicalFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_medical, container, false);
+        return inflater.inflate(R.layout.fragment_low_alert, container, false);
     }
 
     @Override
@@ -83,49 +79,10 @@ public class MedicalFragment extends Fragment {
         });
 
 
-/*
-        BackgroundMail.newBuilder(con).withUsername("merisafety@gmail.com")
-                .withPassword("WRTB@droid")
-                .withMailto(mail)
-                .withType(BackgroundMail.TYPE_PLAIN)
-                .withSubject("Mail from MeriSafety")
-                .withBody(sms)
-                .withOnSuccessCallback(new BackgroundMail.OnSuccessCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //do some magic
-//                        SmsManager smsManager = SmsManager.getDefault();
-//                        smsManager.sendTextMessage(number, null, "Help! Call me urgently. Please save me", null, null);
-//                        Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
-
-
-
-                    }
-                })
-                .withOnFailCallback(new BackgroundMail.OnFailCallback() {
-                    @Override
-                    public void onFail() {
-                        //do some magic
-
-                        SmsManager smsManager = SmsManager.getDefault();
-                        smsManager.sendTextMessage(number, null, "Help! Call me urgently. Please save me", null, null);
-                        Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .send();
-
-*/
-
     }
 
     public  void sendAlert(final String mobile)
     {
-
-
-        final PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.sent"), 0);
-        final PendingIntent pin = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
-        final SmsManager smss = SmsManager.getDefault();
-        final String sms = "Emergency! Save me urgently. I need medical help";
 
         new Thread(){
 

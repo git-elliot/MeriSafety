@@ -73,9 +73,9 @@ public class Frag_guardian extends Fragment {
          v4=  l.inflate(R.layout.activity_frag_guardian,container,false);
         mAuth = FirebaseAuth.getInstance();
         Button b1 = (Button)v4.findViewById(R.id.b2);
-        final EditText et1 = (EditText)v4. findViewById(R.id.et1);
-        final EditText et2 = (EditText)v4. findViewById(R.id.et2);
-        final EditText et3 = (EditText) v4.findViewById(R.id.et3);
+        final EditText et1 = v4. findViewById(R.id.et1);
+        final EditText et2 = v4. findViewById(R.id.et2);
+        final EditText et3 =  v4.findViewById(R.id.et3);
         final String emailPattern = "[a-zA-Z0-9._-]+@gmail+\\.+[a-z]+";
 
         b1.setOnClickListener(new View.OnClickListener() {
@@ -98,8 +98,6 @@ public class Frag_guardian extends Fragment {
                         task.execute();
 
                     }
-//                    DatabaseOperations DB = new DatabaseOperations(getActivity());
-  //                  DB.putInformationGaur(DB,et1.getText().toString(),et2.getText().toString(),et3.getText().toString());
          }
 
             }

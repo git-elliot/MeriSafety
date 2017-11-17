@@ -63,7 +63,7 @@
                 android:textStyle="bold"
                 android:textColor="@color/Light_grey_text"
                 android:onClick="fun"
-                android:id="@+id/medical"
+                android:id="@+id/lowalert"
                 android:background="@drawable/button"
                 android:layout_weight="3"
                 />
@@ -76,7 +76,7 @@
                 android:textStyle="bold"
                 android:textColor="@color/Light_grey_text"
                 android:onClick="fun"
-                android:id="@+id/security"
+                android:id="@+id/highalert"
                 android:background="@drawable/button"
                 android:layout_weight="3"
                 />
@@ -89,7 +89,7 @@
                 android:textColor="@color/Light_grey_text"
                 android:text="Advance Alert"
                 android:onClick="fun"
-                android:id="@+id/travel"
+                android:id="@+id/advancealert"
                 android:layout_margin="5dp"
                 android:background="@drawable/button"
                 />

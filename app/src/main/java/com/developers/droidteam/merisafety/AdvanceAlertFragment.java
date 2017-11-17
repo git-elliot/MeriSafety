@@ -5,20 +5,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
 import com.google.firebase.database.DataSnapshot;
@@ -31,14 +25,17 @@ import com.google.firebase.database.ValueEventListener;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SecurityFragment extends Fragment {
-
+public class AdvanceAlertFragment extends Fragment {
 
     private DatabaseReference mDatabase;
     private DatabaseReference guarEnd ;
 
+
     View v;
     Context con;
+    public AdvanceAlertFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -46,16 +43,11 @@ public class SecurityFragment extends Fragment {
         con=context;
     }
 
-    public SecurityFragment() {
-        // Required empty public constructor
-    }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.fragment_security, container, false);
         // Inflate the layout for this fragment
+        v=inflater.inflate(R.layout.fragment_advance_alert, container, false);
         return v;
     }
 
@@ -63,23 +55,16 @@ public class SecurityFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
-       /* Button b = (Button) v.findViewById(R.id.save_me_map_security);
+     /*   Button b = (Button) v.findViewById(R.id.save_me_travel);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(con,MapsActivity.class));
             }
-        });*/
-
+        }); */
 
         SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
         final String user = sp.getString("login_key", null);
-
-        final String[] name = new String[1];
-        final String[] email = new String[1];
-        final String[] mobile = new String[1];
-
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -91,7 +76,7 @@ public class SecurityFragment extends Fragment {
 
                 for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
                 {
-                    sendAlert(dataSnapshot.child("name").getValue().toString(), dataSnapshot.child("mobile").getValue().toString());
+                    sendAlert(dataSnapshot.child("name").getValue().toString(),dataSnapshot.child("mobile").getValue().toString(),dataSnapshot.child("email").getValue().toString());
                 }
             }
 
@@ -101,21 +86,21 @@ public class SecurityFragment extends Fragment {
             }
         });
 
-
-
     }
 
-    public void sendAlert(String name, final String mobile){
-
+    public  void sendAlert(String name, final String mobile, String email)
+    {
 
         SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
+
+
         final PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.sent"), 0);
         final PendingIntent pin = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
         final SmsManager smss = SmsManager.getDefault();
         sp = con.getSharedPreferences("currentloc", con.MODE_PRIVATE);
         String loc = sp.getString("curloc",null);
-        final String sms = name+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
 
+        final String sms = name+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
 
 
         new Thread(){
@@ -135,10 +120,10 @@ public class SecurityFragment extends Fragment {
                 }
             }
         }.start();
-/*
+
         BackgroundMail.newBuilder(con).withUsername("merisafety@gmail.com")
                 .withPassword("WRTB@droid")
-                .withMailto(mail)
+                .withMailto(email)
                 .withType(BackgroundMail.TYPE_PLAIN)
                 .withSubject("Mail from MeriSafety")
                 .withBody(sms)
@@ -149,6 +134,8 @@ public class SecurityFragment extends Fragment {
 //                        SmsManager smsManager = SmsManager.getDefault();
 //                        smsManager.sendTextMessage(number, null, "Help! Call me urgently. Please save me", null, null);
 //                        Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
+
+                        smss.sendTextMessage(mobile, null, sms, pi, pin);
 
 
 
@@ -162,14 +149,13 @@ public class SecurityFragment extends Fragment {
                         SmsManager smsManager = SmsManager.getDefault();
                         smsManager.sendTextMessage(number, null, "Help! Call me urgently. Please save me", null, null);
                         Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
+*/
+
+                        smss.sendTextMessage(mobile, null, sms, pi, pin);
 
                     }
                 })
                 .send();
-*/
-
-        smss.sendTextMessage(mobile, null, sms, pi, pin);
-
 
     }
 }

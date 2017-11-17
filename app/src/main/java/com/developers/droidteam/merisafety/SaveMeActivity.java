@@ -24,25 +24,25 @@ public class SaveMeActivity extends AppCompatActivity {
             ft.add(R.id.maps_layout,new SaveMeFragment());
             ft.commit();
         }
-        if(Resid==R.id.medical)
+        if(Resid==R.id.lowalert)
         {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
-            ft.add(R.id.maps_layout,new MedicalFragment());
+            ft.add(R.id.maps_layout,new LowAlertFragment());
             ft.commit();
         }
-        if(Resid==R.id.security)
+        if(Resid==R.id.highalert)
         {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
-            ft.add(R.id.maps_layout,new SecurityFragment());
+            ft.add(R.id.maps_layout,new HighAlertFragment());
             ft.commit();
         }
-        if(Resid==R.id.travel)
+        if(Resid==R.id.advancealert)
         {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
-            ft.add(R.id.maps_layout,new TravelFragment());
+            ft.add(R.id.maps_layout,new AdvanceAlertFragment());
             ft.commit();
         }
         if(Resid==R.id.self_defence)

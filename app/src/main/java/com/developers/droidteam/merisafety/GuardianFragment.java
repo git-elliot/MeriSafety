@@ -181,6 +181,7 @@ public class GuardianFragment extends Fragment {
 
                             if(onEmail.equals(email))
                             {
+
                                 FetchBitmap task = new FetchBitmap((Activity) con,dataSnapshot.child("photoUrl").getValue().toString(),img);
                                 task.execute();
 

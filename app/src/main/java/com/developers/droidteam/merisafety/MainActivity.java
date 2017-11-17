@@ -313,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
             FirebaseUser currentUser = mAuth.getCurrentUser();
 
+
                BackgroundTask task = new BackgroundTask(MainActivity.this,acct,name,email,photoUrl);
                task.execute();
 

@@ -270,7 +270,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         public void fun(View v)
     {
-        if(R.id.medical==v.getId()){
+        if(R.id.lowalert==v.getId()){
 
             Intent i = new Intent(this,SaveMeActivity.class);
             i.putExtra("key",v.getId());
@@ -283,13 +283,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
             i.putExtra("key",v.getId());
             startActivity(i);
         }
-        if(R.id.security==v.getId())
+        if(R.id.highalert==v.getId())
         {
             Intent i = new Intent(this,SaveMeActivity.class);
             i.putExtra("key",v.getId());
             startActivity(i);
         }
-        if(R.id.travel==v.getId())
+        if(R.id.advancealert==v.getId())
         {
             Intent i = new Intent(this,SaveMeActivity.class);
             i.putExtra("key",v.getId());
