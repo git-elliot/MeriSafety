@@ -43,6 +43,8 @@ public class Frag_verification extends Fragment {
     private DatabaseReference mDatabase;
     private DatabaseReference userEnd ;
     private FirebaseAuth mAuth;
+    private final String d_key = "users";
+    private final String m_key = "mobile";
     Context con;
     Button b1;
     EditText editText;
@@ -103,7 +105,7 @@ public class Frag_verification extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            dialog.setMessage("Please wait.,,,,");
+            dialog.setMessage("Please wait.....");
             dialog.show();
         }
 
@@ -148,7 +150,7 @@ public class Frag_verification extends Fragment {
 
                mDatabase = FirebaseDatabase.getInstance().getReference();
 
-               userEnd = mDatabase.child("users").child(currentUser.getUid()).child("mobile");
+               userEnd = mDatabase.child(d_key).child(currentUser.getUid()).child(m_key);
                userEnd.setValue(num).addOnCompleteListener(new OnCompleteListener<Void>() {
                    @Override
                    public void onComplete(@NonNull Task<Void> task) {

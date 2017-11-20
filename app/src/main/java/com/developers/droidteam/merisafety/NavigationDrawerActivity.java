@@ -31,6 +31,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,7 +60,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private DatabaseReference mDatabase;
     private DatabaseReference userEnd ;
     ImageView iv;
+    ProgressBar progressBar;
     LocationRequest locationRequest = null;
+
+    private static final String i_key = "key";
+    private static final String sp_db = "account_db";
+    private static final String l_key = "login_key";
+    private static final String d_key = "users";
+    private static final String n_key = "name";
+    private static final String m_key = "mobile";
+    private static final String e_key = "email";
+    private static final String p_key = "photoUrl";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,19 +100,20 @@ public class NavigationDrawerActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //**************************havigation drawer data**********************
-        final TextView tv_name = (TextView) hView.findViewById(R.id.nav_drawer_name);
+        final TextView tv_name =  hView.findViewById(R.id.nav_drawer_name);
 
-        final TextView tv_user = (TextView) hView.findViewById(R.id.nav_drawer_user);
+        final TextView tv_user =  hView.findViewById(R.id.nav_drawer_user);
 
-        iv = (ImageView) hView.findViewById(R.id.imageView);
+        progressBar=hView.findViewById(R.id.prog_user);
 
-        final SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
-        final String user = sp.getString("login_key", null);
+        iv =  hView.findViewById(R.id.imageView);
 
-        String name;
+        final SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
+        final String user = sp.getString(l_key, null);
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        userEnd = mDatabase.child("users").child(user).child("name");
+        userEnd = mDatabase.child(d_key).child(user).child(n_key);
 
         userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -110,7 +123,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     tv_name.setText(dataSnapshot.getValue().toString());
 
                     SharedPreferences.Editor et = sp.edit();
-                    et.putString("name",dataSnapshot.getValue().toString());
+                    et.putString(n_key,dataSnapshot.getValue().toString());
                     et.apply();
                 }
             }
@@ -121,7 +134,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             }
         });
 
-        userEnd = mDatabase.child("users").child(user).child("email");
+        userEnd = mDatabase.child(d_key).child(user).child(e_key);
 
         userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -130,7 +143,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 {
                     tv_user.setText(dataSnapshot.getValue().toString());
                     SharedPreferences.Editor et = sp.edit();
-                    et.putString("email",dataSnapshot.getValue().toString());
+                    et.putString(e_key,dataSnapshot.getValue().toString());
                     et.apply();
                 }
             }
@@ -140,7 +153,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             }
         });
-        userEnd = mDatabase.child("users").child(user).child("photoUrl");
+        userEnd = mDatabase.child(d_key).child(user).child(p_key);
 
         userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -149,7 +162,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 {
 
                     String imageURL = dataSnapshot.getValue().toString();
-                    FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,imageURL,iv);
+                    FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,imageURL,iv,progressBar);
                     task.execute();
 
                 }
@@ -161,62 +174,17 @@ public class NavigationDrawerActivity extends AppCompatActivity
             }
         });
 
-
-/*
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-
-        // Create a storage reference from our app
-        StorageReference storageRef = storage.getReference();
-
-
-       String email = sp.getString("email",null);
-        if(email!=null)
-        {
-            StorageReference photoRef = storageRef.child("images/"+email+".jpg");
-
-            File localFile = null;
-            try {
-                localFile = File.createTempFile("images", "jpg");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            final File finalLocalFile = localFile;
-            photoRef.getFile(localFile)
-                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            // Successfully downloaded data to local file
-                            // ...
-                            File imgFile = new  File(String.valueOf(finalLocalFile));
-
-                            if(imgFile.exists()){
-
-                                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-
-                                iv.setImageBitmap(myBitmap);
-
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle failed download
-                    // ...
-                }
-            });
-        }
-        */
-
     }
 
 
     private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
         String imageURL;
         ImageView imgView;
-
-        public FetchBitmap(Activity activity, String imgURL, ImageView imageView) {
+        ProgressBar progressBar;
+        public FetchBitmap(Activity activity, String imgURL, ImageView imageView,ProgressBar progressBar1) {
             imageURL = imgURL;
             imgView = imageView;
+           progressBar= progressBar1;
         }
 
         @Override
@@ -225,6 +193,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(Bitmap result) {
+            progressBar.setVisibility(View.INVISIBLE);
             imgView.setImageBitmap(result);
         }
 
@@ -273,7 +242,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         if(R.id.lowalert==v.getId()){
 
             Intent i = new Intent(this,SaveMeActivity.class);
-            i.putExtra("key",v.getId());
+            i.putExtra(i_key,v.getId());
             startActivity(i);
 
         }
@@ -405,7 +374,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
-                    e.remove("login_key");
+                    e.remove(l_key);
                     e.putString("logout_key","logout");
                     e.commit();
                     startActivity(new Intent(NavigationDrawerActivity.this, MainActivity.class));

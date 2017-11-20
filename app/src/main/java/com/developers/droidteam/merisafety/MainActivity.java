@@ -64,8 +64,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final int CORSE_LOCATION_PERMISSION_REQUEST_CODE = 2;
     private DatabaseReference mDatabase;
     private DatabaseReference userEnd ;
-     FragmentManager fm = getSupportFragmentManager();
-   LinearLayout l =null;
+
+    private final String sp_db = "account_db";
+    private final String l_key = "login_key";
+    private final String d_key = "users";
+    private final String n_key = "name";
+    private final String m_key = "mobile";
+    private final String e_key = "email";
+
+    FragmentManager fm = getSupportFragmentManager();
+    LinearLayout l =null;
     private ViewFlipper simpleViewFlipper;
     int[] images = {R.drawable.round_safety_launcher,R.drawable.m1, R.drawable.m2, R.drawable.m3};
 //v
@@ -133,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .build();
 
         progressBar = findViewById(R.id.progress_bar);
-        signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButton = findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -218,16 +226,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             Log.d("OAuth", "signInWithCredential:success");
                             final FirebaseUser user = mAuth.getCurrentUser();
                           //  updateUI(user);
-                            SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
+                            SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
                             final SharedPreferences.Editor et = sp.edit();
                             et.putString("uid",user.getUid().toString());
-                            et.putString("name",name);
+                            et.putString(n_key,name);
                             et.apply();
 
 
                             mDatabase = FirebaseDatabase.getInstance().getReference();
 
-                            userEnd = mDatabase.child("users").child(user.getUid());
+                            userEnd = mDatabase.child(d_key).child(user.getUid());
 
                             userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -244,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
                                         if(dataSnapshot.child(user.getUid()).exists())
                                         {
-                                            et.putString("login_key",user.getUid());
+                                            et.putString(l_key,user.getUid());
                                             et.apply();
                                             Toast.makeText(MainActivity.this, "Welcome back to MeriSafey, you are signed in as "+dataSnapshot.child("email").getValue().toString(), Toast.LENGTH_LONG).show();
                                             Intent it3=new Intent(MainActivity.this,NavigationDrawerActivity.class);
@@ -331,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     mDatabase = FirebaseDatabase.getInstance().getReference();
 
-    userEnd = mDatabase.child("users");
+    userEnd = mDatabase.child(d_key);
 
     addUserToFirebase(name,email,uid,pUrl);
 

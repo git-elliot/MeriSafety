@@ -77,6 +77,17 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     private LocationRequest mLocationRequest;
     private boolean mLocationUpdateState;
     private static final int REQUEST_CHECK_SETTINGS = 2;
+
+    private final String cur_key="curloc";
+    private final String cur_db = "currentloc";
+    private final String sp_db = "account_db";
+    private final String d_key = "users";
+    private final String lat_key = "lat";
+    private final String lng_key = "lng";
+    private final String pin_key = "pincode";
+    private final String uid_key= "uid";
+
+
     TextView cur_loc;
     View v;
     Context con;
@@ -204,26 +215,26 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                 if(list2 != null)
                 {
                     Address address1 = list2.get(0);
-                    SharedPreferences sp = con.getSharedPreferences("currentloc",MODE_PRIVATE);
+                    SharedPreferences sp = con.getSharedPreferences(cur_db,MODE_PRIVATE);
                     SharedPreferences.Editor et = sp.edit();
-                    et.putString("curloc",address1.getAddressLine(0));
+                    et.putString(cur_key,address1.getAddressLine(0));
                     et.apply();
 
                     cur_loc.setText(address1.getAddressLine(0));
-                    SharedPreferences sp1 = con.getSharedPreferences("account_db", MODE_PRIVATE);
+                    SharedPreferences sp1 = con.getSharedPreferences(sp_db, MODE_PRIVATE);
                     mDatabase = FirebaseDatabase.getInstance().getReference();
 
-                    String uid =  sp1.getString("uid",null);
+                    String uid =  sp1.getString(uid_key,null);
                     if(uid!=null)
                     {
-                        userEndlat = mDatabase.child("users").child(uid).child("lat");
+                        userEndlat = mDatabase.child(d_key).child(uid).child(lat_key);
                         userEndlat.setValue(lat);
-                        userEndlng = mDatabase.child("users").child(uid).child("lng");
+                        userEndlng = mDatabase.child(d_key).child(uid).child(lng_key);
                         userEndlng.setValue(lng);
-                        userPincode = mDatabase.child("users").child(uid).child("pincode");
+                        userPincode = mDatabase.child(d_key).child(uid).child(pin_key);
                         userPincode.setValue(address1.getPostalCode());
                         SharedPreferences.Editor et1 = sp1.edit();
-                        et1.putString("pincode",address1.getPostalCode());
+                        et1.putString(pin_key,address1.getPostalCode());
                         et1.apply();
 
                     }

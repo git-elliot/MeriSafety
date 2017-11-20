@@ -10,13 +10,15 @@ import android.widget.TextView;
 
 public class SaveMeActivity extends AppCompatActivity {
 
+    private final String key = "key";
+    private final int defaultValue = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_me);
       Intent i = getIntent();
 
-       int Resid = i.getIntExtra("key",0);
+       int Resid = i.getIntExtra(key,defaultValue);
         if(Resid==R.id.save_me)
         {
             FragmentManager fm = getSupportFragmentManager();

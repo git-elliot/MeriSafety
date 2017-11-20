@@ -85,11 +85,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int PLACE_PICKER_REQUEST = 3;
     // 2
     private static final int REQUEST_CHECK_SETTINGS = 2;
+    private String guarEmail = null;
 
     private DatabaseReference mDatabase;
     private DatabaseReference peopleEnd ;
     private DatabaseReference userEnd ;
 
+    private final String l_key = "login_key";
+    private final String cur_key="curloc";
+    private final String cur_db = "currentloc";
+    private final String sp_db = "account_db";
+    private final String d_key = "users";
+    private final String lat_key = "lat";
+    private final String n_key = "name";
+    private final String m_key = "mobile";
+    private final String e_key = "email";
+    private final String lng_key = "lng";
+    private final String pin_key = "pincode";
+    private final String uid_key= "uid";
+    private final String p_key = "photoUrl";
     private boolean nearbySet=false;
 
 
@@ -257,12 +271,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void placeNearbyPeoples()
     {
-        SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
-        final String user = sp.getString("login_key", null);
-        final String currentpin = sp.getString("pincode",null);
+        SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
+        final String user = sp.getString(l_key, null);
+        final String currentpin = sp.getString(pin_key,null);
 
 
-        peopleEnd = mDatabase.child("users");
+        peopleEnd = mDatabase.child(d_key);
 
         peopleEnd.addValueEventListener(new ValueEventListener() {
             @Override
@@ -270,17 +284,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
                 {
-                   Log.d("uid","uid : "+ currentsnapshot.getKey());
                     if(!currentsnapshot.getKey().equals(user))
                     {
-                      String pincode =currentsnapshot.child("pincode").getValue().toString();
-                        Log.d("uid","uid different, pincode : "+pincode);
-
+                      String pincode =currentsnapshot.child(pin_key).getValue().toString();
+                      Log.d("MeriSafety","pincode : "+pincode+" current pin :"+currentpin);
                         if(pincode.equals(currentpin))
                         {
-                            Log.d("pincode","pincode match");
-                            placePeopleWindow(currentsnapshot.child("name").getValue().toString(),currentsnapshot.child("mobile").getValue().toString(),currentsnapshot.child("lat").getValue().toString(),currentsnapshot.child("lng").getValue().toString(),currentsnapshot.child("photoUrl").getValue().toString());
-                            Log.d("people",currentsnapshot.child("pincode").getValue().toString());
+                            Log.d("MeriSafety","pincode Matched : "+pincode);
+                            placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.child(p_key).getValue().toString(),currentsnapshot.child(e_key).getValue().toString());
 
                         }
                     }
@@ -293,12 +304,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
     }
-    public void placePeopleWindow(String name, String mobile,String lat, String lng,String pUrl)
+    public void placePeopleWindow(String name, String mobile,String lat, String lng,String pUrl,String email)
     {
         double mylat = Double.parseDouble(lat);
         double mylng = Double.parseDouble(lng);
         LatLng mylatlng = new LatLng(mylat,mylng);
-        placeMarkerOnMapPeople(name,mobile,mylatlng,pUrl);
+        placeMarkerOnMapPeople(name,mobile,mylatlng,pUrl,email);
     }
 
     private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
@@ -306,11 +317,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng loc ;
         String myName;
         GoogleMap myMap;
-        public FetchBitmap(String imgURL, GoogleMap mMap, LatLng location, String name) {
+        String gEmail ;
+        public FetchBitmap(String imgURL, GoogleMap mMap, LatLng location, String name,String email) {
             imageURL = imgURL;
             loc = location;
             myName = name;
             myMap = mMap;
+            gEmail=email;
         }
 
         @Override
@@ -320,10 +333,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(Bitmap result) {
 
+
             MarkerOptions markerOptions = new MarkerOptions().position(loc).icon(BitmapDescriptorFactory.fromBitmap(result
 ));
             String titleStr = getAddress(loc);  // add these two lines
-            markerOptions.title(myName).snippet(titleStr);
+            if(guarEmail.equals(gEmail))
+            {
+                markerOptions.title("Guardian: "+myName).snippet(titleStr);
+            }
+            else
+            {
+                markerOptions.title(myName).snippet(titleStr);
+            }
             // 2
             myMap.addMarker(markerOptions);
         }
@@ -383,18 +404,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void placeMarkerOnMap(LatLng location) {
         // 1
         final LatLng loc = location;
-        final SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
-        String userid = sp.getString("login_key",null);
+        final SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
+        String userid = sp.getString(l_key,null);
 
-        userEnd = mDatabase.child("users").child(userid).child("photoUrl");
+        userEnd = mDatabase.child(d_key).child(userid).child(p_key);
 
         userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists())
                 {
-                    FetchBitmap task = new FetchBitmap(dataSnapshot.getValue().toString(),mMap,loc,"You");
+                    FetchBitmap task = new FetchBitmap(dataSnapshot.getValue().toString(),mMap,loc,"You",null);
                     task.execute();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        userEnd = mDatabase.child((d_key)).child(userid).child(userid).child(e_key);
+        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+                    guarEmail = dataSnapshot.getValue().toString();
                 }
             }
 
@@ -408,9 +445,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    protected void placeMarkerOnMapPeople(String name, String mobile, LatLng location, String pUrl) {
+    protected void placeMarkerOnMapPeople(String name, String mobile, LatLng location, String pUrl,String email) {
         // 1
-        FetchBitmap task = new FetchBitmap(pUrl,mMap,location,name);
+        FetchBitmap task = new FetchBitmap(pUrl,mMap,location,name,email);
         task.execute();
 
     }

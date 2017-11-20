@@ -8,6 +8,8 @@ import android.os.Bundle;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
+    private final String sp_db = "account_db";
+    private final String l_key = "login_key";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,8 +21,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                 try {
                     Thread.sleep(3000);
 
-                    SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
-                    String key=sp.getString("login_key",null);
+                    SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
+                    String key=sp.getString(l_key,null);
                     if(key!=null)
                     {
 

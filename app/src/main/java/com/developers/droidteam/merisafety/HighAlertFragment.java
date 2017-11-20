@@ -30,6 +30,14 @@ public class HighAlertFragment extends Fragment {
     private DatabaseReference mDatabase;
     private DatabaseReference guarEnd ;
 
+    private final String sp_db = "account_db";
+    private final String l_key = "login_key";
+    private final String d_key = "users";
+    private final String n_key = "name";
+    private final String m_key = "mobile";
+    private final String e_key = "email";
+    private final String cur_key="curloc";
+    private final String cur_db = "currentloc";
     View v;
     Context con;
 
@@ -66,13 +74,13 @@ public class HighAlertFragment extends Fragment {
         });*/
 
 
-        SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
-        final String user = sp.getString("login_key", null);
+        SharedPreferences sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
+        final String user = sp.getString(l_key, null);
 
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        guarEnd = mDatabase.child("users").child(user).child(user);
+        guarEnd = mDatabase.child(d_key).child(user).child(user);
 
         guarEnd.addValueEventListener(new ValueEventListener() {
             @Override
@@ -80,7 +88,7 @@ public class HighAlertFragment extends Fragment {
 
                 for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
                 {
-                    sendAlert(dataSnapshot.child("name").getValue().toString(), dataSnapshot.child("mobile").getValue().toString());
+                    sendAlert(dataSnapshot.child(n_key).getValue().toString(), dataSnapshot.child(m_key).getValue().toString());
                 }
             }
 
@@ -101,8 +109,8 @@ public class HighAlertFragment extends Fragment {
         final PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.sent"), 0);
         final PendingIntent pin = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
         final SmsManager smss = SmsManager.getDefault();
-        sp = con.getSharedPreferences("currentloc", con.MODE_PRIVATE);
-        String loc = sp.getString("curloc",null);
+        sp = con.getSharedPreferences(cur_db, con.MODE_PRIVATE);
+        String loc = sp.getString(cur_key,null);
         final String sms = name+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
 
 

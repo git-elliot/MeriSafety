@@ -60,6 +60,14 @@ public class Frag_guardian extends Fragment {
     private DatabaseReference mDatabase;
     private DatabaseReference guarEnd;
     Context con;
+    private final String d_key = "users";
+    private final String l_key = "login_key";
+    private final String sp_db = "account_db";
+    private final String sp_n="name";
+    private final String em_id = "merisafety@gmail.com";
+    private final String pass_id = "WRTB@droid";
+    private final String text_id = "Mail from MeriSafety";
+
 
     @Override
     public void onAttach(Context context) {
@@ -123,7 +131,7 @@ public class Frag_guardian extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            dialog.setMessage("Please wait.,,,,");
+            dialog.setMessage("Please wait....");
             dialog.show();
         }
 
@@ -154,7 +162,7 @@ public class Frag_guardian extends Fragment {
     {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        guarEnd = mDatabase.child("users").child(currentUser.getUid());
+        guarEnd = mDatabase.child(d_key).child(currentUser.getUid());
 
         addGuarToFirebase(name,email,number,currentUser.getUid().toString());
 
@@ -183,8 +191,8 @@ public class Frag_guardian extends Fragment {
                     final SmsManager smss = SmsManager.getDefault();
 
                     final String sms = " I have added you as my guardian on MeriSafety app. Download MeriSafety app on PlayStore to help me when I need you.";
-                    SharedPreferences sp = con.getSharedPreferences("account_db",con.MODE_PRIVATE);
-                    String name1 = sp.getString("name",null);
+                    SharedPreferences sp = con.getSharedPreferences(sp_db,con.MODE_PRIVATE);
+                    String name1 = sp.getString(sp_n,null);
 
                     final String mail = name1+" have added you as their guardian on MeriSafety app. Download MeriSafety app on PlayStore to help them when they need you.";
 
@@ -193,20 +201,20 @@ public class Frag_guardian extends Fragment {
 
                     //**********************SENDING MAIL TO GUARDIAN***********************
 
-                    BackgroundMail.newBuilder(con).withUsername("merisafety@gmail.com")
-                            .withPassword("WRTB@droid")
+                    BackgroundMail.newBuilder(con).withUsername(em_id)
+                            .withPassword(pass_id)
                             .withMailto(guarEmail)
                             .withType(BackgroundMail.TYPE_PLAIN)
-                            .withSubject("Mail from MeriSafety")
+                            .withSubject(text_id)
                             .withBody(mail)
                             .withOnSuccessCallback(new BackgroundMail.OnSuccessCallback() {
                                 @Override
                                 public void onSuccess() {
 
                                     Toast.makeText(getContext(), "Guardian added successfully", Toast.LENGTH_SHORT).show();
-                                    SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
+                                    SharedPreferences sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
                                     SharedPreferences.Editor et = sp.edit();
-                                    et.putString("login_key",uid);
+                                    et.putString(l_key,uid);
                                     et.apply();
 
                                     Intent it3=new Intent(getContext(),NavigationDrawerActivity.class);
@@ -219,9 +227,9 @@ public class Frag_guardian extends Fragment {
                                 public void onFail() {
 
                                     Toast.makeText(getContext(), "Unable to send them email.", Toast.LENGTH_SHORT).show();
-                                    SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
+                                    SharedPreferences sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
                                     SharedPreferences.Editor et = sp.edit();
-                                    et.putString("login_key",uid);
+                                    et.putString(l_key,uid);
                                     et.apply();
 
                                     Intent it3=new Intent(getContext(),NavigationDrawerActivity.class);

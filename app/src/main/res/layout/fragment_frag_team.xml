@@ -35,7 +35,13 @@
                <ImageView
                    android:layout_width="140dp"
                    android:layout_height="140dp"
-                   android:src="@drawable/abhi_new" />
+                   android:id="@+id/abhi" />
+               <ProgressBar
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center"
+                   android:id="@+id/prog_abhi"
+                   />
 
            </FrameLayout>
            <LinearLayout
@@ -103,7 +109,14 @@
                 <ImageView
                     android:layout_width="140dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/par_new" />
+                    android:id="@+id/paras" />
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:id="@+id/prog_paras"
+                    />
+
             </FrameLayout>
 
         </LinearLayout>
@@ -123,7 +136,14 @@
                 <ImageView
                     android:layout_width="160dp"
                     android:layout_height="160dp"
-                    android:src="@drawable/pri1_new" />
+                    android:id="@+id/priya" />
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:id="@+id/prog_priya"
+                    />
+
             </FrameLayout>
             <LinearLayout
                 android:layout_width="0dp"
@@ -190,7 +210,15 @@
                 <ImageView
                     android:layout_width="140dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/rid_new" />
+                    android:id="@+id/ridhima"
+                    />
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:id="@+id/prog_ridhi"
+                    />
+
             </FrameLayout>
 
         </LinearLayout>
@@ -211,7 +239,13 @@
                 <ImageView
                     android:layout_width="140dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/sid1_new1" />
+                    android:id="@+id/siddharth" />
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:id="@+id/prog_sid"
+                    />
 
             </FrameLayout>
             <LinearLayout
@@ -278,7 +312,14 @@
                 <ImageView
                     android:layout_width="140dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/sun1_new" />
+                    android:id="@+id/sunny" />
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:id="@+id/prog_sun"
+                    />
+
             </FrameLayout>
         </LinearLayout>
        </LinearLayout>

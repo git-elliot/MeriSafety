@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,10 +49,19 @@ import java.util.List;
  */
 public class GuardianFragment extends Fragment {
 
+    private static final String TAG = "MeriSafety" ;
     private DatabaseReference mDatabase;
     private DatabaseReference guarEnd ;
 
 
+    private final String sp_db = "account_db";
+    private final String l_key = "login_key";
+    private final String d_key = "users";
+    private final String n_key = "name";
+    private final String m_key = "mobile";
+    private final String e_key = "email";
+    private final String p_key = "photoUrl";
+    ProgressBar progressBar;
     View v;
     Context con;
 
@@ -77,8 +87,8 @@ public class GuardianFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
-        final String user = sp.getString("login_key", null);
+        SharedPreferences sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
+        final String user = sp.getString(l_key, null);
 
         final ImageView img = v.findViewById(R.id.guar_photo);
         final TextView tname = (TextView) v.findViewById(R.id.guar_name);
@@ -88,7 +98,7 @@ public class GuardianFragment extends Fragment {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        guarEnd = mDatabase.child("users").child(user).child(user);
+        guarEnd = mDatabase.child(d_key).child(user).child(user);
 
         guarEnd.addValueEventListener(new ValueEventListener() {
             @Override
@@ -96,20 +106,20 @@ public class GuardianFragment extends Fragment {
 
                 for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
                 {
-                   if(currentsnapshot.getKey().equals("name"))
+                   if(currentsnapshot.getKey().equals(n_key))
                    {
-                       tname.setText(dataSnapshot.child("name").getValue().toString());
+                       tname.setText(dataSnapshot.child(n_key).getValue().toString());
                    }
-                   else if(currentsnapshot.getKey().equals("mobile"))
+                   else if(currentsnapshot.getKey().equals(m_key))
                    {
-                       temail.setText(dataSnapshot.child("mobile").getValue().toString());
+                       temail.setText(dataSnapshot.child(m_key).getValue().toString());
 
                    }
-                   else if(currentsnapshot.getKey().equals("email"))
+                   else if(currentsnapshot.getKey().equals(e_key))
                    {
-                       tphone.setText(dataSnapshot.child("email").getValue().toString());
-                       setGuardianPhoto(dataSnapshot.child("email").getValue().toString(),dataSnapshot.child("mobile").getValue().toString(),user,img);
-                       Log.d("photoUrl",dataSnapshot.child("email").getValue().toString()+dataSnapshot.child("mobile").getValue().toString()+user);
+                       tphone.setText(dataSnapshot.child(e_key).getValue().toString());
+                       setGuardianPhoto(dataSnapshot.child(e_key).getValue().toString(),user,img);
+
                    }
                 }
             }
@@ -131,7 +141,7 @@ public class GuardianFragment extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
 
-                        guarEnd = mDatabase.child("users").child(user).child(user);
+                        guarEnd = mDatabase.child(d_key).child(user).child(user);
                         guarEnd.setValue(null).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -158,13 +168,12 @@ public class GuardianFragment extends Fragment {
 
     }
 
-    public void setGuardianPhoto(String email1, String mobile1, String firebaseUser, ImageView imageView)
+    public void setGuardianPhoto(String email1, String firebaseUser, ImageView imageView)
     {
         final String user = firebaseUser;
         final String email = email1;
-        final String mobile = mobile1;
         final ImageView img = imageView;
-        guarEnd = mDatabase.child("users");
+        guarEnd = mDatabase.child(d_key);
 
         guarEnd.addValueEventListener(new ValueEventListener() {
             @Override
@@ -174,22 +183,16 @@ public class GuardianFragment extends Fragment {
                 {
                     if(!currentsnapshot.getKey().equals(user))
                     {
-                        try {
-
-                            String onEmail =dataSnapshot.child("email").getValue().toString();
-                            String onMobile =dataSnapshot.child("mobile").getValue().toString();
-
+                        String onEmail =currentsnapshot.child(e_key).getValue().toString();
                             if(onEmail.equals(email))
                             {
 
-                                FetchBitmap task = new FetchBitmap((Activity) con,dataSnapshot.child("photoUrl").getValue().toString(),img);
+                                Log.d(TAG,"guardian matches");
+                                progressBar = v.findViewById(R.id.prog_user);
+                                FetchBitmap task = new FetchBitmap(progressBar,currentsnapshot.child(p_key).getValue().toString(),img);
                                 task.execute();
 
                             }
-                        }catch(NullPointerException e)
-                        {
-                            Toast.makeText(con, "Unable to update picture.", Toast.LENGTH_SHORT).show();
-                        }
                     }
                 }
             }
@@ -205,10 +208,11 @@ public class GuardianFragment extends Fragment {
     private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
         String imageURL;
         ImageView imgView;
-
-        public FetchBitmap(Activity activity, String imgURL, ImageView imageView) {
+        ProgressBar progressBar1;
+        public FetchBitmap(ProgressBar progressBar, String imgURL, ImageView imageView) {
             imageURL = imgURL;
             imgView = imageView;
+            progressBar1=progressBar;
         }
 
         @Override
@@ -217,6 +221,7 @@ public class GuardianFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Bitmap result) {
+            progressBar1.setVisibility(View.INVISIBLE);
             imgView.setImageBitmap(result);
         }
 

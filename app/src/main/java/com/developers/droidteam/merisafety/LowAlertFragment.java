@@ -28,6 +28,11 @@ public class LowAlertFragment extends Fragment {
     private DatabaseReference mDatabase;
     private DatabaseReference guarEnd ;
 
+    private final String sp_db = "account_db";
+    private final String l_key = "login_key";
+    private final String d_key = "users";
+    private final String m_key = "mobile";
+
     Context con;
 
     public LowAlertFragment()
@@ -50,17 +55,12 @@ public class LowAlertFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
-        final String user = sp.getString("login_key", null);
-
-        final String[] name = new String[1];
-        final String[] email = new String[1];
-        final String[] mobile = new String[1];
-
+        SharedPreferences sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
+        final String user = sp.getString(l_key, null);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        guarEnd = mDatabase.child("users").child(user).child(user);
+        guarEnd = mDatabase.child(d_key).child(user).child(user);
 
         guarEnd.addValueEventListener(new ValueEventListener() {
             @Override
@@ -68,7 +68,7 @@ public class LowAlertFragment extends Fragment {
 
                 for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
                 {
-                    sendAlert(dataSnapshot.child("mobile").getValue().toString());
+                    sendAlert(dataSnapshot.child(m_key).getValue().toString());
                 }
             }
 
