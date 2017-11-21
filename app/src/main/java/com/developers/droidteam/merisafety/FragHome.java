@@ -205,7 +205,7 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                 }
                 List<Address> list2 = null;
                 Geocoder geocoder1 = new Geocoder(con);
-                
+
                 try {
                     list2 = geocoder1.getFromLocation(lat, lng, 1);
                 } catch (IOException e) {

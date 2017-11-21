@@ -39,7 +39,7 @@ String[] num = {"100","1091","101","103","104","1073","108","1066","1072","1098"
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,src);
+        ArrayAdapter<String> ad = new ArrayAdapter<String>(getActivity(),R.layout.list_item_textview,src);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
