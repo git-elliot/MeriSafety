@@ -28,8 +28,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,7 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // 2
     private static final int REQUEST_CHECK_SETTINGS = 2;
     private String guarEmail = null;
-
+    private ProgressBar progressBar;
     private DatabaseReference mDatabase;
     private DatabaseReference peopleEnd ;
     private DatabaseReference userEnd ;
@@ -113,6 +115,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        progressBar = findViewById(R.id.updateMap);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
 
@@ -128,6 +131,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         createLocationRequest();
+
+        Button nearby_people = findViewById(R.id.people);
+        Button nearby_police = findViewById(R.id.police);
+        Button nearby_hospitals = findViewById(R.id.hospitals);
+
+        nearby_people.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+             mMap.clear();
+
+                placeNearbyPeoples();
+
+            }
+        });
+
+        nearby_police.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMap.clear();
+
+
+                performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+
+            }
+        });
+
+        nearby_hospitals.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMap.clear();
+
+                performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+
+            }
+        });
     }
 
 
@@ -151,6 +189,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         toPass[0] = googleMap;
         toPass[1] = googlePlacesUrl.toString();
         googlePlacesReadTask.execute(toPass);
+
+
     }
 
     private boolean isGooglePlayServicesAvailable() {
@@ -262,10 +302,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(mLastLocation!=null)
         {
             mMap.clear();
+            progressBar.setVisibility(View.VISIBLE);
+
             placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
             placeNearbyPeoples();
-            performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),2000,mMap);
-            performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),2000,mMap);
         }
     }
 
@@ -287,15 +327,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if(!currentsnapshot.getKey().equals(user))
                     {
                       String pincode =currentsnapshot.child(pin_key).getValue().toString();
-                      Log.d("MeriSafety","pincode : "+pincode+" current pin :"+currentpin);
                         if(pincode.equals(currentpin))
                         {
-                            Log.d("MeriSafety","pincode Matched : "+pincode);
                             placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.child(p_key).getValue().toString(),currentsnapshot.child(e_key).getValue().toString());
 
                         }
                     }
                 }
+                progressBar.setVisibility(View.INVISIBLE);
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -337,14 +377,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             MarkerOptions markerOptions = new MarkerOptions().position(loc).icon(BitmapDescriptorFactory.fromBitmap(result
 ));
             String titleStr = getAddress(loc);  // add these two lines
-            if(guarEmail.equals(gEmail))
-            {
-                markerOptions.title("Guardian: "+myName).snippet(titleStr);
-            }
-            else
-            {
+           if(guarEmail!=null&&guarEmail.equals(gEmail))
+           {
+
+               markerOptions.title("Guardian: "+myName).snippet(titleStr);
+           }
+           else
+           {
                 markerOptions.title(myName).snippet(titleStr);
-            }
+           }
             // 2
             myMap.addMarker(markerOptions);
         }
@@ -489,9 +530,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         // 2
-        mLocationRequest.setInterval(100000);
+        mLocationRequest.setInterval(500000);
         // 3
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setFastestInterval(25000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()

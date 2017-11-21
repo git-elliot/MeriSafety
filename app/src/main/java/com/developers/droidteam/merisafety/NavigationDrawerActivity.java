@@ -366,7 +366,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ft.addToBackStack("stack7");
             ft.replace(R.id.newfraglayout,obj,"setting");
             ft.commit();
-        }*/else if (id == R.id.nav_logout) {
+        }else if (id == R.id.nav_logout) {
             final SharedPreferences.Editor e = sp.edit();
 
             AlertDialog.Builder ad= new AlertDialog.Builder(this);
@@ -386,7 +386,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ad.setMessage("Are you sure to logout ?");
             ad.show();
         }
-
+*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

@@ -258,6 +258,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                             Intent it3=new Intent(MainActivity.this,NavigationDrawerActivity.class);
                                             startActivity(it3);
 
+                                            MainActivity.this.finish();
+
                                         }
                                         else
                                         {
@@ -268,6 +270,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                             ft.addToBackStack("stack2");
                                             ft.replace(R.id.l2,obj,"verify");
                                             ft.commit();
+
+                                            MainActivity.this.finish();
 
                                         }
                                     }

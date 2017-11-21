@@ -41,10 +41,6 @@
             <item android:id="@+id/team"
                 android:icon="@drawable/ic_group_black_24dp"
                 android:title="Team"/>
-            <item
-                android:id="@+id/nav_logout"
-                android:icon="@android:drawable/ic_lock_power_off"
-                android:title="Logout" />
         </menu>
     </item>
 
