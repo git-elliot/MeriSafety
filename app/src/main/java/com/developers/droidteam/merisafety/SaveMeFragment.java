@@ -89,10 +89,8 @@ public class SaveMeFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
-                {
-                  sendAlert(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(e_key).getValue().toString());
-                }
+                  sendAlert(dataSnapshot.child(n_key).getValue().toString(),dataSnapshot.child(m_key).getValue().toString(),dataSnapshot.child(e_key).getValue().toString());
+
             }
 
             @Override

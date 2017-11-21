@@ -66,10 +66,8 @@ public class LowAlertFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
-                {
                     sendAlert(dataSnapshot.child(m_key).getValue().toString());
-                }
+
             }
 
             @Override

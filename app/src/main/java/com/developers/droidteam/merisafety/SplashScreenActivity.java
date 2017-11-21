@@ -15,6 +15,10 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
+        Intent i = new Intent(this, AlertService.class);
+
+        startService(i);
+
 
         new Thread(new Runnable() {
             public void run() {

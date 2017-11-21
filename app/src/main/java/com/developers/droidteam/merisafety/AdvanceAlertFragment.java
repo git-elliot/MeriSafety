@@ -85,10 +85,8 @@ public class AdvanceAlertFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
-                {
                     sendAlert(dataSnapshot.child(n_key).getValue().toString(),dataSnapshot.child(m_key).getValue().toString(),dataSnapshot.child(e_key).getValue().toString());
-                }
+
             }
 
             @Override
