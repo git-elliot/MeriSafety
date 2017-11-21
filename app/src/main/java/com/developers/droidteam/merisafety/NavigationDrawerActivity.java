@@ -30,6 +30,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -85,6 +86,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         ft.add(R.id.newfraglayout, obj, "homepage");
         ft.commit();
 
+        Toast.makeText(this, "Long press these alert buttons to know about them", Toast.LENGTH_LONG).show();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -176,6 +178,58 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Button lowAlert = findViewById(R.id.lowalert);
+
+        lowAlert.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(NavigationDrawerActivity.this, "This alert will only call your guardian", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+        Button highAlert = findViewById(R.id.highalert);
+        highAlert.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(NavigationDrawerActivity.this, "This alert will call and message your guardian", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+
+        Button adAlert = findViewById(R.id.advancealert);
+
+        adAlert.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(NavigationDrawerActivity.this, "This alert will call, mail and message your guardian", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+
+        Button selfDef = findViewById(R.id.self_defence);
+
+        selfDef.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(NavigationDrawerActivity.this, "This will help you learn some basics moves.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+
+        Button savemeAlert = findViewById(R.id.save_me);
+
+        savemeAlert.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(NavigationDrawerActivity.this, "This alert will call, mail and message your guardian and show the location of other users also.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
+
+    }
 
     private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
         String imageURL;

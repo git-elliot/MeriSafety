@@ -91,7 +91,7 @@ public class SaveMeFragment extends Fragment {
 
                 for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
                 {
-                  sendAlert(dataSnapshot.child(n_key).getValue().toString(),dataSnapshot.child(m_key).getValue().toString(),dataSnapshot.child(e_key).getValue().toString());
+                  sendAlert(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(e_key).getValue().toString());
                 }
             }
 
