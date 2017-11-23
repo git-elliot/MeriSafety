@@ -22,11 +22,12 @@ public class SaveMeActivity extends AppCompatActivity {
        int Resid = i.getIntExtra(key,defaultValue);
         if(Resid==R.id.save_me)
         {
-            Toast.makeText(this, "Alert generated", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Save Me Alert generated", Toast.LENGTH_SHORT).show();
+            /*
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             ft.add(R.id.maps_layout,new SaveMeFragment());
-            ft.commit();
+            ft.commit();*/
         }
         if(Resid==R.id.lowalert)
         {
@@ -37,10 +38,14 @@ public class SaveMeActivity extends AppCompatActivity {
         }
         if(Resid==R.id.highalert)
         {
+            Toast.makeText(this, "High Alert generated", Toast.LENGTH_SHORT).show();
+
+            /*
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             ft.add(R.id.maps_layout,new HighAlertFragment());
             ft.commit();
+            */
         }
         if(Resid==R.id.advancealert)
         {

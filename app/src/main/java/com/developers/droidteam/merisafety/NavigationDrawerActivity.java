@@ -231,6 +231,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
         });
 
 
+        Intent i = new Intent(NavigationDrawerActivity.this, AlertService.class);
+
+        startService(i);
+
+
+
     }
 
     private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {

@@ -1,10 +1,13 @@
 package com.developers.droidteam.merisafety;
 
+import android.*;
 import android.app.Activity;
 import android.app.LauncherActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -28,7 +31,9 @@ public class EmergencyAlert extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         Log.v("onReceive", "Power button is pressed.");
-
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
 
         if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
            if(lastClicktime==0)
@@ -48,9 +53,20 @@ public class EmergencyAlert extends BroadcastReceiver {
            {
                lastClicktime=0;
                countPowerOff=0;
-
-
            }
+
+            if(countPowerOff==1)
+            {
+                if(isConnected)
+                {
+                    Toast.makeText(context, "Data is on, Save Me alert will be generated.", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(context, "Data is off, High alert will be generated.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
         }
         else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
             if(lastClicktime==0)
@@ -68,10 +84,28 @@ public class EmergencyAlert extends BroadcastReceiver {
                 lastClicktime=0;
             }
 
-
+            if(countPowerOff==1)
+            {
+                if(isConnected)
+                {
+                    Toast.makeText(context, "Data is on, Save Me alert will be generated.", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(context, "Data is off, High alert will be generated.", Toast.LENGTH_SHORT).show();
+                }
+            }
             if (countPowerOff >= 3) {
+
                 Intent i = new Intent();
-                i.putExtra("key", R.id.save_me);
+                if(isConnected)
+                {
+                    i.putExtra("key", R.id.save_me);
+                }else
+                {
+                    i.putExtra("key", R.id.highalert);
+                }
+
                 i.setClassName("com.developers.droidteam.merisafety","com.developers.droidteam.merisafety.SaveMeActivity");
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
          context.startActivity(i);
