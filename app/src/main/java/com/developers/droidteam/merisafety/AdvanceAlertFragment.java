@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,7 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
+//import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,9 +39,12 @@ public class AdvanceAlertFragment extends Fragment {
     private final String e_key = "email";
     private final String cur_key="curloc";
     private final String cur_db = "currentloc";
-    private final String em_id = "merisafety@gmail.com";
-    private final String pass_id = "WRTB@droid";
-    private final String text_id = "Mail from MeriSafety";
+    private final String gn_key="gname";
+    private final String gm_key="gmobile";
+    private final String ge_key="gemail";
+
+    private DatabaseReference apiKey;
+    private boolean executeOnce = false;
 
     private SharedPreferences sp = null;
     View v;
@@ -74,8 +79,16 @@ public class AdvanceAlertFragment extends Fragment {
             }
         }); */
 
+        ConnectivityManager cm = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
+        final boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
+
+
         sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         final String user = sp.getString(l_key, null);
+        final String gname = sp.getString(gn_key,null);
+        final String gmobile = sp.getString(gm_key,null);
+        final String gemail = sp.getString(ge_key,null);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -85,8 +98,17 @@ public class AdvanceAlertFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                if(isConnected)
+                {
                     sendAlert(dataSnapshot.child(n_key).getValue().toString(),dataSnapshot.child(m_key).getValue().toString(),dataSnapshot.child(e_key).getValue().toString());
 
+                }
+                else
+                {
+
+                    sendAlert(gname,gmobile,gemail);
+
+                }
             }
 
             @Override
@@ -97,7 +119,7 @@ public class AdvanceAlertFragment extends Fragment {
 
     }
 
-    public  void sendAlert(String name, final String mobile, String email)
+    public  void sendAlert(String name, final String mobile, final String email)
     {
 
 
@@ -117,7 +139,7 @@ public class AdvanceAlertFragment extends Fragment {
                 super.run();
 
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(2000);
 
                     Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +mobile));
                     startActivity(intent);
@@ -127,42 +149,28 @@ public class AdvanceAlertFragment extends Fragment {
                 }
             }
         }.start();
-
-        BackgroundMail.newBuilder(con).withUsername(em_id)
-                .withPassword(pass_id)
-                .withMailto(email)
-                .withType(BackgroundMail.TYPE_PLAIN)
-                .withSubject(text_id)
-                .withBody(sms)
-                .withOnSuccessCallback(new BackgroundMail.OnSuccessCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //do some magic
-//                        SmsManager smsManager = SmsManager.getDefault();
-//                        smsManager.sendTextMessage(number, null, "Help! Call me urgently. Please save me", null, null);
-//                        Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
-
-                        smss.sendTextMessage(mobile, null, sms, pi, pin);
+        smss.sendTextMessage(mobile, null, sms, pi, pin);
 
 
+        apiKey = mDatabase.child("mailapikey");
+        apiKey.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String api_key=dataSnapshot.getValue().toString();
+                if(!executeOnce){
 
-                    }
-                })
-                .withOnFailCallback(new BackgroundMail.OnFailCallback() {
-                    @Override
-                    public void onFail() {
-                        //do some magic
-                        /*
-                        SmsManager smsManager = SmsManager.getDefault();
-                        smsManager.sendTextMessage(number, null, "Help! Call me urgently. Please save me", null, null);
-                        Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
-*/
+                    SendMail sendMail = new SendMail(email,"Advance Alert",sms,api_key);
+                    sendMail.execute();
+                    executeOnce=true;
+                }
+            }
 
-                        smss.sendTextMessage(mobile, null, sms, pi, pin);
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                })
-                .send();
+            }
+        });
+
 
     }
 }

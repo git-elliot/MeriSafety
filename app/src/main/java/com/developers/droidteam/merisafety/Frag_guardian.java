@@ -35,14 +35,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
+//import com.creativityapps.gmailbackgroundlibrary.BackgroundMail;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +67,12 @@ public class Frag_guardian extends Fragment {
     private final String l_key = "login_key";
     private final String sp_db = "account_db";
     private final String sp_n="name";
-    private final String em_id = "merisafety@gmail.com";
-    private final String pass_id = "WRTB@droid";
-    private final String text_id = "Mail from MeriSafety";
+    private final String gn_key="gname";
+    private final String gm_key="gmobile";
+    private final String ge_key="gemail";
+
+    private DatabaseReference apiKey;
+    private boolean executeOnce = false;
 
 
     @Override
@@ -168,7 +174,7 @@ public class Frag_guardian extends Fragment {
 
     }
 
-    public void addGuarToFirebase(String name, String email, String number, final String uid ){
+    public void addGuarToFirebase(final String name, final String email, final String number, final String uid ){
         final String guarNum = number;
         final String guarEmail = email;
         List<GuardianInfo> guardianInfos = getGuarInfo(name,email,number,uid);
@@ -198,47 +204,38 @@ public class Frag_guardian extends Fragment {
 
 
                     smss.sendTextMessage(guarNum, null, sms, pi, pin);
+                    apiKey = mDatabase.child("mailapikey");
+                    apiKey.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    //**********************SENDING MAIL TO GUARDIAN***********************
+                            String api_key=dataSnapshot.getValue().toString();
 
-                    BackgroundMail.newBuilder(con).withUsername(em_id)
-                            .withPassword(pass_id)
-                            .withMailto(guarEmail)
-                            .withType(BackgroundMail.TYPE_PLAIN)
-                            .withSubject(text_id)
-                            .withBody(mail)
-                            .withOnSuccessCallback(new BackgroundMail.OnSuccessCallback() {
-                                @Override
-                                public void onSuccess() {
+                            if(!executeOnce){
+                                SendMail sendMail = new SendMail(guarEmail,"Added you as a guardian",mail,api_key);
+                                sendMail.execute();
 
-                                    Toast.makeText(getContext(), "Guardian added successfully", Toast.LENGTH_SHORT).show();
-                                    SharedPreferences sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor et = sp.edit();
-                                    et.putString(l_key,uid);
-                                    et.apply();
+                                executeOnce=true;
+                            }
+                        }
 
-                                    Intent it3=new Intent(getContext(),NavigationDrawerActivity.class);
-                                    startActivity(it3);
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            })
-                            .withOnFailCallback(new BackgroundMail.OnFailCallback() {
-                                @Override
-                                public void onFail() {
+                        }
+                    });
 
-                                    Toast.makeText(getContext(), "Unable to send them email.", Toast.LENGTH_SHORT).show();
-                                    SharedPreferences sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor et = sp.edit();
-                                    et.putString(l_key,uid);
-                                    et.apply();
+                    Toast.makeText(getContext(), "Guardian added successfully", Toast.LENGTH_SHORT).show();
+                    SharedPreferences.Editor et = sp.edit();
+                    et.putString(l_key,uid);
+                    et.putString(gn_key,name);
+                    et.putString(gm_key,number);
+                    et.putString(ge_key,email);
 
-                                    Intent it3=new Intent(getContext(),NavigationDrawerActivity.class);
-                                    startActivity(it3);
-                                }
-                            })
-                            .send();
+                    et.apply();
 
-
+                    Intent it3=new Intent(getContext(),NavigationDrawerActivity.class);
+                    startActivity(it3);
 
                 }
             });

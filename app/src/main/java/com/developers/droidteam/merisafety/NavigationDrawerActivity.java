@@ -74,7 +74,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private static final String e_key = "email";
     private static final String p_key = "photoUrl";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

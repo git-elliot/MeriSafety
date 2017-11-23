@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -38,6 +40,9 @@ public class HighAlertFragment extends Fragment {
     private final String e_key = "email";
     private final String cur_key="curloc";
     private final String cur_db = "currentloc";
+    private final String gn_key="gname";
+    private final String gm_key="gmobile";
+    private final String ge_key="gemail";
     View v;
     Context con;
 
@@ -73,9 +78,16 @@ public class HighAlertFragment extends Fragment {
             }
         });*/
 
+        ConnectivityManager cm = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
+        final boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
+
 
         SharedPreferences sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         final String user = sp.getString(l_key, null);
+        final String gname = sp.getString(gn_key,null);
+        final String gmobile = sp.getString(gm_key,null);
+
 
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -86,8 +98,17 @@ public class HighAlertFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    sendAlert(dataSnapshot.child(n_key).getValue().toString(), dataSnapshot.child(m_key).getValue().toString());
+                if(isConnected)
+                {
+                    sendAlert(dataSnapshot.child(n_key).getValue().toString(),dataSnapshot.child(m_key).getValue().toString());
 
+                }
+                else
+                {
+
+                    sendAlert(gname,gmobile);
+
+                }
             }
 
             @Override
