@@ -1,14 +1,9 @@
 package com.developers.droidteam.merisafety;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
-
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGridException;
-
-import java.io.IOException;
 
 /**
  * Created by paras on 23/11/17.

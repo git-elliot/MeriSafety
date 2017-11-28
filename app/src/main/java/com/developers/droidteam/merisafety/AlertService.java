@@ -1,11 +1,8 @@
 package com.developers.droidteam.merisafety;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;

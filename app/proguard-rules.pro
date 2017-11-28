@@ -25,7 +25,10 @@
 #-renamesourcefileattribute SourceFile
 #// Basic proguard rules
 
-#// Removing logging code
+-keepattributes InnerClasses
+-keepattributes EnclosingMethod
+
+#Removing logging code
 -assumenosideeffects class android.util.Log {
 public static *** d(...);
 public static *** v(...);
@@ -34,14 +37,24 @@ public static *** w(...);
 public static *** e(...);
 }
 
-#// The -dontwarn option tells ProGuard not to complain about some artefacts in the Scala runtime
+#The -dontwarn option tells ProGuard not to complain about some artefacts in the Scala runtime
 
 -dontwarn android.support.**
 -dontwarn android.app.Notification
--dontwarn org.apache.log4j.**
+-dontwarn org.apache.**
 -dontwarn com.google.common.**
 -dontwarn com.sun.mail.imap.**
 -dontwarn org.apache.harmony.awt.**
 -dontwarn javax.security.**
 -dontwarn java.awt.**
 -dontwarn javax.activation.**
+-dontwarn java.lang.invoke**
+-dontwarn org.apache.httpcomponents.**
+-dontwarn org.apache.http.**
+
+-ignorewarnings
+
+-keep class * {
+    public private *;
+}
+

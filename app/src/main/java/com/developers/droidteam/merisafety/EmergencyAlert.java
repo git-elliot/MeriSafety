@@ -1,19 +1,12 @@
 package com.developers.droidteam.merisafety;
 
-import android.*;
-import android.app.Activity;
-import android.app.LauncherActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
-
-import java.util.Calendar;
-import java.util.Map;
 
 /**
  * Created by paras on 21/11/17.
