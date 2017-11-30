@@ -24,6 +24,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -126,6 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
              mMap.clear();
 
+                Toast.makeText(MapsActivity.this, "Finding nearby peoples", Toast.LENGTH_SHORT).show();
                 placeNearbyPeoples();
 
             }
@@ -136,7 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 mMap.clear();
 
-
+                Toast.makeText(MapsActivity.this, "Finding nearby police stations", Toast.LENGTH_SHORT).show();
                 performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
 
             }
@@ -147,6 +150,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 mMap.clear();
 
+                Toast.makeText(MapsActivity.this, "Finding nearby Hospitals", Toast.LENGTH_SHORT).show();
                 performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
 
             }
