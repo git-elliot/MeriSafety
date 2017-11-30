@@ -4,15 +4,18 @@ import android.*;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,6 +32,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -91,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             imageView.setImageResource(images[i]);
             simpleViewFlipper.addView(imageView);
         }
-        Animation in = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
+        final Animation in = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
         Animation out = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
         simpleViewFlipper.setInAnimation(in);
         simpleViewFlipper.setOutAnimation(out);
@@ -104,18 +108,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         // Inflate the layout for this fragment
 
 
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)+ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)+ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)+ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)+ActivityCompat.checkSelfPermission(this,Manifest.permission.RECEIVE_BOOT_COMPLETED)== PackageManager.PERMISSION_GRANTED){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)+ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)+ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)+ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)+ActivityCompat.checkSelfPermission(this,Manifest.permission.RECEIVE_BOOT_COMPLETED)+ActivityCompat.checkSelfPermission(this,Manifest.permission.DISABLE_KEYGUARD)== PackageManager.PERMISSION_GRANTED){
 
         }
         else{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if(shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)||shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE)||shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)||shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)||shouldShowRequestPermissionRationale(Manifest.permission.RECEIVE_BOOT_COMPLETED)){
+                if(shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)||shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE)||shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)||shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)||shouldShowRequestPermissionRationale(Manifest.permission.RECEIVE_BOOT_COMPLETED)||shouldShowRequestPermissionRationale(Manifest.permission.DISABLE_KEYGUARD)){
                     Toast.makeText(this, "you need to check permission", Toast.LENGTH_SHORT).show();
                 }
             }
         }
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-            requestPermissions(new String[]{Manifest.permission.SEND_SMS,Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.RECEIVE_BOOT_COMPLETED},REQUEST_PERMISSIONS);
+            requestPermissions(new String[]{Manifest.permission.SEND_SMS,Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.RECEIVE_BOOT_COMPLETED,Manifest.permission.DISABLE_KEYGUARD},REQUEST_PERMISSIONS);
         }
 
 
@@ -137,6 +141,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!isGooglePlayServicesAvailable()) {
+                    finish();
+                }
                 Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
                 startActivityForResult(signInIntent, 1);
             }
@@ -144,6 +151,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 
     }
+
+    private boolean isGooglePlayServicesAvailable() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (ConnectionResult.SUCCESS == status) {
+            return true;
+        } else {
+            GooglePlayServicesUtil.getErrorDialog(status, this, 0).show();
+            return false;
+        }
+    }
+
 
     private class BackgroundTask extends AsyncTask<Void, Void, Void> {
         private ProgressDialog dialog;
@@ -413,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 
         if(requestCode==REQUEST_PERMISSIONS){
-            if((grantResults.length>0)&&(grantResults[0]+grantResults[1]+grantResults[2]+grantResults[3]+grantResults[4])==PackageManager.PERMISSION_GRANTED){
+            if((grantResults.length>0)&&(grantResults[0]+grantResults[1]+grantResults[2]+grantResults[3]+grantResults[4]+grantResults[5])==PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(this, "Permissions successfully granted  .", Toast.LENGTH_SHORT).show();
 
             }else {

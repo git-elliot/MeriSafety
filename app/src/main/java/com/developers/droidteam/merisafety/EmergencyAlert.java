@@ -1,5 +1,6 @@
 package com.developers.droidteam.merisafety;
 
+import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 import android.widget.Toast;
+
+import static android.content.Context.KEYGUARD_SERVICE;
 
 /**
  * Created by paras on 21/11/17.
@@ -101,8 +104,10 @@ public class EmergencyAlert extends BroadcastReceiver {
 
                 i.setClassName("com.developers.droidteam.merisafety","com.developers.droidteam.merisafety.SaveMeActivity");
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-         context.startActivity(i);
-
+                KeyguardManager keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
+                KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
+                lock.disableKeyguard();
+                context.startActivity(i);
                 countPowerOff=0;
                 lastClicktime=0;
            }
