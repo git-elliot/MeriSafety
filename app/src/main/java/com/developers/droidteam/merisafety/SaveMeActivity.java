@@ -29,6 +29,7 @@ public class SaveMeActivity extends AppCompatActivity {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.setStatusBarColor(Color.RED);
+                window.setNavigationBarColor(Color.RED);
             }
             /*
             FragmentManager fm = getSupportFragmentManager();

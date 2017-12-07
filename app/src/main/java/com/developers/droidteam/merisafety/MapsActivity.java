@@ -112,6 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.setStatusBarColor(Color.RED);
+                window.setNavigationBarColor(Color.RED);
             }
 
         }
@@ -144,6 +145,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Window window = getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                     window.setStatusBarColor(Color.BLUE);
+                    window.setNavigationBarColor(Color.BLUE);
                 }
             }
         });
