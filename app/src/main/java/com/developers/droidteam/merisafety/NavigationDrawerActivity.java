@@ -382,7 +382,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         }else if(id == R.id.nav_nearby)
         {
-         startActivity(new Intent(NavigationDrawerActivity.this,MapsActivity.class));
+         startActivity(new Intent(NavigationDrawerActivity.this,MapsActivity.class).putExtra("saveme","no"));
         }
         else if (id == R.id.nav_feedback) {
 

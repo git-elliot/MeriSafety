@@ -1,10 +1,14 @@
 package com.developers.droidteam.merisafety;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 public class SaveMeActivity extends AppCompatActivity {
@@ -21,6 +25,11 @@ public class SaveMeActivity extends AppCompatActivity {
         if(Resid==R.id.save_me)
         {
             Toast.makeText(this, "Save Me Alert generated", Toast.LENGTH_SHORT).show();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(Color.RED);
+            }
             /*
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();

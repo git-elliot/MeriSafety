@@ -9,11 +9,13 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -21,11 +23,12 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -102,6 +105,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        Intent i = getIntent();
+        String saveme=  i.getStringExtra("saveme");
+        if(saveme.equals("yes")&&saveme!=null){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(Color.RED);
+            }
+
+        }
         progressBar = findViewById(R.id.updateMap);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -122,6 +135,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Button nearby_people = findViewById(R.id.people);
         Button nearby_police = findViewById(R.id.police);
         Button nearby_hospitals = findViewById(R.id.hospitals);
+        Button rescued = findViewById(R.id.rescued);
+
+        rescued.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.setStatusBarColor(Color.BLUE);
+                }
+            }
+        });
 
         nearby_people.setOnClickListener(new View.OnClickListener() {
             @Override

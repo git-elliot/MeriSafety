@@ -168,7 +168,7 @@ public class SaveMeFragment extends Fragment {
                 try {
                     Thread.sleep(100);
 
-                    startActivity(new Intent(con,MapsActivity.class));
+                    startActivity(new Intent(con,MapsActivity.class).putExtra("saveme","yes"));
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
