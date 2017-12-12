@@ -38,7 +38,7 @@ public class EmergencyAlert extends BroadcastReceiver {
                countPowerOff++;
 
            }
-           else if(System.currentTimeMillis()-lastClicktime<=1500)
+           else if(System.currentTimeMillis()-lastClicktime<=1200)
            {
 
                lastClicktime = System.currentTimeMillis();
@@ -70,7 +70,7 @@ public class EmergencyAlert extends BroadcastReceiver {
                 lastClicktime = System.currentTimeMillis();
                 countPowerOff++;
             }
-            else if(System.currentTimeMillis()-lastClicktime<=1500)
+            else if(System.currentTimeMillis()-lastClicktime<=1200)
             {
                 lastClicktime =System.currentTimeMillis();
                 countPowerOff++;

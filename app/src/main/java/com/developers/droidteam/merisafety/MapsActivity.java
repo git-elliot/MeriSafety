@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -59,6 +60,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.ui.BubbleIconFactory;
+import com.google.maps.android.ui.IconGenerator;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -144,8 +148,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     Window window = getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.setStatusBarColor(Color.BLUE);
-                    window.setNavigationBarColor(Color.BLUE);
+                    window.setStatusBarColor(getResources().getColor(R.color.rescued_color));
+                    window.setNavigationBarColor(getResources().getColor(R.color.rescued_color));
                 }
             }
         });
@@ -389,9 +393,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(Bitmap result) {
 
+            ImageView mImageView = new ImageView(getApplicationContext());
+            IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
+            mIconGenerator.setContentView(mImageView);
+            mImageView.setImageBitmap(result);
+            Bitmap iconBitmap = mIconGenerator.makeIcon();
 
-            MarkerOptions markerOptions = new MarkerOptions().position(loc).icon(BitmapDescriptorFactory.fromBitmap(result
-));
+            MarkerOptions markerOptions = new MarkerOptions().position(loc).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
             String titleStr = getAddress(loc);  // add these two lines
            if(guarEmail!=null&&guarEmail.equals(gEmail))
            {

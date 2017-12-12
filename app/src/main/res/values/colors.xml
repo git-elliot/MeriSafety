@@ -12,5 +12,6 @@
     <color name="divider">#BDBDBD</color>
     <color name="white">#fff</color>
     <color name="Light_green_screen">#a6d174</color>
+    <color name="rescued_color">#30b4ec</color>
 
 </resources>
