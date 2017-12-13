@@ -38,7 +38,7 @@ public class EmergencyAlert extends BroadcastReceiver {
                countPowerOff++;
 
            }
-           else if(System.currentTimeMillis()-lastClicktime<=1200)
+           else if(System.currentTimeMillis()-lastClicktime<=1000)
            {
 
                lastClicktime = System.currentTimeMillis();
@@ -70,7 +70,7 @@ public class EmergencyAlert extends BroadcastReceiver {
                 lastClicktime = System.currentTimeMillis();
                 countPowerOff++;
             }
-            else if(System.currentTimeMillis()-lastClicktime<=1200)
+            else if(System.currentTimeMillis()-lastClicktime<=1000)
             {
                 lastClicktime =System.currentTimeMillis();
                 countPowerOff++;
@@ -91,7 +91,7 @@ public class EmergencyAlert extends BroadcastReceiver {
                     Toast.makeText(context, "Data is off, High alert will be generated.", Toast.LENGTH_SHORT).show();
                 }
             }
-            if (countPowerOff >= 3) {
+            if (countPowerOff >= 4) {
 
                 Intent i = new Intent();
                 if(isConnected)
