@@ -401,15 +401,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ft.replace(R.id.newfraglayout,new FragHelpLine());
             ft.addToBackStack("stack6");
             ft.commit();
-        }/*
+        }
         else if (id == R.id.nav_settings) {
-            FragmentManager fm = getSupportFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            FragSettings obj = new FragSettings();
-            ft.addToBackStack("stack7");
-            ft.replace(R.id.newfraglayout,obj,"setting");
-            ft.commit();
-        }else if (id == R.id.nav_logout) {
+           startActivity(new Intent(NavigationDrawerActivity.this,SettingsActivity.class));
+        }
+        /*else if (id == R.id.nav_logout) {
             final SharedPreferences.Editor e = sp.edit();
 
             AlertDialog.Builder ad= new AlertDialog.Builder(this);
@@ -452,9 +448,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 Uri.parse("https://www.facebook.com/merisafety"));
 
         startActivity(intent);
-
-    }
-    else if(item.getItemId()==R.id.settings){
 
     }
     return super.onOptionsItemSelected(item);
