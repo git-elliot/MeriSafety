@@ -1,0 +1,21 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:padding="@dimen/widget_margin">
+
+    <Button
+        android:layout_width="100dp"
+        android:background="@drawable/button"
+        android:id="@+id/save_me_widget"
+        android:typeface="sans"
+        android:textStyle="bold"
+        android:longClickable="true"
+        android:textColor="@color/Light_grey_text"
+        android:textSize="20dp"
+        android:layout_centerInParent="true"
+        android:text="Save Me"
+        android:layout_height="100dp"
+        />
+
+</RelativeLayout>
