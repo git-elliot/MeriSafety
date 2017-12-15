@@ -10,6 +10,7 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.MenuInflater;
@@ -158,11 +159,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
             }
         });
 
+
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
+
         Button lowAlert = findViewById(R.id.lowalert);
 
         lowAlert.setOnLongClickListener(new View.OnLongClickListener() {
@@ -211,13 +214,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
             }
         });
 
-
-        Intent i = new Intent(NavigationDrawerActivity.this, AlertService.class);
-
-        startService(i);
-
-
-
+        //setting default value for the first time user use this app
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
+        //Starting the service for the hot key
+        startService(new Intent(NavigationDrawerActivity.this, AlertService.class));
     }
 
     private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
@@ -403,7 +405,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ft.commit();
         }
         else if (id == R.id.nav_settings) {
-           startActivity(new Intent(NavigationDrawerActivity.this,SettingsActivity.class));
+            startActivity(new Intent(this,SettingsActivity.class));
         }
         /*else if (id == R.id.nav_logout) {
             final SharedPreferences.Editor e = sp.edit();

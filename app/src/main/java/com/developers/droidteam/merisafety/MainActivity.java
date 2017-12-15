@@ -27,6 +27,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
+
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.ResultCodes;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -49,10 +53,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity  {
     private static final int REQUEST_PERMISSIONS = 10;
     private static final int REQUEST_PHONE =1889 ;
     private static final int REQUEST_MSG =1880 ;
@@ -60,7 +67,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final int CORSE_LOCATION_PERMISSION_REQUEST_CODE = 2;
     private DatabaseReference mDatabase;
     private DatabaseReference userEnd ;
-
+    Long buttonClicked;
+    private static final int RC_SIGN_IN = 123;
     private final String sp_db = "account_db";
     private final String l_key = "login_key";
     private final String d_key = "users";
@@ -78,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     Bundle bs= new Bundle();
     private FirebaseAuth mAuth;
 
+
     ProgressBar progressBar;
     SignInButton signInButton;
     @Override
@@ -85,7 +94,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
+       //hiding action bar
+        getSupportActionBar().hide();
         l = findViewById(R.id.l2);
         //        View Flipper
 
@@ -124,17 +134,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestId()
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .build();
 
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */,this/* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+// Choose authentication providers
+        final List<AuthUI.IdpConfig> providers = Collections.singletonList(
+                new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build());
 
         progressBar = findViewById(R.id.progress_bar);
         signInButton = findViewById(R.id.sign_in_button);
@@ -144,11 +147,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 if (!isGooglePlayServicesAvailable()) {
                     finish();
                 }
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                startActivityForResult(signInIntent, 1);
+                updateUI(true,true);
+
+// Create and launch sign-in intent
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setAvailableProviders(providers)
+                                .build(),
+                        RC_SIGN_IN);
             }
         });
-
 
     }
 
@@ -165,16 +174,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private class BackgroundTask extends AsyncTask<Void, Void, Void> {
         private ProgressDialog dialog;
-        GoogleSignInAccount acct;
-        String name;
-        String email;
-        String pUrl;
-        public BackgroundTask(MainActivity activity, GoogleSignInAccount googleSignInAccount, String yourname, String youremail, String photoUrl) {
+        FirebaseUser user;
+        public BackgroundTask(MainActivity activity, FirebaseUser firebaseUser) {
+            user = firebaseUser;
             dialog = new ProgressDialog(activity);
-            acct = googleSignInAccount;
-            name = yourname;
-            email = youremail;
-           pUrl = photoUrl;
         }
 
         @Override
@@ -187,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         protected void onPostExecute(Void result) {
             if (dialog.isShowing()) {
                 dialog.dismiss();
-                updateUI(true);
+                updateUI(true,false);
             }
         }
 
@@ -195,8 +198,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         protected Void doInBackground(Void... params) {
             try {
                 Thread.sleep(2000);
-                firebaseAuthWithGoogle(acct,name,email,pUrl);
 
+                checkandlogin(user,user.getDisplayName().toString(),user.getEmail().toString(),user.getPhotoUrl().toString());
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -207,105 +210,87 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     }
 
-    public void updateUI(Boolean value)
+    public void updateUI(Boolean value,Boolean click)
     {
         if(value)
         {
-            progressBar.setVisibility(View.VISIBLE);
-            signInButton.setVisibility(View.INVISIBLE);
+            if(click) {
+                signInButton.setVisibility(View.INVISIBLE);
+            }
+            else {
+                signInButton.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
+            }
         }
         else
         {
-
-            progressBar.setVisibility(View.INVISIBLE);
-            signInButton.setVisibility(View.VISIBLE);
+           if(click){
+               signInButton.setVisibility(View.VISIBLE);
+           }else{
+               signInButton.setVisibility(View.VISIBLE);
+               progressBar.setVisibility(View.INVISIBLE);
+           }
         }
 
     }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct, final String name, final String email, final String pUrl) {
-        Log.d("OAuth", "firebaseAuthWithGoogle:" + acct.getId());
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-
-                            Log.d("OAuth", "signInWithCredential:success");
-                            final FirebaseUser user = mAuth.getCurrentUser();
-                          //  updateUI(user);
-                            SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
-                            final SharedPreferences.Editor et = sp.edit();
-                            et.putString("uid",user.getUid().toString());
-                            et.putString(n_key,name);
-                            et.apply();
+    public void checkandlogin(final FirebaseUser user, final String name, final String email, final String pUrl ){
+        SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor et = sp.edit();
+        et.putString("uid",user.getUid().toString());
+        et.putString(n_key,name);
+        et.apply();
 
 
-                            mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
-                            userEnd = mDatabase.child(d_key).child(user.getUid());
+        userEnd = mDatabase.child(d_key).child(user.getUid());
 
-                            userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if(!dataSnapshot.exists())
-                                    {
-                                          Log.d("OAuth","User does not exists");
-                                        Toast.makeText(MainActivity.this, "Sigining in you to MeriSafety.. Please wait..", Toast.LENGTH_SHORT).show();
-                                        createUser(name, email, user.getUid().toString(),pUrl);
+        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists())
+                {
+                    Log.d("OAuth","User does not exists");
+                    Toast.makeText(MainActivity.this, "Sigining in you to MeriSafety.. Please wait..", Toast.LENGTH_SHORT).show();
+                    createUser(name, email, user.getUid().toString(),pUrl);
 
-                                    }
-                                    else
-                                    {
+                }
+                else
+                {
 
-                                        if(dataSnapshot.child(user.getUid()).exists())
-                                        {
-                                            et.putString(l_key,user.getUid());
-                                            et.apply();
-                                            Toast.makeText(MainActivity.this, "Welcome back to MeriSafey, you are signed in as "+dataSnapshot.child("email").getValue().toString(), Toast.LENGTH_LONG).show();
-                                            Intent it3=new Intent(MainActivity.this,NavigationDrawerActivity.class);
-                                            startActivity(it3);
+                    if(dataSnapshot.child(user.getUid()).exists())
+                    {
 
-                                            MainActivity.this.finish();
+                        et.putString(l_key,user.getUid());
+                        et.apply();
+                        Toast.makeText(MainActivity.this, "Welcome back to MeriSafey, you are signed in as "+dataSnapshot.child("email").getValue().toString(), Toast.LENGTH_LONG).show();
+                        Intent it3=new Intent(MainActivity.this,NavigationDrawerActivity.class);
+                        startActivity(it3);
 
-                                        }
-                                        else
-                                        {
-                                            l.removeAllViews();;
-                                            FragmentManager fm = getSupportFragmentManager();
-                                            FragmentTransaction ft = fm.beginTransaction();
-                                            Frag_verification obj = new Frag_verification();
-                                            ft.addToBackStack("stack2");
-                                            ft.replace(R.id.l2,obj,"verify");
-                                            ft.commit();
+                        MainActivity.this.finish();
 
-                                            MainActivity.this.finish();
-
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("OAuth", "signInWithCredential:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed. Check your internet",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(false);
-                        }
-
-                        // ...
                     }
-                });
-    }
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                    else
+                    {
+                        l.removeAllViews();;
+                        FragmentManager fm = getSupportFragmentManager();
+                        FragmentTransaction ft = fm.beginTransaction();
+                        Frag_verification obj = new Frag_verification();
+                        ft.addToBackStack("stack2");
+                        ft.replace(R.id.l2,obj,"verify");
+                        ft.commit();
+
+                        MainActivity.this.finish();
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -314,39 +299,28 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == 1) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-        }
-    }
+         if (requestCode == RC_SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+            if (resultCode == ResultCodes.OK) {
+                // Successfully signed in
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-    private void handleSignInResult(GoogleSignInResult result) {
-        Log.d("aaa", "handleSignInResult:" + result.isSuccess());
-        if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
+                BackgroundTask task2 = new BackgroundTask(MainActivity.this,user);
+                task2.execute();
 
 
-//           tv.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            String name = acct.getDisplayName();
-            String email = acct.getEmail();
-            String photoUrl = acct.getPhotoUrl().toString();
+                // ...
+            } else {
 
+                updateUI(false,true);
 
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-
-
-               BackgroundTask task = new BackgroundTask(MainActivity.this,acct,name,email,photoUrl);
-               task.execute();
-
-
-        } else {
-            // Signed out, show unauthenticated UI.
-            Toast.makeText(this, "Unable to sign in, Maybe internet problem.", Toast.LENGTH_SHORT).show();
+                // Sign in failed, check response for error code
+                // ...
+                Toast.makeText(this, "Unable to signin to app", Toast.LENGTH_LONG).show();
+            }
         }
 
     }
-
 
     public void createUser(String name, String email, String uid, String pUrl)
     {
