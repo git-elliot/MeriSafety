@@ -1,6 +1,7 @@
 package com.developers.droidteam.merisafety;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,9 +38,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.nio.CharBuffer;
 
 public class NavigationDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragHome.SendLocation {
     private static final int REQUEST_MSG =1880 ;
     private static final int REQUEST_CHECK_SETTINGS = 2;
     private DatabaseReference mDatabase;
@@ -47,7 +49,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
     ImageView iv;
     ProgressBar progressBar;
     LocationRequest locationRequest = null;
-
+    Toolbar toolbar=null;
+    TextView textbar = null;
+    boolean toggle=true;
     private static final String i_key = "key";
     private static final String sp_db = "account_db";
     private static final String l_key = "login_key";
@@ -71,8 +75,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         Toast.makeText(this, "Long press these alert buttons to know about them", Toast.LENGTH_LONG).show();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        textbar = findViewById(R.id.textbar);
+        textbar.setSelected(true);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -220,6 +227,20 @@ public class NavigationDrawerActivity extends AppCompatActivity
         PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
         //Starting the service for the hot key
         startService(new Intent(NavigationDrawerActivity.this, AlertService.class));
+    }
+
+    @Override
+    public void communicate(String address) {
+
+        if(toggle)
+        {
+            textbar.setText(address);
+            toggle = false;
+        }else
+        {
+            textbar.setText("");
+            toggle = true;
+        }
     }
 
     private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {

@@ -70,7 +70,6 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     private final String uid_key= "uid";
 
 
-    TextView cur_loc;
     View v;
     Context con;
     @Override
@@ -89,8 +88,6 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        cur_loc = (TextView) v.findViewById(R.id.current_location);
 
         mGoogleApiClient = new GoogleApiClient.Builder(con)
                 .addApi(LocationServices.API)
@@ -122,7 +119,7 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setFastestInterval(7000);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest).setAlwaysShow(true);
@@ -203,8 +200,11 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                     et.putString(cur_key,address1.getAddressLine(0));
                     et.apply();
 
-                    cur_loc.setText(address1.getAddressLine(0));
+                    SendLocation sendLocation= (SendLocation) con;
+                    sendLocation.communicate(address1.getAddressLine(0));
+
                     SharedPreferences sp1 = con.getSharedPreferences(sp_db, MODE_PRIVATE);
+                    SharedPreferences.Editor et1 = sp1.edit();
                     mDatabase = FirebaseDatabase.getInstance().getReference();
 
                     String uid =  sp1.getString(uid_key,null);
@@ -216,7 +216,6 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                         userEndlng.setValue(lng);
                         userPincode = mDatabase.child(d_key).child(uid).child(pin_key);
                         userPincode.setValue(address1.getPostalCode());
-                        SharedPreferences.Editor et1 = sp1.edit();
                         et1.putString(pin_key,address1.getPostalCode());
                         et1.apply();
 
@@ -233,5 +232,9 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    public interface SendLocation{
+        public void communicate(String address);
     }
 }
