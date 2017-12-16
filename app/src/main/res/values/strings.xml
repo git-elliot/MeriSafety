@@ -34,16 +34,6 @@
     <string name="pref_default_display_name">John Smith</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
 
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
@@ -93,4 +83,20 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="app_widget_text">SaveMe</string>
     <string name="add_widget">Add widget</string>
+
+    <!-- String related Settings created by paras -->
+    <string name="pref_description_hot_key">Turning this feature on will send \'Save Me Alert\' when user press 3 times power button</string>
+    <string name="pref_title_hot_key">Hot key</string>
+
+    <string-array name="nearby_users_list_titles">
+        <item>Name</item>
+        <item>Mobile Number</item>
+        <item>Email</item>
+    </string-array>
+    <string-array name="nearby_users_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
 </resources>

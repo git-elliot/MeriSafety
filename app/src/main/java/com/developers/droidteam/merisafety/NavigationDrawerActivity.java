@@ -42,13 +42,11 @@ import java.nio.CharBuffer;
 
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragHome.SendLocation {
-    private static final int REQUEST_MSG =1880 ;
-    private static final int REQUEST_CHECK_SETTINGS = 2;
+
     private DatabaseReference mDatabase;
     private DatabaseReference userEnd ;
     ImageView iv;
     ProgressBar progressBar;
-    LocationRequest locationRequest = null;
     Toolbar toolbar=null;
     TextView textbar = null;
     boolean toggle=true;
@@ -221,10 +219,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             }
         });
 
-        //setting default value for the first time user use this app
-        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_data_sync, false);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_notification, false);
         //Starting the service for the hot key
         startService(new Intent(NavigationDrawerActivity.this, AlertService.class));
     }
