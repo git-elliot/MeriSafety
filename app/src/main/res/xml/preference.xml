@@ -6,67 +6,65 @@
         android:layout="@layout/preference_category_layout"
         android:title="Privacy"
         android:key="privacy"
-        android:fragment="com.developers.droidteam.merisafety.SettingsActivity$MyPreferenceFragment"
         >
 
         <SwitchPreference
             android:defaultValue="true"
-            android:key="location"
-            android:summary="Turning this feature on will save your location to the server"
-            android:title="Location" />
+            android:key="@string/privacy_location_key"
+            android:summary="@string/privacy_location_summary"
+            android:title="@string/privacy_location_title" />
 
         <SwitchPreference
             android:defaultValue="true"
-            android:key="share_location"
-            android:summary="When Enabled nearby people will see you on map "
-            android:title="Share Location" />
+            android:key="@string/privacy_share_location_key"
+            android:summary="@string/privacy_share_location_summary"
+            android:title="@string/privacy_share_location_title" />
 
         <MultiSelectListPreference
-            android:title="Nearby users can see "
+            android:title="@string/privacy_nearby_users_title"
             android:key="nearby_users_sharing"
             android:entries="@array/nearby_users_list_titles"
             android:entryValues="@array/nearby_users_list_values"
-            android:defaultValue="1"
+            android:defaultValue="@string/nearby_user_default_value"
             />
 
 
     </PreferenceCategory>
 
-<PreferenceCategory
-    android:layout="@layout/preference_category_layout"
-    android:title="Alert"
-    android:key="gen"
-    android:fragment="com.developers.droidteam.merisafety.SettingsActivity$MyPreferenceFragment"
-    >
+    <PreferenceCategory
+        android:layout="@layout/preference_category_layout"
+        android:title="Alert"
+        android:key="gen"
+        >
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="hot_key"
-        android:summary="@string/pref_description_hot_key"
-        android:title="@string/pref_title_hot_key" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="hot_key"
+            android:summary="@string/pref_description_hot_key"
+            android:title="@string/pref_title_hot_key" />
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="send_msg"
-        android:title="Message"
-        android:summary="Send Message to guardian"
-        />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="send_msg"
+            android:title="Message"
+            android:summary="Send Message to guardian"
+            />
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="dial_call"
-        android:title="Call"
-        android:summary="Dial call to guardian"
-        />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="dial_call"
+            android:title="Call"
+            android:summary="Dial call to guardian"
+            />
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="send_email"
-        android:title="Email"
-        android:summary="Send Email to guardians"
-        />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="send_email"
+            android:title="Email"
+            android:summary="Send Email to guardians"
+            />
 
-</PreferenceCategory>
+    </PreferenceCategory>
     <PreferenceCategory
         android:layout="@layout/preference_category_layout"
         android:title="@string/pref_header_notifications"

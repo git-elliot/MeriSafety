@@ -87,6 +87,14 @@
     <!-- String related Settings created by paras -->
     <string name="pref_description_hot_key">Turning this feature on will send \'Save Me Alert\' when user press 3 times power button</string>
     <string name="pref_title_hot_key">Hot key</string>
+    <string name="nearby_user_default_value">1</string>
+    <string name="privacy_location_key">location</string>
+    <string name="privacy_location_summary">Turning this feature on will save your location to the server</string>
+    <string name="privacy_location_title">Location</string>
+    <string name="privacy_share_location_key">share location</string>
+    <string name="privacy_share_location_summary">When Enabled nearby people will see you on map</string>
+    <string name="privacy_share_location_title">Share Location</string>
+    <string name="privacy_nearby_users_title">Nearby users can see</string>
 
     <string-array name="nearby_users_list_titles">
         <item>Name</item>
@@ -94,9 +102,9 @@
         <item>Email</item>
     </string-array>
     <string-array name="nearby_users_list_values">
-        <item>1</item>
         <item>0</item>
-        <item>-1</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 
 </resources>

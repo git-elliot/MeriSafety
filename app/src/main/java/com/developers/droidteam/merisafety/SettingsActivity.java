@@ -3,6 +3,7 @@ package com.developers.droidteam.merisafety;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
+import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v7.app.ActionBar;
@@ -21,6 +23,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,79 +42,6 @@ import java.util.Set;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
-    /**
-     * A preference value change listener that updates the preference's summary
-     * to reflect its new value.
-     */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
-
-            if (preference instanceof ListPreference) {
-                // For list preferences, look up the correct display value in
-                // the preference's 'entries' list.
-                ListPreference listPreference = (ListPreference) preference;
-                int index = listPreference.findIndexOfValue(stringValue);
-
-                // Set the summary to reflect the new value.
-                preference.setSummary(
-                        index >= 0
-                                ? listPreference.getEntries()[index]
-                                : null);
-
-            } else if (preference instanceof RingtonePreference) {
-                // For ringtone preferences, look up the correct display value
-                // using RingtoneManager.
-                if (TextUtils.isEmpty(stringValue)) {
-                    // Empty values correspond to 'silent' (no ringtone).
-                    preference.setSummary(R.string.pref_ringtone_silent);
-
-                } else {
-                    Ringtone ringtone = RingtoneManager.getRingtone(
-                            preference.getContext(), Uri.parse(stringValue));
-
-                    if (ringtone == null) {
-                        // Clear the summary if there was a lookup error.
-                        preference.setSummary(null);
-                    } else {
-                        // Set the summary to reflect the new ringtone display
-                        // name.
-                        String name = ringtone.getTitle(preference.getContext());
-                        preference.setSummary(name);
-                    }
-                }
-
-            } else {
-                // For all other preferences, set the summary to the value's
-                // simple string representation.
-                preference.setSummary(stringValue);
-            }
-            return true;
-        }
-    };
-
-
-    /**
-     * Binds a preference's summary to its value. More specifically, when the
-     * preference's value is changed, its summary (line of text below the
-     * preference title) is updated to reflect the value. The summary is also
-     * immediately updated upon calling this method. The exact display format is
-     * dependent on the type of preference.
-     *
-     * @see #sBindPreferenceSummaryToValueListener
-     */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
-        // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-
-        // Trigger the listener immediately with the preference's
-        // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,11 +49,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         setupActionBar();
         getFragmentManager().beginTransaction().replace(android.R.id.content,new MyPreferenceFragment()).commit();
         PreferenceManager.setDefaultValues(this, R.xml.preference, false);
-
     }
 
     public static class MyPreferenceFragment extends PreferenceFragment
     {
+
+        private static Preference.OnPreferenceChangeListener listener;
+        Context con;
+        @Override
+        public void onAttach(Context context) {
+            super.onAttach(context);
+            con=context;
+        }
 
         @Override
         public void onCreate(final Bundle savedInstanceState)
@@ -129,10 +68,113 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preference);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
+            listener = new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    String stringValue = o.toString();
+
+                    if (preference instanceof ListPreference) {
+                        // For list preferences, look up the correct display value in
+                        // the preference's 'entries' list.
+                        ListPreference listPreference = (ListPreference) preference;
+                        int index = listPreference.findIndexOfValue(stringValue);
+
+                        // Set the summary to reflect the new value.
+                        preference.setSummary(
+                                index >= 0
+                                        ? listPreference.getEntries()[index]
+                                        : null);
+
+                    } else if (preference instanceof RingtonePreference) {
+                        // For ringtone preferences, look up the correct display value
+                        // using RingtoneManager.
+                        if (TextUtils.isEmpty(stringValue)) {
+                            // Empty values correspond to 'silent' (no ringtone).
+                            preference.setSummary(R.string.pref_ringtone_silent);
+
+                        } else {
+                            Ringtone ringtone = RingtoneManager.getRingtone(
+                                    preference.getContext(), Uri.parse(stringValue));
+
+                            if (ringtone == null) {
+                                // Clear the summary if there was a lookup error.
+                                preference.setSummary(null);
+                            } else {
+                                // Set the summary to reflect the new ringtone display
+                                // name.
+                                String name = ringtone.getTitle(preference.getContext());
+                                preference.setSummary(name);
+                            }
+                        }
+
+                    }else if(preference instanceof MultiSelectListPreference){
+
+                        boolean name = false;
+                        boolean mob = false;
+                        String s = "";
+                        Log.i("multiselect","String : "+stringValue);
+                        if(stringValue.contains("0")){
+                           s+="Name";
+                           name = true;
+                        }
+                        if(stringValue.contains("1")){
+                           if(name)
+                           {
+                               s+=", ";
+                           }
+                            s+="Mobile Number";
+                           mob=true;
+                        }
+                        if(stringValue.contains("2")){
+                            if(mob)
+                            {
+                                s+=", ";
+                            }
+                            s+="Email";
+                        }
+                        preference.setSummary(s);
+                    }
+                    else {
+                        // For all other preferences, set the summary to the value's
+                        // simple string representation.
+                        preference.setSummary(stringValue);
+                    }
+                    return true;
+
+                }
+            };
+
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
+            bindPreferenceSummaryToValue(findPreference("nearby_users_sharing"));
+        }
+
+        private static void bindPreferenceSummaryToValue(Preference preference) {
+            // Set the listener to watch for value changes.
+            preference.setOnPreferenceChangeListener(listener);
+
+            // Trigger the listener immediately with the preference's
+            // current value.
+            if(preference instanceof MultiSelectListPreference){
+
+                MultiSelectListPreference multiSelectListPreference = (MultiSelectListPreference) preference;
+                Set<String> s= multiSelectListPreference.getValues();
+                listener.onPreferenceChange(preference,
+                        PreferenceManager
+                                .getDefaultSharedPreferences(preference.getContext())
+                                .getStringSet(preference.getKey(),s ));
+            }
+            else {
+
+                listener.onPreferenceChange(preference,
+                        PreferenceManager
+                                .getDefaultSharedPreferences(preference.getContext())
+                                .getString(preference.getKey(),""));
+            }
         }
     }
     /**
