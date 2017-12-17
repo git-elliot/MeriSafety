@@ -7,6 +7,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -51,6 +53,7 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     private DatabaseReference userEndlat ;
     private DatabaseReference userEndlng ;
     private DatabaseReference userPincode;
+    private DatabaseReference userLocUse;
 
     private static final int REQUEST_PHONE =1889 ;
     private GoogleApiClient mGoogleApiClient;
@@ -68,6 +71,7 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     private final String lng_key = "lng";
     private final String pin_key = "pincode";
     private final String uid_key= "uid";
+    private final String use_loc_key = "useloc";
 
 
     View v;
@@ -210,15 +214,26 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                     String uid =  sp1.getString(uid_key,null);
                     if(uid!=null)
                     {
-                        userEndlat = mDatabase.child(d_key).child(uid).child(lat_key);
-                        userEndlat.setValue(lat);
-                        userEndlng = mDatabase.child(d_key).child(uid).child(lng_key);
-                        userEndlng.setValue(lng);
-                        userPincode = mDatabase.child(d_key).child(uid).child(pin_key);
-                        userPincode.setValue(address1.getPostalCode());
-                        et1.putString(pin_key,address1.getPostalCode());
-                        et1.apply();
+                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        boolean locationPref = sharedPref.getBoolean(SettingsActivity.KEY_PREF_LOCATION,true);
+                        boolean shareLocationPref =sharedPref.getBoolean(SettingsActivity.KEY_PREF_SHARE_LOCATION,true);
+                        if(locationPref){
 
+                            userEndlat = mDatabase.child(d_key).child(uid).child(lat_key);
+                            userEndlat.setValue(lat);
+                            userEndlng = mDatabase.child(d_key).child(uid).child(lng_key);
+                            userEndlng.setValue(lng);
+                            userPincode = mDatabase.child(d_key).child(uid).child(pin_key);
+                            userPincode.setValue(address1.getPostalCode());
+                            et1.putString(pin_key,address1.getPostalCode());
+                            et1.apply();
+
+                            if(!shareLocationPref){
+                                userEndlat = mDatabase.child(d_key).child(uid).child(use_loc_key);
+                                userEndlat.setValue(0);
+
+                            }
+                        }
                     }
                 }
             }

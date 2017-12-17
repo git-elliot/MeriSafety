@@ -43,10 +43,18 @@ import java.util.Set;
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
+    static final String KEY_PREF_LOCATION = "privacy_location";
+    static final String KEY_PREF_SHARE_LOCATION = "share_location";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+        //Read preference by using below lines
+//                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+//        String syncConnPref = sharedPref.getString(SettingsActivity.KEY_PREF_LOCATION, "");
+
+
         getFragmentManager().beginTransaction().replace(android.R.id.content,new MyPreferenceFragment()).commit();
         PreferenceManager.setDefaultValues(this, R.xml.preference, false);
     }
@@ -112,7 +120,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         boolean name = false;
                         boolean mob = false;
                         String s = "";
-                        Log.i("multiselect","String : "+stringValue);
                         if(stringValue.contains("0")){
                            s+="Name";
                            name = true;
@@ -151,6 +158,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onResume();
             bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
             bindPreferenceSummaryToValue(findPreference("nearby_users_sharing"));
+            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
         }
 
         private static void bindPreferenceSummaryToValue(Preference preference) {

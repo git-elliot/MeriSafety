@@ -350,6 +350,7 @@ public class MainActivity extends AppCompatActivity  {
         userInfo.setUserid(uid);
         userInfo.setPhotoUrl(pUrl);
         userInfo.setMobile(null);
+        userInfo.setUseloc(1);
         userInfos.add(userInfo);
     return userInfos;
     }

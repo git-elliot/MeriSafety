@@ -71,7 +71,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         ft.add(R.id.newfraglayout, obj, "homepage");
         ft.commit();
 
-        Toast.makeText(this, "Long press these alert buttons to know about them", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Long press these alert buttons to activate them", Toast.LENGTH_LONG).show();
 
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -170,13 +170,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        final Intent i = new Intent(NavigationDrawerActivity.this,SaveMeActivity.class);
 
         Button lowAlert = findViewById(R.id.lowalert);
 
         lowAlert.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(NavigationDrawerActivity.this, "This alert will only call your guardian", Toast.LENGTH_LONG).show();
+
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
                 return false;
             }
         });
@@ -184,7 +187,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
         highAlert.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(NavigationDrawerActivity.this, "This alert will call and message your guardian", Toast.LENGTH_LONG).show();
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
+
                 return false;
             }
         });
@@ -194,7 +199,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
         adAlert.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(NavigationDrawerActivity.this, "This alert will call, mail and message your guardian", Toast.LENGTH_LONG).show();
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
+
                 return false;
             }
         });
@@ -204,7 +211,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
         selfDef.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(NavigationDrawerActivity.this, "This will help you learn some basics moves.", Toast.LENGTH_LONG).show();
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
+
                 return false;
             }
         });
@@ -214,7 +223,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
         savemeAlert.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(NavigationDrawerActivity.this, "This alert will call, mail and message your guardian and show the location of other users also.", Toast.LENGTH_LONG).show();
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
+
                 return false;
             }
         });
@@ -301,34 +312,30 @@ public class NavigationDrawerActivity extends AppCompatActivity
     {
         if(R.id.lowalert==v.getId()){
 
-            Intent i = new Intent(this,SaveMeActivity.class);
-            i.putExtra(i_key,v.getId());
-            startActivity(i);
+            Toast.makeText(NavigationDrawerActivity.this, "This alert will only call your guardian", Toast.LENGTH_LONG).show();
 
         }
         if(R.id.save_me==v.getId())
         {
-            Intent i = new Intent(this,SaveMeActivity.class);
-            i.putExtra("key",v.getId());
-            startActivity(i);
+            Toast.makeText(NavigationDrawerActivity.this, "This alert will call, mail and message your guardian and show the location of other users also.", Toast.LENGTH_LONG).show();
         }
         if(R.id.highalert==v.getId())
         {
-            Intent i = new Intent(this,SaveMeActivity.class);
-            i.putExtra("key",v.getId());
-            startActivity(i);
+
+            Toast.makeText(NavigationDrawerActivity.this, "This alert will call and message your guardian", Toast.LENGTH_LONG).show();
+
         }
         if(R.id.advancealert==v.getId())
         {
-            Intent i = new Intent(this,SaveMeActivity.class);
-            i.putExtra("key",v.getId());
-            startActivity(i);
+
+            Toast.makeText(NavigationDrawerActivity.this, "This alert will call, mail and message your guardian", Toast.LENGTH_LONG).show();
+
         }
         if(R.id.self_defence==v.getId())
         {
-            Intent i = new Intent(this,SaveMeActivity.class);
-            i.putExtra("key",v.getId());
-            startActivity(i);
+
+            Toast.makeText(NavigationDrawerActivity.this, "This will help you learn some basics moves.", Toast.LENGTH_LONG).show();
+
         }
 
     }
