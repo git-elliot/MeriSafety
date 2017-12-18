@@ -14,9 +14,9 @@ public class UserInfo {
     private String mobile;
     private long pincode;
     private String photoUrl;
-    private long useloc;
+    private boolean useloc;
 
-    public void setUseloc(long useloc) {
+    public void setUseloc(boolean useloc) {
         this.useloc = useloc;
     }
 

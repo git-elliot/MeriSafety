@@ -102,6 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final String p_key = "photoUrl";
     private final String use_loc_key = "useloc";
     private boolean nearbySet=false;
+    private final String ge_key="gemail";
 
 
 
@@ -348,9 +349,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if(!currentsnapshot.getKey().equals(user))
                     {
                       String pincode =currentsnapshot.child(pin_key).getValue().toString();
-                        long useLoc = (long) currentsnapshot.child(use_loc_key).getValue();
+                        boolean useLoc = (boolean) currentsnapshot.child(use_loc_key).getValue();
                         Toast.makeText(MapsActivity.this, "Use location is "+useLoc+" for "+currentsnapshot.child(e_key).getValue().toString(), Toast.LENGTH_SHORT).show();
-                        if(pincode.equals(currentpin)&&useLoc!=0)
+                        if(guarEmail.equals(currentsnapshot.child(e_key).getValue().toString())){
+
+                            placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.child(p_key).getValue().toString(),currentsnapshot.child(e_key).getValue().toString());
+                        }else if(pincode.equals(currentpin)&&useLoc)
                         {
                             placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.child(p_key).getValue().toString(),currentsnapshot.child(e_key).getValue().toString());
 

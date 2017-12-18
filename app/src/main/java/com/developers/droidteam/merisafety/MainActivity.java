@@ -216,8 +216,9 @@ public class MainActivity extends AppCompatActivity  {
     public void checkandlogin(final FirebaseUser user, final String name, final String email, final String pUrl ){
         SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         final SharedPreferences.Editor et = sp.edit();
-        et.putString("uid",user.getUid().toString());
+        et.putString("uid",user.getUid());
         et.putString(n_key,name);
+        et.putString(e_key,email);
         et.apply();
 
 
@@ -350,7 +351,7 @@ public class MainActivity extends AppCompatActivity  {
         userInfo.setUserid(uid);
         userInfo.setPhotoUrl(pUrl);
         userInfo.setMobile(null);
-        userInfo.setUseloc(1);
+        userInfo.setUseloc(true);
         userInfos.add(userInfo);
     return userInfos;
     }

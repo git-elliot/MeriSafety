@@ -214,7 +214,7 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                     String uid =  sp1.getString(uid_key,null);
                     if(uid!=null)
                     {
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(con);
                         boolean locationPref = sharedPref.getBoolean(SettingsActivity.KEY_PREF_LOCATION,true);
                         boolean shareLocationPref =sharedPref.getBoolean(SettingsActivity.KEY_PREF_SHARE_LOCATION,true);
                         if(locationPref){
@@ -230,7 +230,7 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
 
                             if(!shareLocationPref){
                                 userEndlat = mDatabase.child(d_key).child(uid).child(use_loc_key);
-                                userEndlat.setValue(0);
+                                userEndlat.setValue(false);
 
                             }
                         }

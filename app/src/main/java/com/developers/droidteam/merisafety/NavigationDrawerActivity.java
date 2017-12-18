@@ -1,5 +1,6 @@
 package com.developers.droidteam.merisafety;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -8,12 +9,17 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.MemoryFile;
 import android.preference.PreferenceManager;
+import android.support.constraint.solver.Cache;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -29,12 +35,20 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.load.engine.cache.MemoryCache;
+import com.bumptech.glide.load.engine.cache.MemoryCacheAdapter;
 import com.google.android.gms.location.LocationRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -64,12 +78,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
 
-
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         FragHome obj = new FragHome();
         ft.add(R.id.newfraglayout, obj, "homepage");
         ft.commit();
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
 
         Toast.makeText(this, "Long press these alert buttons to activate them", Toast.LENGTH_LONG).show();
 
@@ -100,69 +117,82 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         final SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         final String user = sp.getString(l_key, null);
+        final String user_name = sp.getString(n_key,null);
+        final String user_email = sp.getString(e_key,null);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        if(isConnected){
 
-        userEnd = mDatabase.child(d_key).child(user).child(n_key);
+            mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists())
-                {
-                    tv_name.setText(dataSnapshot.getValue().toString());
+            userEnd = mDatabase.child(d_key).child(user).child(n_key);
 
-                    SharedPreferences.Editor et = sp.edit();
-                    et.putString(n_key,dataSnapshot.getValue().toString());
-                    et.apply();
+            userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists())
+                    {
+                        tv_name.setText(dataSnapshot.getValue().toString());
+
+                        SharedPreferences.Editor et = sp.edit();
+                        et.putString(n_key,dataSnapshot.getValue().toString());
+                        et.apply();
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        userEnd = mDatabase.child(d_key).child(user).child(e_key);
-
-        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists())
-                {
-                    tv_user.setText(dataSnapshot.getValue().toString());
-                    SharedPreferences.Editor et = sp.edit();
-                    et.putString(e_key,dataSnapshot.getValue().toString());
-                    et.apply();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        userEnd = mDatabase.child(d_key).child(user).child(p_key);
-
-        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists())
-                {
-
-                    String imageURL = dataSnapshot.getValue().toString();
-                    FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,imageURL,iv,progressBar);
-                    task.execute();
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
                 }
-            }
+            });
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+            userEnd = mDatabase.child(d_key).child(user).child(e_key);
 
-            }
-        });
+            userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists())
+                    {
+                        tv_user.setText(dataSnapshot.getValue().toString());
+                        SharedPreferences.Editor et = sp.edit();
+                        et.putString(e_key,dataSnapshot.getValue().toString());
+                        et.apply();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+            userEnd = mDatabase.child(d_key).child(user).child(p_key);
+
+            userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists())
+                    {
+
+                        String imageURL = dataSnapshot.getValue().toString();
+                        FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,imageURL,iv,progressBar);
+                        task.execute();
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }else{
+              tv_name.setText(user_name);
+              tv_user.setText(user_email);
+            FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,null,iv,progressBar);
+            task.execute();
+
+        }
 
 
     }
@@ -248,6 +278,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
         String imageURL;
         ImageView imgView;
@@ -270,7 +301,22 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         @Override
         protected Bitmap doInBackground(Void... params) {
-            return getBitmapFromURL(imageURL);
+
+            File file;
+            FileInputStream fileInputStream;
+            try{
+                file = new File(getCacheDir(),"user_pic");
+                fileInputStream = new FileInputStream(file);
+                Log.i("file","File found");
+                return BitmapFactory.decodeStream(fileInputStream);
+
+             } catch (IOException e) {
+                e.printStackTrace();
+                Log.i("file","file not found");
+                return getBitmapFromURL(imageURL);
+
+            }
+
         }
     }
 
@@ -304,7 +350,23 @@ public class NavigationDrawerActivity extends AppCompatActivity
         Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
                 matrix, false);
 
+        createCacheOfFile("user_pic",resizedBitmap);
         return resizedBitmap;
+    }
+    public void createCacheOfFile(String fileName, Bitmap data){
+        File file;
+        FileOutputStream fileOutputStream;
+        try{
+             file = new File(getCacheDir(),fileName);
+             fileOutputStream = new FileOutputStream(file);
+             data.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
+             fileOutputStream.flush();
+             fileOutputStream.close();
+             Log.i("file","file created successfully");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.i("file","Cannot create file, failed");
+        }
     }
 
 
