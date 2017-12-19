@@ -427,6 +427,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 markerOptions.title(myName).snippet(titleStr);
            }
             // 2
+            LatLng l = new LatLng(loc.latitude,loc.longitude);
+            myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(l,12));
             myMap.addMarker(markerOptions);
         }
 

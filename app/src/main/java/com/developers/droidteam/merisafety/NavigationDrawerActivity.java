@@ -528,26 +528,5 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        MenuInflater m = getMenuInflater();
-        m.inflate(R.menu.bottom_menu,menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-    if(item.getItemId()==R.id.like) {
-        Intent intent =  new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://www.facebook.com/merisafety"));
-
-        startActivity(intent);
-
-    }
-    return super.onOptionsItemSelected(item);
-    }
-
 
 }

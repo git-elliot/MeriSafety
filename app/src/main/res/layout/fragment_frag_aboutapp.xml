@@ -42,6 +42,20 @@
         android:layout_marginTop="15dp"
         android:textColor="@color/Dark_grey_text"
         android:typeface="sans"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Like us on facebook"
+        android:textSize="20sp"
+        android:id="@+id/like_us_fb"
+        android:background="@drawable/button"
+        android:textAlignment="center"
+        android:layout_marginTop="15dp"
+        android:textColor="#000"
+        android:typeface="sans"
+        android:textStyle="bold"
+        />
+
 </LinearLayout>
 
 </ScrollView>
