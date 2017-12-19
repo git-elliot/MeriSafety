@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,10 +73,18 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     private final String pin_key = "pincode";
     private final String uid_key= "uid";
     private final String use_loc_key = "useloc";
+    private static final String i_key = "key";
+
 
 
     View v;
     Context con;
+
+    Button savemeAlert;
+    Button selfDef;
+    Button adAlert;
+    Button highAlert;
+    Button lowAlert;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -86,6 +95,13 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v= inflater.inflate(R.layout.activity_frag_home,container,false);
+
+        lowAlert = v.findViewById(R.id.lowalert);
+        highAlert = v.findViewById(R.id.highalert);
+        adAlert = v.findViewById(R.id.advancealert);
+        selfDef = v.findViewById(R.id.self_defence);
+        savemeAlert = v.findViewById(R.id.save_me);
+
         return v;
     }
 
@@ -102,6 +118,74 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
 
        }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        final Intent i = new Intent(con,SaveMeActivity.class);
+
+        lowAlert.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
+                return false;
+            }
+        });
+
+        highAlert.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
+
+                return false;
+            }
+        });
+
+        adAlert.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
+
+                return false;
+            }
+        });
+
+        selfDef.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
+
+                return false;
+            }
+        });
+
+        savemeAlert.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                i.putExtra(i_key,v.getId());
+                startActivity(i);
+
+                return false;
+            }
+        });
+
+        Intent intent = new Intent(con, AlertService.class);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(con);
+        boolean hot_key = sharedPref.getBoolean(SettingsActivity.KEY_HOT,true);
+        if(hot_key){
+            //Starting the service for the hot key
+            con.startService(intent);
+        }
+        else{
+            con.stopService(intent);
+        }
+
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

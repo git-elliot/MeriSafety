@@ -64,7 +64,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
     Toolbar toolbar=null;
     TextView textbar = null;
     boolean toggle=true;
-    private static final String i_key = "key";
     private static final String sp_db = "account_db";
     private static final String l_key = "login_key";
     private static final String d_key = "users";
@@ -197,82 +196,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        final Intent i = new Intent(NavigationDrawerActivity.this,SaveMeActivity.class);
-
-        Button lowAlert = findViewById(R.id.lowalert);
-
-        lowAlert.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
-                return false;
-            }
-        });
-        Button highAlert = findViewById(R.id.highalert);
-        highAlert.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
-
-                return false;
-            }
-        });
-
-        Button adAlert = findViewById(R.id.advancealert);
-
-        adAlert.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
-
-                return false;
-            }
-        });
-
-        Button selfDef = findViewById(R.id.self_defence);
-
-        selfDef.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
-
-                return false;
-            }
-        });
-
-        Button savemeAlert = findViewById(R.id.save_me);
-
-        savemeAlert.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
-
-                return false;
-            }
-        });
-
-        Intent intent = new Intent(NavigationDrawerActivity.this, AlertService.class);
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean hot_key = sharedPref.getBoolean(SettingsActivity.KEY_HOT,true);
-        if(hot_key){
-            //Starting the service for the hot key
-            startService(intent);
-        }
-        else{
-            stopService(intent);
-        }
-
-
-    }
 
     @Override
     public void communicate(String address) {
