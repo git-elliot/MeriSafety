@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.SmsManager;
@@ -76,7 +77,6 @@ public class AdvanceAlertFragment extends Fragment {
                 startActivity(new Intent(con,MapsActivity.class));
             }
         }); */
-
         ConnectivityManager cm = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         final boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
@@ -121,6 +121,12 @@ public class AdvanceAlertFragment extends Fragment {
     {
 
 
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(con);
+        boolean msg = sharedPref.getBoolean(SettingsActivity.KEY_SEND_MSG,true);
+        boolean call = sharedPref.getBoolean(SettingsActivity.KEY_DIAL_CALL,true);
+        boolean em = sharedPref.getBoolean(SettingsActivity.KEY_SEND_EMAIL,true);
+
+
         final PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.sent"), 0);
         final PendingIntent pin = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
         final SmsManager smss = SmsManager.getDefault();
@@ -129,46 +135,55 @@ public class AdvanceAlertFragment extends Fragment {
 
         final String sms = name+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
 
+        //************************SENDING CALL INTENT***************************
+        if(call){
 
-        new Thread(){
+            new Thread(){
 
-            @Override
-            public void run() {
-                super.run();
+                @Override
+                public void run() {
+                    super.run();
 
-                try {
-                    Thread.sleep(2000);
+                    try {
+                        Thread.sleep(2000);
 
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +mobile));
-                    startActivity(intent);
+                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +mobile));
+                        startActivity(intent);
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }.start();
-        smss.sendTextMessage(mobile, null, sms, pi, pin);
+            }.start();
+        }
+        //**********************SENDING MESSAGE INTENT*************************8888
+        if(msg){
 
+            smss.sendTextMessage(mobile, null, sms, pi, pin);
 
-        apiKey = mDatabase.child("mailapikey");
-        apiKey.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String api_key=dataSnapshot.getValue().toString();
-                if(!executeOnce){
+        }
+        if(em){
 
-                    SendMail sendMail = new SendMail(email,"Advance Alert",sms,api_key);
-                    sendMail.execute();
-                    executeOnce=true;
+            apiKey = mDatabase.child("mailapikey");
+            apiKey.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String api_key=dataSnapshot.getValue().toString();
+                    if(!executeOnce){
+
+                        SendMail sendMail = new SendMail(email,"Advance Alert",sms,api_key);
+                        sendMail.execute();
+                        executeOnce=true;
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
 
+        }
 
     }
 }

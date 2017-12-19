@@ -137,6 +137,8 @@ public class SaveMeFragment extends Fragment {
                 }
             }
         }.start();
+
+
         smss.sendTextMessage(mobile, null, sms, pi, pin);
 
         apiKey = mDatabase.child("mailapikey");

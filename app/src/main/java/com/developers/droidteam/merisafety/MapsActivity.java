@@ -162,6 +162,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
              mMap.clear();
 
                 Toast.makeText(MapsActivity.this, "Finding nearby peoples", Toast.LENGTH_SHORT).show();
+               if(mLastLocation.getLongitude()!=0){
+                   placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+               }
                 placeNearbyPeoples();
 
             }
@@ -173,6 +176,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
 
                 Toast.makeText(MapsActivity.this, "Finding nearby police stations", Toast.LENGTH_SHORT).show();
+                if(mLastLocation.getLongitude()!=0){
+                    placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                }
+
                 performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
 
             }
@@ -184,6 +191,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
 
                 Toast.makeText(MapsActivity.this, "Finding nearby Hospitals", Toast.LENGTH_SHORT).show();
+                if(mLastLocation.getLongitude()!=0){
+                    placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                }
                 performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
 
             }
@@ -206,7 +216,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googlePlacesUrl.append("&sensor=true");
         googlePlacesUrl.append("&key=" + GOOGLE_API_KEY);
 
-        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask();
+        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask(this,type);
         Object[] toPass = new Object[2];
         toPass[0] = googleMap;
         toPass[1] = googlePlacesUrl.toString();
@@ -350,7 +360,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     {
                       String pincode =currentsnapshot.child(pin_key).getValue().toString();
                         boolean useLoc = (boolean) currentsnapshot.child(use_loc_key).getValue();
-                        Toast.makeText(MapsActivity.this, "Use location is "+useLoc+" for "+currentsnapshot.child(e_key).getValue().toString(), Toast.LENGTH_SHORT).show();
                         if(guarEmail.equals(currentsnapshot.child(e_key).getValue().toString())){
 
                             placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.child(p_key).getValue().toString(),currentsnapshot.child(e_key).getValue().toString());

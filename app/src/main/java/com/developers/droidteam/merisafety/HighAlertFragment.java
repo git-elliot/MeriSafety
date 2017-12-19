@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.SmsManager;
@@ -89,39 +90,42 @@ public class HighAlertFragment extends Fragment {
         final String gmobile = sp.getString(gm_key,null);
 
 
+        if(isConnected){
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+            sendAlert(gname,gmobile);
 
-        guarEnd = mDatabase.child(d_key).child(user).child(user);
+        }else{
 
-        guarEnd.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            mDatabase = FirebaseDatabase.getInstance().getReference();
 
-                if(isConnected)
-                {
+            guarEnd = mDatabase.child(d_key).child(user).child(user);
+
+            guarEnd.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
                     sendAlert(dataSnapshot.child(n_key).getValue().toString(),dataSnapshot.child(m_key).getValue().toString());
 
                 }
-                else
-                {
 
-                    sendAlert(gname,gmobile);
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
                 }
-            }
+            });
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        }
 
 
 
     }
 
     public void sendAlert(String name, final String mobile){
+
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(con);
+        boolean msg = sharedPref.getBoolean(SettingsActivity.KEY_SEND_MSG,true);
+        boolean call = sharedPref.getBoolean(SettingsActivity.KEY_DIAL_CALL,true);
+        boolean em = sharedPref.getBoolean(SettingsActivity.KEY_SEND_EMAIL,true);
 
 
         SharedPreferences sp = con.getSharedPreferences("account_db", Context.MODE_PRIVATE);
@@ -133,24 +137,26 @@ public class HighAlertFragment extends Fragment {
         final String sms = name+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
 
 
+        if(call){
 
-        new Thread(){
+            new Thread(){
 
-            @Override
-            public void run() {
-                super.run();
+                @Override
+                public void run() {
+                    super.run();
 
-                try {
-                    Thread.sleep(100);
+                    try {
+                        Thread.sleep(100);
 
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +mobile));
-                    startActivity(intent);
+                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +mobile));
+                        startActivity(intent);
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }.start();
+            }.start();
+        }
 /*
         BackgroundMail.newBuilder(con).withUsername("merisafety@gmail.com")
                 .withPassword("WRTB@droid")
@@ -183,9 +189,11 @@ public class HighAlertFragment extends Fragment {
                 })
                 .send();
 */
+       if(msg){
 
-        smss.sendTextMessage(mobile, null, sms, pi, pin);
+           smss.sendTextMessage(mobile, null, sms, pi, pin);
 
+       }
 
     }
 }

@@ -8,11 +8,13 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -71,35 +73,29 @@ public class LowAlertFragment extends Fragment {
         final String gname = sp.getString(gn_key,null);
         final String gmobile = sp.getString(gm_key,null);
 
+        if(isConnected){
+            mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+            guarEnd = mDatabase.child(d_key).child(user).child(user);
 
-        guarEnd = mDatabase.child(d_key).child(user).child(user);
+            guarEnd.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
 
-        guarEnd.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-
-                if(isConnected)
-                {
-                    sendAlert(dataSnapshot.child(m_key).getValue().toString());
-
-                }
-                else
-                {
-
-                    sendAlert(gmobile);
+                        sendAlert(dataSnapshot.child(m_key).getValue().toString());
                 }
 
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
+                }
+            });
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+        }
+        else{
+            sendAlert(gmobile);
 
-            }
-        });
+        }
 
 
     }
@@ -107,23 +103,33 @@ public class LowAlertFragment extends Fragment {
     public  void sendAlert(final String mobile)
     {
 
-        new Thread(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(con);
+        boolean msg = sharedPref.getBoolean(SettingsActivity.KEY_SEND_MSG,true);
+        boolean call = sharedPref.getBoolean(SettingsActivity.KEY_DIAL_CALL,true);
+        boolean em = sharedPref.getBoolean(SettingsActivity.KEY_SEND_EMAIL,true);
 
-            @Override
-            public void run() {
-                super.run();
+        if(call){
 
-                try {
-                    Thread.sleep(100);
+            new Thread(){
 
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +mobile));
-                    startActivity(intent);
+                @Override
+                public void run() {
+                    super.run();
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    try {
+                        Thread.sleep(100);
+
+                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +mobile));
+                        startActivity(intent);
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }.start();
+            }.start();
 
+        }else {
+            Toast.makeText(con, "Call must be turned on in the settings", Toast.LENGTH_LONG).show();
+        }
     }
 }

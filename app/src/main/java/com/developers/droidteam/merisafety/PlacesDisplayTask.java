@@ -1,11 +1,19 @@
 package com.developers.droidteam.merisafety;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
+
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.ui.IconGenerator;
+
 import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +22,12 @@ public class PlacesDisplayTask extends AsyncTask<Object, Integer, List<HashMap<S
 
     JSONObject googlePlacesJson;
     GoogleMap googleMap;
-
+    Context con;
+    String ssType;
+    public PlacesDisplayTask(Context context,String type){
+        con=context;
+        ssType=type;
+    }
     @Override
     protected List<HashMap<String, String>> doInBackground(Object... inputObj) {
 
@@ -35,6 +48,20 @@ public class PlacesDisplayTask extends AsyncTask<Object, Integer, List<HashMap<S
     protected void onPostExecute(List<HashMap<String, String>> list) {
         if(list!=null)
         {
+            ImageView mImageView = new ImageView(con);
+            IconGenerator mIconGenerator = new IconGenerator(con);
+            mIconGenerator.setContentView(mImageView);
+            mImageView.setBackgroundColor(con.getResources().getColor(R.color.colorPrimary));
+            if(ssType.equals("hospital"))
+            {
+                mImageView.setImageResource(R.drawable.ic_local_hospital_black_24dp);
+            }
+            else if(ssType.equals("police")){
+                mImageView.setImageResource(R.drawable.ic_security_black_24dp);
+            }
+            MapsActivity mapsActivity = new MapsActivity();
+            Bitmap iconBitmap = mapsActivity.getResizedBitmap(mIconGenerator.makeIcon(),100,100);
+
             for (int i = 0; i < list.size(); i++) {
                 MarkerOptions markerOptions = new MarkerOptions();
                 HashMap<String, String> googlePlace = list.get(i);
@@ -43,7 +70,7 @@ public class PlacesDisplayTask extends AsyncTask<Object, Integer, List<HashMap<S
                 String placeName = googlePlace.get("place_name");
                 String vicinity = googlePlace.get("vicinity");
                 LatLng latLng = new LatLng(lat, lng);
-                markerOptions.position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                markerOptions.position(latLng).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
                 markerOptions.title(placeName + " : " + vicinity);
                 googleMap.addMarker(markerOptions);
             }

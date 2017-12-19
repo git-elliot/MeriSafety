@@ -1,14 +1,9 @@
 package com.developers.droidteam.merisafety;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
@@ -19,14 +14,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.MenuItem;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -45,6 +33,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     static final String KEY_PREF_LOCATION = "privacy_location";
     static final String KEY_PREF_SHARE_LOCATION = "share_location";
+    static final String KEY_HOT = "hot_key";
+    static final String KEY_SEND_MSG = "send_msg";
+    static final String KEY_DIAL_CALL = "dial_call";
+    static final String KEY_SEND_EMAIL = "send_email";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

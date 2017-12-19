@@ -260,8 +260,18 @@ public class NavigationDrawerActivity extends AppCompatActivity
             }
         });
 
-        //Starting the service for the hot key
-        startService(new Intent(NavigationDrawerActivity.this, AlertService.class));
+        Intent intent = new Intent(NavigationDrawerActivity.this, AlertService.class);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean hot_key = sharedPref.getBoolean(SettingsActivity.KEY_HOT,true);
+        if(hot_key){
+            //Starting the service for the hot key
+            startService(intent);
+        }
+        else{
+            stopService(intent);
+        }
+
+
     }
 
     @Override
