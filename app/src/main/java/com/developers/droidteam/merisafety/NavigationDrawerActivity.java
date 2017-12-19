@@ -198,8 +198,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         final Intent i = new Intent(NavigationDrawerActivity.this,SaveMeActivity.class);
 
         Button lowAlert = findViewById(R.id.lowalert);
