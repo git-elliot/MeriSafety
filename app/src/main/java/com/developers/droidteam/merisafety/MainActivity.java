@@ -48,13 +48,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity  {
     private static final int REQUEST_PERMISSIONS = 10;
-    private static final int REQUEST_PHONE =1889 ;
-    private static final int REQUEST_MSG =1880 ;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private static final int CORSE_LOCATION_PERMISSION_REQUEST_CODE = 2;
     private DatabaseReference mDatabase;
     private DatabaseReference userEnd ;
-    Long buttonClicked;
     private static final int RC_SIGN_IN = 123;
     private final String sp_db = "account_db";
     private final String l_key = "login_key";

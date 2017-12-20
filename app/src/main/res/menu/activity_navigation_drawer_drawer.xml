@@ -12,15 +12,15 @@
             android:title="Gaurdian" />
         <item
             android:id="@+id/nav_police"
-            android:icon="@drawable/ic_security_black_48dp"
+            android:icon="@drawable/ic_security_black_24dp"
             android:title="All Police Station" />
         <item
             android:id="@+id/nav_contact"
-            android:icon="@drawable/ic_contact_mail_black_48dp"
+            android:icon="@drawable/ic_contact_mail_black_24dp"
             android:title="Helpine Nos" />
         <item
             android:id="@+id/nav_nearby"
-            android:icon="@drawable/ic_location_on_black_48dp"
+            android:icon="@drawable/ic_location_on_black_24dp"
             android:title="Nearby" />
     </group>
 
@@ -32,7 +32,7 @@
                 android:title="Settings" />
             <item
                 android:id="@+id/nav_feedback"
-                android:icon="@drawable/ic_feedback_black_48dp"
+                android:icon="@drawable/ic_feedback_black_24dp"
                 android:title="Feedback" />
 
             <item android:id="@+id/aboutapp"

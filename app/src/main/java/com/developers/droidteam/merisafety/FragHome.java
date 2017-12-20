@@ -313,8 +313,8 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                             et1.apply();
 
                             if(!shareLocationPref){
-                                userEndlat = mDatabase.child(d_key).child(uid).child(use_loc_key);
-                                userEndlat.setValue(false);
+                                userLocUse = mDatabase.child(d_key).child(uid).child(use_loc_key);
+                                userLocUse.setValue(false);
 
                             }
                         }
