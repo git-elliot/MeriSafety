@@ -3,6 +3,8 @@ package com.developers.droidteam.merisafety;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
  * Created by paras on 23/11/17.
@@ -13,7 +15,13 @@ public class BootComplete extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         Intent i = new Intent(context, AlertService.class);
-        context.startService(i);
 
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean hot_key = sharedPref.getBoolean(SettingsActivity.KEY_HOT,true);
+        if(hot_key){
+
+            context.startService(i);
+
+        }
     }
 }
