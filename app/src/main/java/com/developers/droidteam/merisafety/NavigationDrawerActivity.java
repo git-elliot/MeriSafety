@@ -20,6 +20,7 @@ import android.support.constraint.solver.Cache;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -304,33 +305,39 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
 
         public void fun(View v)
-    {
+       {
+
+           Toast t = null;
         if(R.id.lowalert==v.getId()){
 
-            Toast.makeText(NavigationDrawerActivity.this, "This alert will only call your guardian", Toast.LENGTH_LONG).show();
-
+            t= Toast.makeText(getApplicationContext(), R.string.low_alert_toast,Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.END|Gravity.TOP,0,0);
+            t.show();
         }
         if(R.id.save_me==v.getId())
         {
-            Toast.makeText(NavigationDrawerActivity.this, "This alert will call, mail and message your guardian and show the location of other users also.", Toast.LENGTH_LONG).show();
+            t= Toast.makeText(getApplicationContext(), R.string.save_me_toast,Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.CENTER,0,0);
+            t.show();
+
         }
         if(R.id.highalert==v.getId())
         {
-
-            Toast.makeText(NavigationDrawerActivity.this, "This alert will call and message your guardian", Toast.LENGTH_LONG).show();
-
+            t= Toast.makeText(getApplicationContext(), R.string.high_alert_toast,Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.END|Gravity.CENTER_HORIZONTAL,0,0);
+            t.show();
         }
         if(R.id.advancealert==v.getId())
         {
-
-            Toast.makeText(NavigationDrawerActivity.this, "This alert will call, mail and message your guardian", Toast.LENGTH_LONG).show();
-
+            t= Toast.makeText(getApplicationContext(), R.string.advance_alert_toast,Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.END,0,200);
+            t.show();
         }
         if(R.id.self_defence==v.getId())
         {
-
-            Toast.makeText(NavigationDrawerActivity.this, "This will help you learn some basics moves.", Toast.LENGTH_LONG).show();
-
+            t= Toast.makeText(getApplicationContext(), R.string.self_defence_toast,Toast.LENGTH_SHORT);
+            t.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.END,0,400);
+            t.show();
         }
 
     }
