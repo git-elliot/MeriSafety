@@ -213,14 +213,16 @@ public class NavigationDrawerActivity extends AppCompatActivity
     }
 
     @SuppressLint("StaticFieldLeak")
-    private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
+    public static class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
         String imageURL;
         ImageView imgView;
         ProgressBar progressBar;
+        Context context;
         public FetchBitmap(Activity activity, String imgURL, ImageView imageView,ProgressBar progressBar1) {
             imageURL = imgURL;
             imgView = imageView;
            progressBar= progressBar1;
+           context=activity;
         }
 
         @Override
@@ -239,7 +241,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             File file;
             FileInputStream fileInputStream;
             try{
-                file = new File(getCacheDir(),"user_pic");
+                file = new File(context.getCacheDir(),"user_pic");
                 fileInputStream = new FileInputStream(file);
                 Log.i("file","File found");
                 return BitmapFactory.decodeStream(fileInputStream);
@@ -247,14 +249,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
              } catch (IOException e) {
                 e.printStackTrace();
                 Log.i("file","file not found");
-                return getBitmapFromURL(imageURL);
+                return getBitmapFromURL(context,imageURL);
 
             }
 
         }
     }
 
-    public Bitmap getBitmapFromURL(String src) {
+    public static Bitmap getBitmapFromURL(Context context,String src) {
         try {
             java.net.URL url = new java.net.URL(src);
             HttpURLConnection connection = (HttpURLConnection) url
@@ -263,14 +265,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
             connection.connect();
             InputStream input = connection.getInputStream();
             Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return getResizedBitmap(myBitmap,70,70);
+            return getResizedBitmap(context,myBitmap,70,70);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+    public static Bitmap getResizedBitmap(Context context,Bitmap bm, int newHeight, int newWidth) {
         int width = bm.getWidth();
         int height = bm.getHeight();
         float scaleWidth = ((float) newWidth) / width;
@@ -284,14 +286,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
         Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
                 matrix, false);
 
-        createCacheOfFile("user_pic",resizedBitmap);
+        createCacheOfFile(context,"user_pic",resizedBitmap);
         return resizedBitmap;
     }
-    public void createCacheOfFile(String fileName, Bitmap data){
+    public static void createCacheOfFile(Context context,String fileName, Bitmap data){
         File file;
         FileOutputStream fileOutputStream;
         try{
-             file = new File(getCacheDir(),fileName);
+             file = new File(context.getCacheDir(),fileName);
              fileOutputStream = new FileOutputStream(file);
              data.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
              fileOutputStream.flush();
@@ -370,6 +372,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ft.addToBackStack("stack1");
             ft.replace(R.id.newfraglayout,obj,"homebutton");
             ft.commit();
+        } else if (id == R.id.nav_profile) {
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ProfileFragment obj = new ProfileFragment();
+            ft.addToBackStack("stack2");
+            ft.replace(R.id.newfraglayout,obj,"profile");
+            ft.commit();
+
         } else if (id == R.id.nav_gaudian) {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
