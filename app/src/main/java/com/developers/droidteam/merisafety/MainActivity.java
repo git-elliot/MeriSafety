@@ -7,6 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -30,11 +34,11 @@ import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.ResultCodes;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,6 +47,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -303,40 +316,116 @@ public class MainActivity extends AppCompatActivity  {
     public void createUser(String name, String email, String uid, String pUrl)
     {
 
-    mDatabase = FirebaseDatabase.getInstance().getReference();
 
-    userEnd = mDatabase.child(d_key);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        userEnd = mDatabase.child(d_key);
+        addUserToFirebase(name,email,uid,pUrl);
 
-    addUserToFirebase(name,email,uid,pUrl);
+        DownloadAndUpload task = new DownloadAndUpload(con,uid,pUrl);
+        task.execute();
+
+    }
+    public static class DownloadAndUpload extends AsyncTask{
+
+        String UID;
+        String URL;
+        Context con;
+        public DownloadAndUpload(Context context, String uid,String url){
+            UID=uid;
+            URL=url;
+            con=context;
+
+        }
+        @Override
+        protected Object doInBackground(Object[] objects) {
+
+            return Uri.fromFile(getBitmapFromURL(con,URL,200,200));
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+
+            // Create a storage reference from our app
+            StorageReference storageRef = storage.getReference();
 
 
+            StorageReference photoRef = storageRef.child("user_photos/"+UID+".jpg");
 
-       /* FirebaseStorage storage = FirebaseStorage.getInstance();
+            photoRef.putFile((Uri) o)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded content
+                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                            Toast.makeText(con, "Upload successfull", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            // ...
+                            Toast.makeText(con, "Upload unsucessfull", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-        // Create a storage reference from our app
-        StorageReference storageRef = storage.getReference();
+        }
+    }
+
+    public static File getBitmapFromURL(Context context, String src, int h, int w) {
+        try {
+            java.net.URL url = new java.net.URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url
+                    .openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return getResizedBitmap(context,myBitmap,h,w);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static File getResizedBitmap(Context context, Bitmap bm, int newHeight, int newWidth) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
+                matrix, false);
+
+      return createCacheOfFile(context,"user_pic",resizedBitmap);
+
+    }
+    public static File createCacheOfFile(Context context,String fileName, Bitmap data){
 
 
-        StorageReference photoRef = storageRef.child("images/"+email+".jpg");
-
-        photoRef.putFile(purl)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded content
-                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                        Toast.makeText(con, "Upload successfull", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        // ...
-                        Toast.makeText(con, "Upload unsucessfull", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                */
+        File file = null;
+        FileOutputStream fileOutputStream;
+        try{
+            file = new File(context.getCacheDir(),fileName);
+            fileOutputStream = new FileOutputStream(file);
+            data.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            Log.i("file","file created successfully");
+          
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.i("file","Cannot create file, failed");
+        }
+        return file;
     }
 
     public static List<UserInfo> getUserInfo(String name, String email, String uid, String pUrl){

@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -22,6 +23,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -30,6 +32,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -58,6 +65,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.io.IOException;
@@ -359,10 +368,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         boolean useLoc = (boolean) currentsnapshot.child(use_loc_key).getValue();
                         if(guarEmail.equals(currentsnapshot.child(e_key).getValue().toString())){
 
-                            placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.child(p_key).getValue().toString(),currentsnapshot.child(e_key).getValue().toString());
+                            placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.getKey(),currentsnapshot.child(e_key).getValue().toString());
                         }else if(pincode.equals(currentpin)&&useLoc)
                         {
-                            placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.child(p_key).getValue().toString(),currentsnapshot.child(e_key).getValue().toString());
+                            placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.getKey(),currentsnapshot.child(e_key).getValue().toString());
 
                         }
                     }
@@ -377,92 +386,68 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
     }
-    public void placePeopleWindow(String name, String mobile,String lat, String lng,String pUrl,String email)
+    public void placePeopleWindow(String name, String mobile,String lat, String lng,String uid,String email)
     {
         double mylat = Double.parseDouble(lat);
         double mylng = Double.parseDouble(lng);
         LatLng mylatlng = new LatLng(mylat,mylng);
-        placeMarkerOnMapPeople(name,mobile,mylatlng,pUrl,email);
+        placeMarkerOnMapPeople(name,mobile,mylatlng,uid,email);
     }
 
-    private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
-        String imageURL;
-        LatLng loc ;
-        String myName;
-        GoogleMap myMap;
-        String gEmail ;
-        public FetchBitmap(String imgURL, GoogleMap mMap, LatLng location, String name,String email) {
-            imageURL = imgURL;
-            loc = location;
-            myName = name;
-            myMap = mMap;
-            gEmail=email;
-        }
+    public void setImageMarker( final String UID, final GoogleMap mMap, final LatLng location, final String name, final String email)
+    {
+        Log.d("glide","entered glide");
 
-        @Override
-        protected void onPreExecute() {
-        }
+        final ImageView mImageView = new ImageView(getApplicationContext());
+        final IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
 
-        @Override
-        protected void onPostExecute(Bitmap result) {
+        // Reference to an image file in Cloud Storage
+        FirebaseStorage storage = FirebaseStorage.getInstance();
 
-            ImageView mImageView = new ImageView(getApplicationContext());
-            IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
-            mIconGenerator.setContentView(mImageView);
-            mImageView.setImageBitmap(result);
-            Bitmap iconBitmap = mIconGenerator.makeIcon();
+        StorageReference storageRef = storage.getReference();
 
-            MarkerOptions markerOptions = new MarkerOptions().position(loc).icon(BitmapDescriptorFactory.fromBitmap(iconBitmap));
-            String titleStr = getAddress(loc);  // add these two lines
-           if(guarEmail!=null&&guarEmail.equals(gEmail))
-           {
+        StorageReference photoRef = storageRef.child("user_photos/"+UID+".jpg");
 
-               markerOptions.title("Guardian: "+myName).snippet(titleStr);
-           }
-           else
-           {
-                markerOptions.title(myName).snippet(titleStr);
-           }
-            // 2
-            LatLng l = new LatLng(loc.latitude,loc.longitude);
-            myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(l,12));
-            myMap.addMarker(markerOptions);
-        }
+        GlideApp.with(mImageView.getContext() /* context */)
+                .load(photoRef)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        Log.d("glide",e.getMessage());
+                        return false;
+                    }
 
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-            return getBitmapFromURL(imageURL);
-        }
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+
+                        Log.d("glide","successfully downloaded : "+UID);
+                        mIconGenerator.setContentView(mImageView);
+                        Bitmap iconBitmap = mIconGenerator.makeIcon();
+
+                        MarkerOptions markerOptions = new MarkerOptions().position(location).icon(BitmapDescriptorFactory.fromBitmap(getResizedBitmap(iconBitmap,70,70)));
+                        String titleStr = getAddress(location);  // add these two lines
+                        if(guarEmail!=null&&guarEmail.equals(email))
+                        {
+
+                            markerOptions.title("Guardian: "+name).snippet(titleStr);
+                        }
+                        else
+                        {
+                            markerOptions.title(name).snippet(titleStr);
+                        }
+                        // 2
+                        LatLng l = new LatLng(location.latitude,location.longitude);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(l,12));
+                        mMap.addMarker(markerOptions);
+
+                        return false;
+                    }
+                })
+                .dontAnimate()
+                .into(mImageView);
+
     }
 
-    public Bitmap getBitmapFromURL(String src) {
-        try {
-            java.net.URL url = new java.net.URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url
-                    .openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return getResizedBitmap(myBitmap,100,100);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public static Bitmap createDrawableFromView(Context context, View view, Bitmap bitmap) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        view.setLayoutParams(new LinearLayout.LayoutParams(100,100));
-        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.buildDrawingCache();
-
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
-
-        return bitmap;
-    }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
         int width = bm.getWidth();
@@ -487,23 +472,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         String userid = sp.getString(l_key,null);
 
-        userEnd = mDatabase.child(d_key).child(userid).child(p_key);
-
-        userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists())
-                {
-                    FetchBitmap task = new FetchBitmap(dataSnapshot.getValue().toString(),mMap,loc,"You",null);
-                    task.execute();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        setImageMarker(userid,mMap,loc,"You",null);
 
         userEnd = mDatabase.child((d_key)).child(userid).child(userid).child(e_key);
         userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -525,11 +494,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    protected void placeMarkerOnMapPeople(String name, String mobile, LatLng location, String pUrl,String email) {
+    protected void placeMarkerOnMapPeople(String name, String mobile, LatLng location, String uid,String email) {
         // 1
-        FetchBitmap task = new FetchBitmap(pUrl,mMap,location,name,email);
-        task.execute();
-
+        setImageMarker(uid,mMap,location,name,email);
     }
 
     private String getAddress(LatLng latLng) {

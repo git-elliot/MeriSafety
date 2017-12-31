@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -16,6 +17,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.MemoryFile;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.solver.Cache;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -37,14 +40,23 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.engine.cache.MemoryCache;
 import com.bumptech.glide.load.engine.cache.MemoryCacheAdapter;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -114,6 +126,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         final TextView tv_user =  hView.findViewById(R.id.nav_drawer_user);
 
         progressBar=hView.findViewById(R.id.prog_user);
+        progressBar.setVisibility(View.VISIBLE);
 
         iv =  hView.findViewById(R.id.imageView);
 
@@ -136,6 +149,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         final String user = sp.getString(l_key, null);
         final String user_name = sp.getString(n_key,null);
         final String user_email = sp.getString(e_key,null);
+        final String user_purl = sp.getString(p_key,null);
+
 
         if(isConnected){
 
@@ -192,9 +207,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     {
 
                         String imageURL = dataSnapshot.getValue().toString();
-                        FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,imageURL,iv,progressBar,70,70);
-                        task.execute();
+                        SharedPreferences.Editor et = sp.edit();
+                        et.putString(p_key,imageURL);
+                        et.apply();
 
+                       setImageView(iv,"user_photos/"+user+".jpg",progressBar);
                     }
                 }
 
@@ -206,11 +223,54 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }else{
               tv_name.setText(user_name);
               tv_user.setText(user_email);
-            FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,null,iv,progressBar,70,70);
-            task.execute();
+            File file;
+            FileInputStream fileInputStream;
+            try{
+                file = new File(getCacheDir(),"user_pic");
+                fileInputStream = new FileInputStream(file);
+                Log.i("file","File found");
+                iv.setImageBitmap(BitmapFactory.decodeStream(fileInputStream));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.i("file","file not found");
+            }
 
         }
 
+
+    }
+
+    public void setImageView(ImageView i, String dir, final ProgressBar progressBar)
+    {
+
+        // Reference to an image file in Cloud Storage
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        StorageReference storageRef = storage.getReference();
+
+        StorageReference photoRef = storageRef.child(dir);
+
+        GlideApp.with(i.getContext() /* context */)
+                .load(photoRef)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        Log.d("glide",e.getMessage());
+                        progressBar.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+
+                        Log.d("glide","successfully downloaded");
+                        progressBar.setVisibility(View.INVISIBLE);
+                        return false;
+                    }
+                })
+                .dontAnimate()
+                .into(i);
 
     }
 
@@ -228,102 +288,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             toggle = true;
         }
     }
-
-    @SuppressLint("StaticFieldLeak")
-    public static class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
-        String imageURL;
-        ImageView imgView;
-        ProgressBar progressBar;
-        Context context;
-        int h, w;
-        public FetchBitmap(Context activity, String imgURL, ImageView imageView,ProgressBar progressBar1, int height, int width) {
-            imageURL = imgURL;
-            imgView = imageView;
-           progressBar= progressBar1;
-           context=activity;
-           h=height;
-           w=width;
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            progressBar.setVisibility(View.INVISIBLE);
-            imgView.setImageBitmap(result);
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-
-            File file;
-            FileInputStream fileInputStream;
-            try{
-                file = new File(context.getCacheDir(),"user_pic");
-                fileInputStream = new FileInputStream(file);
-                Log.i("file","File found");
-                return BitmapFactory.decodeStream(fileInputStream);
-
-             } catch (IOException e) {
-                e.printStackTrace();
-                Log.i("file","file not found");
-                return getBitmapFromURL(context,imageURL,h,w);
-            }
-
-        }
-    }
-
-    public static Bitmap getBitmapFromURL(Context context,String src, int h, int w) {
-        try {
-            java.net.URL url = new java.net.URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url
-                    .openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return getResizedBitmap(context,myBitmap,h,w);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static Bitmap getResizedBitmap(Context context,Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // CREATE A MATRIX FOR THE MANIPULATION
-        Matrix matrix = new Matrix();
-        // RESIZE THE BIT MAP
-        matrix.postScale(scaleWidth, scaleHeight);
-
-        // "RECREATE" THE NEW BITMAP
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
-                matrix, false);
-
-        createCacheOfFile(context,"user_pic",resizedBitmap);
-        return resizedBitmap;
-    }
-    public static void createCacheOfFile(Context context,String fileName, Bitmap data){
-        File file;
-        FileOutputStream fileOutputStream;
-        try{
-             file = new File(context.getCacheDir(),fileName);
-             fileOutputStream = new FileOutputStream(file);
-             data.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
-             fileOutputStream.flush();
-             fileOutputStream.close();
-             Log.i("file","file created successfully");
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.i("file","Cannot create file, failed");
-        }
-    }
-
 
         public void fun(View v)
        {

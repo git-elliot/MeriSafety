@@ -47,17 +47,17 @@ public class Frag_team extends Fragment {
         ImageView siddharth = v.findViewById(R.id.siddharth);
         ImageView sunny = v.findViewById(R.id.sunny);
 
-        setImageView(abhi,"abhi_new",R.id.prog_abhi,0);
-        setImageView(paras,"par_new",R.id.prog_paras,1);
-        setImageView(priya,"pri1_new",R.id.prog_priya,2);
-        setImageView(ridhima,"rid_new",R.id.prog_ridhi,3);
-        setImageView(siddharth,"sid1_new1",R.id.prog_sid,4);
-        setImageView(sunny,"sun1_new",R.id.prog_sun,5);
+        setImageView(abhi,"teamimages/abhi_new.png",R.id.prog_abhi,0);
+        setImageView(paras,"teamimages/par_new.png",R.id.prog_paras,1);
+        setImageView(priya,"teamimages/pri1_new.png",R.id.prog_priya,2);
+        setImageView(ridhima,"teamimages/rid_new.png",R.id.prog_ridhi,3);
+        setImageView(siddharth,"teamimages/sid1_new1.png",R.id.prog_sid,4);
+        setImageView(sunny,"teamimages/sun1_new.png",R.id.prog_sun,5);
 
     }
 
 
-    public void setImageView(ImageView i, String name, int id, final int k)
+    public void setImageView(ImageView i, String dir, int id, final int k)
     {
 
         progressBar[k] = v.findViewById(id);
@@ -66,7 +66,7 @@ public class Frag_team extends Fragment {
 
         StorageReference storageRef = storage.getReference();
 
-        StorageReference photoRef = storageRef.child("teamimages/"+name+".png");
+        StorageReference photoRef = storageRef.child(dir);
 
         GlideApp.with(i.getContext() /* context */)
                 .load(photoRef)

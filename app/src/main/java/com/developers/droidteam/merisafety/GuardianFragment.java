@@ -43,9 +43,9 @@ import java.net.HttpURLConnection;
  */
 public class GuardianFragment extends Fragment {
 
-    private static final String TAG = "MeriSafety" ;
+    private static final String TAG = "MeriSafety";
     private DatabaseReference mDatabase;
-    private DatabaseReference guarEnd ;
+    private DatabaseReference guarEnd;
 
 
     private final String sp_db = "account_db";
@@ -62,7 +62,7 @@ public class GuardianFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        con= context;
+        con = context;
     }
 
     public GuardianFragment() {
@@ -74,7 +74,7 @@ public class GuardianFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        v= inflater.inflate(R.layout.fragment_guardian, container, false);
+        v = inflater.inflate(R.layout.fragment_guardian, container, false);
         return v;
     }
 
@@ -98,23 +98,17 @@ public class GuardianFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
-                {
-                   if(currentsnapshot.getKey().equals(n_key))
-                   {
-                       tname.setText(dataSnapshot.child(n_key).getValue().toString());
-                   }
-                   else if(currentsnapshot.getKey().equals(m_key))
-                   {
-                       temail.setText(dataSnapshot.child(m_key).getValue().toString());
+                for (DataSnapshot currentsnapshot : dataSnapshot.getChildren()) {
+                    if (currentsnapshot.getKey().equals(n_key)) {
+                        tname.setText(dataSnapshot.child(n_key).getValue().toString());
+                    } else if (currentsnapshot.getKey().equals(m_key)) {
+                        temail.setText(dataSnapshot.child(m_key).getValue().toString());
 
-                   }
-                   else if(currentsnapshot.getKey().equals(e_key))
-                   {
-                       tphone.setText(dataSnapshot.child(e_key).getValue().toString());
-                       setGuardianPhoto(dataSnapshot.child(e_key).getValue().toString(),user,img);
+                    } else if (currentsnapshot.getKey().equals(e_key)) {
+                        tphone.setText(dataSnapshot.child(e_key).getValue().toString());
+                        setGuardianPhoto(dataSnapshot.child(e_key).getValue().toString(), user, img);
 
-                   }
+                    }
                 }
             }
 
@@ -129,7 +123,7 @@ public class GuardianFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder ad= new AlertDialog.Builder(con);
+                AlertDialog.Builder ad = new AlertDialog.Builder(con);
                 ad.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -147,12 +141,12 @@ public class GuardianFragment extends Fragment {
                         FragmentTransaction ft = fm.beginTransaction();
                         Frag_guardian obj = new Frag_guardian();
                         ft.addToBackStack("stack2");
-                        ft.replace(R.id.newfraglayout,obj,"guardian");
+                        ft.replace(R.id.newfraglayout, obj, "guardian");
                         ft.commit();
                     }
                 });
 
-                ad.setNegativeButton("No",null);
+                ad.setNegativeButton("No", null);
                 ad.setMessage("This will edit your current guardian, Are you sure ?");
                 ad.show();
 
@@ -162,8 +156,7 @@ public class GuardianFragment extends Fragment {
 
     }
 
-    public void setGuardianPhoto(String email1, String firebaseUser, ImageView imageView)
-    {
+    public void setGuardianPhoto(String email1, String firebaseUser, final ImageView imageView) {
         final String user = firebaseUser;
         final String email = email1;
         final ImageView img = imageView;
@@ -173,89 +166,25 @@ public class GuardianFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
-                {
-                    if(!currentsnapshot.getKey().equals(user))
-                    {
-                        String onEmail =currentsnapshot.child(e_key).getValue().toString();
-                            if(onEmail.equals(email))
-                            {
+                for (DataSnapshot currentsnapshot : dataSnapshot.getChildren()) {
+                    if (!currentsnapshot.getKey().equals(user)) {
+                        String onEmail = currentsnapshot.child(e_key).getValue().toString();
+                        if (onEmail.equals(email)) {
 
-                                Log.d(TAG,"guardian matches");
-                                progressBar = v.findViewById(R.id.prog_user);
-                                FetchBitmap task = new FetchBitmap(progressBar,currentsnapshot.child(p_key).getValue().toString(),img);
-                                task.execute();
-
-                            }
+                            Log.d(TAG, "guardian matches");
+                            progressBar = v.findViewById(R.id.prog_user);
+                            new NavigationDrawerActivity().setImageView(img,"user_photos/"+currentsnapshot.getKey()+".jpg",progressBar);
+                        }
                     }
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
 
-    }
-
-
-    private class FetchBitmap extends AsyncTask<Void, Void, Bitmap> {
-        String imageURL;
-        ImageView imgView;
-        ProgressBar progressBar1;
-        public FetchBitmap(ProgressBar progressBar, String imgURL, ImageView imageView) {
-            imageURL = imgURL;
-            imgView = imageView;
-            progressBar1=progressBar;
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            progressBar1.setVisibility(View.INVISIBLE);
-            imgView.setImageBitmap(result);
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-            return getBitmapFromURL(imageURL);
-        }
-    }
-
-    public Bitmap getBitmapFromURL(String src) {
-        try {
-            java.net.URL url = new java.net.URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url
-                    .openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return getResizedBitmap(myBitmap,220,220);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // CREATE A MATRIX FOR THE MANIPULATION
-        Matrix matrix = new Matrix();
-        // RESIZE THE BIT MAP
-        matrix.postScale(scaleWidth, scaleHeight);
-
-        // "RECREATE" THE NEW BITMAP
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
-                matrix, false);
-
-        return resizedBitmap;
     }
 
 }

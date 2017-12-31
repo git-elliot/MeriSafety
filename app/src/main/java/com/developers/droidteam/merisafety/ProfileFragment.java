@@ -3,11 +3,13 @@ package com.developers.droidteam.merisafety;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +17,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.developers.droidteam.merisafety.NavigationDrawerActivity.FetchBitmap;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 
 /**
@@ -84,6 +89,13 @@ public class ProfileFragment extends Fragment {
         final String user_name = sp.getString(n_key,null);
         final String user_email = sp.getString(e_key,null);
 
+        imgView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        
         if(isConnected){
 
             mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -129,28 +141,7 @@ public class ProfileFragment extends Fragment {
                 }
             });
 
-
-            userEnd = mDatabase.child(d_key).child(user).child(p_key);
-
-            userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists())
-                    {
-
-                        String imageURL = dataSnapshot.getValue().toString();
-
-                        FetchBitmap task =new FetchBitmap(con, imageURL,imgView,progressBar,400,400);
-                        task.execute();
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            new NavigationDrawerActivity().setImageView(imgView,"user_photos/"+user+".jpg",progressBar);
 
             userEnd = mDatabase.child(d_key).child(user).child(m_key);
 
@@ -175,10 +166,18 @@ public class ProfileFragment extends Fragment {
         }else{
             text_name.setText(user_name);
             text_email.setText(user_email);
+            File file;
+            FileInputStream fileInputStream;
+            try{
+                file = new File(con.getCacheDir(),"user_pic");
+                fileInputStream = new FileInputStream(file);
+                Log.i("file","File found");
+                imgView.setImageBitmap(BitmapFactory.decodeStream(fileInputStream));
 
-            FetchBitmap task =new FetchBitmap(con, null,imgView,progressBar,400,400);
-            task.execute();
-
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.i("file","file not found");
+            }
         }
     }
 }
