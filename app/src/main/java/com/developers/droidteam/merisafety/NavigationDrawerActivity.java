@@ -106,6 +106,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         View hView = navigationView.getHeaderView(0);
         navigationView.setNavigationItemSelectedListener(this);
 
+
+
         //**************************havigation drawer data**********************
         final TextView tv_name =  hView.findViewById(R.id.nav_drawer_name);
 
@@ -114,6 +116,21 @@ public class NavigationDrawerActivity extends AppCompatActivity
         progressBar=hView.findViewById(R.id.prog_user);
 
         iv =  hView.findViewById(R.id.imageView);
+
+        iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                ProfileFragment obj = new ProfileFragment();
+                ft.addToBackStack("stack2");
+                ft.replace(R.id.newfraglayout,obj,"profile");
+                ft.commit();
+
+                DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
 
         final SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         final String user = sp.getString(l_key, null);
@@ -175,7 +192,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                     {
 
                         String imageURL = dataSnapshot.getValue().toString();
-                        FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,imageURL,iv,progressBar);
+                        FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,imageURL,iv,progressBar,70,70);
                         task.execute();
 
                     }
@@ -189,7 +206,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }else{
               tv_name.setText(user_name);
               tv_user.setText(user_email);
-            FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,null,iv,progressBar);
+            FetchBitmap task = new FetchBitmap(NavigationDrawerActivity.this,null,iv,progressBar,70,70);
             task.execute();
 
         }
@@ -218,11 +235,14 @@ public class NavigationDrawerActivity extends AppCompatActivity
         ImageView imgView;
         ProgressBar progressBar;
         Context context;
-        public FetchBitmap(Activity activity, String imgURL, ImageView imageView,ProgressBar progressBar1) {
+        int h, w;
+        public FetchBitmap(Context activity, String imgURL, ImageView imageView,ProgressBar progressBar1, int height, int width) {
             imageURL = imgURL;
             imgView = imageView;
            progressBar= progressBar1;
            context=activity;
+           h=height;
+           w=width;
         }
 
         @Override
@@ -249,14 +269,13 @@ public class NavigationDrawerActivity extends AppCompatActivity
              } catch (IOException e) {
                 e.printStackTrace();
                 Log.i("file","file not found");
-                return getBitmapFromURL(context,imageURL);
-
+                return getBitmapFromURL(context,imageURL,h,w);
             }
 
         }
     }
 
-    public static Bitmap getBitmapFromURL(Context context,String src) {
+    public static Bitmap getBitmapFromURL(Context context,String src, int h, int w) {
         try {
             java.net.URL url = new java.net.URL(src);
             HttpURLConnection connection = (HttpURLConnection) url
@@ -265,7 +284,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             connection.connect();
             InputStream input = connection.getInputStream();
             Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return getResizedBitmap(context,myBitmap,70,70);
+            return getResizedBitmap(context,myBitmap,h,w);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -372,14 +391,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ft.addToBackStack("stack1");
             ft.replace(R.id.newfraglayout,obj,"homebutton");
             ft.commit();
-        } else if (id == R.id.nav_profile) {
-            FragmentManager fm = getSupportFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            ProfileFragment obj = new ProfileFragment();
-            ft.addToBackStack("stack2");
-            ft.replace(R.id.newfraglayout,obj,"profile");
-            ft.commit();
-
         } else if (id == R.id.nav_gaudian) {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
