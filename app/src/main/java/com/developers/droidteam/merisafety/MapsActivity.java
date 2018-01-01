@@ -55,20 +55,27 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.maps.android.ui.IconGenerator;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -394,57 +401,92 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         placeMarkerOnMapPeople(name,mobile,mylatlng,uid,email);
     }
 
-    public void setImageMarker( final String UID, final GoogleMap mMap, final LatLng location, final String name, final String email)
-    {
-        Log.d("glide","entered glide");
+    public class SetImageMarker extends AsyncTask{
 
-        final ImageView mImageView = new ImageView(getApplicationContext());
-        final IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
+        String UID;
+        GoogleMap mMap;
+        LatLng location;
+        String name;
+        String email;
+     SetImageMarker(String UID, GoogleMap mMap, LatLng location, String name, String email){
+            this.UID=UID;
+         this.mMap=mMap;
+         this.location=location;
+         this.name=name;
+         this.email=email;
 
-        // Reference to an image file in Cloud Storage
-        FirebaseStorage storage = FirebaseStorage.getInstance();
+    }
 
-        StorageReference storageRef = storage.getReference();
+        @Override
+        protected Object doInBackground(Object[] objects) {
 
-        StorageReference photoRef = storageRef.child("user_photos/"+UID+".jpg");
+            Log.d("glide","entered glide");
 
-        GlideApp.with(mImageView.getContext() /* context */)
-                .load(photoRef)
-                .listener(new RequestListener<Drawable>() {
+            final ImageView mImageView = new ImageView(getApplicationContext());
+            final IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
+
+            // Reference to an image file in Cloud Storage
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+
+            StorageReference storageRef = storage.getReference();
+
+            StorageReference photoRef = storageRef.child("user_photos/"+UID+".jpg");
+
+            File localFile = null;
+            final FileInputStream[] fileInputStream = {null};
+            try {
+                localFile = File.createTempFile(UID, "jpg");
+
+                final File finalLocalFile = localFile;
+                photoRef.getFile(localFile)
+                        .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                // Successfully downloaded data to local file
+                                // ...
+
+                                Log.d("glide","successfully downloaded : "+UID);
+                                mIconGenerator.setContentView(mImageView);
+                                try {
+                                    fileInputStream[0] = new FileInputStream(finalLocalFile);
+
+                                    mImageView.setImageBitmap(BitmapFactory.decodeStream(fileInputStream[0]));
+
+                                    Bitmap iconBitmap = mIconGenerator.makeIcon();
+
+                                    MarkerOptions markerOptions = new MarkerOptions().position(location).icon(BitmapDescriptorFactory.fromBitmap(getResizedBitmap(iconBitmap,120,120)));
+                                    String titleStr = getAddress(location);  // add these two lines
+                                    if(guarEmail!=null&&guarEmail.equals(email))
+                                    {
+
+                                        markerOptions.title("Guardian: "+name).snippet(titleStr);
+                                    }
+                                    else
+                                    {
+                                        markerOptions.title(name).snippet(titleStr);
+                                    }
+                                    // 2
+                                    LatLng l = new LatLng(location.latitude,location.longitude);
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(l,12));
+                                    mMap.addMarker(markerOptions);
+
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        Log.d("glide",e.getMessage());
-                        return false;
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle failed download
+                        // ...
                     }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-
-                        Log.d("glide","successfully downloaded : "+UID);
-                        mIconGenerator.setContentView(mImageView);
-                        Bitmap iconBitmap = mIconGenerator.makeIcon();
-
-                        MarkerOptions markerOptions = new MarkerOptions().position(location).icon(BitmapDescriptorFactory.fromBitmap(getResizedBitmap(iconBitmap,70,70)));
-                        String titleStr = getAddress(location);  // add these two lines
-                        if(guarEmail!=null&&guarEmail.equals(email))
-                        {
-
-                            markerOptions.title("Guardian: "+name).snippet(titleStr);
-                        }
-                        else
-                        {
-                            markerOptions.title(name).snippet(titleStr);
-                        }
-                        // 2
-                        LatLng l = new LatLng(location.latitude,location.longitude);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(l,12));
-                        mMap.addMarker(markerOptions);
-
-                        return false;
-                    }
-                })
-                .dontAnimate()
-                .into(mImageView);
+            return null;
+        }
 
     }
 
@@ -472,7 +514,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         String userid = sp.getString(l_key,null);
 
-        setImageMarker(userid,mMap,loc,"You",null);
+
+        SetImageMarker task = new SetImageMarker(userid,mMap,loc,"You",null);
+        task.execute();
 
         userEnd = mDatabase.child((d_key)).child(userid).child(userid).child(e_key);
         userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -496,7 +540,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     protected void placeMarkerOnMapPeople(String name, String mobile, LatLng location, String uid,String email) {
         // 1
-        setImageMarker(uid,mMap,location,name,email);
+        SetImageMarker task = new SetImageMarker(uid,mMap,location,name,email);
+        task.execute();
     }
 
     private String getAddress(LatLng latLng) {

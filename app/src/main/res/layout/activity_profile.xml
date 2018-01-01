@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.developers.droidteam.merisafety.ProfileFragment">
+    android:background="@color/Dark_green_bg"
+    tools:context="com.developers.droidteam.merisafety.ProfileActivity">
 
     <FrameLayout
         android:layout_width="200dp"
