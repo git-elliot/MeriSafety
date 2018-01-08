@@ -24,6 +24,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -37,6 +38,11 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.github.polok.routedrawer.RouteDrawer;
+import com.github.polok.routedrawer.RouteRest;
+import com.github.polok.routedrawer.model.Routes;
+import com.github.polok.routedrawer.model.TravelMode;
+import com.github.polok.routedrawer.parser.RouteJsonParser;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -80,6 +86,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.List;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener, LocationListener {
@@ -400,6 +410,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng mylatlng = new LatLng(mylat,mylng);
         placeMarkerOnMapPeople(name,mobile,mylatlng,uid,email);
     }
+    public class DrawRoute extends AsyncTask{
+
+        GoogleMap map;
+        LatLng start,end;
+
+        public DrawRoute(GoogleMap googleMap,LatLng first, LatLng last){
+            map=googleMap;
+            start=first;
+            end=last;
+        }
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            final RouteDrawer routeDrawer = new RouteDrawer.RouteDrawerBuilder(map)
+                    .withColor(Color.BLUE)
+                    .withWidth(10)
+                    .withAlpha(0.5f)
+                    .withMarkerIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                    .build();
+            RouteRest routeRest = new RouteRest();
+            routeRest.getJsonDirections(start,end, TravelMode.WALKING)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .map(new Func1<String, Routes>() {
+                        @Override
+                        public Routes call(String s) {
+                            return new RouteJsonParser<Routes>().parse(s, Routes.class);
+                        }
+                    })
+                    .subscribe(new Action1<Routes>() {
+                        @Override
+                        public void call(Routes r) {
+                            routeDrawer.drawPath(r);
+                        }
+                    });
+
+            return null;
+        }
+    }
 
     public class SetImageMarker extends AsyncTask{
 
@@ -460,6 +507,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     {
 
                                         markerOptions.title("Guardian: "+name).snippet(titleStr);
+                                        DrawRoute drawRoute = new DrawRoute(mMap,getLastLatLng(),location);
+                                        drawRoute.execute();
                                     }
                                     else
                                     {
@@ -488,6 +537,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
 
+    }
+    public LatLng getLastLatLng()
+    {
+        return new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
     }
 
 

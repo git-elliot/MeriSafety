@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -31,10 +30,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 
@@ -214,7 +211,7 @@ public class ProfileActivity extends Activity {
                                 progressBar.setVisibility(View.INVISIBLE);
                                 imgView.setImageBitmap(bitmap);
                                 deleteCache(ProfileActivity.this);
-                                Toast.makeText(ProfileActivity.this, "Upload successfull", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ProfileActivity.this, "Changed successfully", Toast.LENGTH_SHORT).show();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -223,7 +220,7 @@ public class ProfileActivity extends Activity {
                                 // Handle unsuccessful uploads
                                 // ...
                                 progressBar.setVisibility(View.INVISIBLE);
-                                Toast.makeText(ProfileActivity.this, "Upload unsucessfull", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ProfileActivity.this, "Unable to change, try again", Toast.LENGTH_SHORT).show();
                             }
                         });
 

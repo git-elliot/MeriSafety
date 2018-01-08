@@ -91,7 +91,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".GalleryUtil" />
 
         <receiver android:name=".NewAppWidget" android:exported="false">
             <intent-filter>

@@ -54,6 +54,9 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:11.8.0'
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'com.google.maps.android:android-maps-utils:0.4'
+    compile ('com.github.polok.routedrawer:library:1.0.0',{
+        exclude group: 'com.google.android.gms'
+    })
     compile('com.github.danysantiago:sendgrid-android:1', {
         exclude group: 'org.apache.httpcomponents.httpclient-android'
         exclude group: 'org.apache.httpcomponents.httpclient'
