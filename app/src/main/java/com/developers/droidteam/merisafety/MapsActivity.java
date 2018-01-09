@@ -1,6 +1,5 @@
 package com.developers.droidteam.merisafety;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -8,10 +7,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -22,30 +19,21 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.github.polok.routedrawer.RouteDrawer;
 import com.github.polok.routedrawer.RouteRest;
 import com.github.polok.routedrawer.model.Routes;
 import com.github.polok.routedrawer.model.TravelMode;
 import com.github.polok.routedrawer.parser.RouteJsonParser;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -61,7 +49,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -83,8 +70,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.List;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -109,6 +94,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DatabaseReference mDatabase;
     private DatabaseReference peopleEnd ;
     private DatabaseReference userEnd ;
+    private double minDistance=200000;
 
     private final String l_key = "login_key";
     private final String cur_key="curloc";
@@ -369,8 +355,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         final String user = sp.getString(l_key, null);
         final String currentpin = sp.getString(pin_key,null);
-
-
+        final double[] mlat = new double[1];
+        final double[] mlng = new double[1];
+        final boolean[] mUseloc = {false};
         peopleEnd = mDatabase.child(d_key);
 
         peopleEnd.addValueEventListener(new ValueEventListener() {
@@ -381,18 +368,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 {
                     if(!currentsnapshot.getKey().equals(user))
                     {
+
                       String pincode =currentsnapshot.child(pin_key).getValue().toString();
-                        boolean useLoc = (boolean) currentsnapshot.child(use_loc_key).getValue();
+                      boolean useLoc = (boolean) currentsnapshot.child(use_loc_key).getValue();
+                      String slat=currentsnapshot.child(lat_key).getValue().toString();
+                      String slng=currentsnapshot.child(lng_key).getValue().toString();
+                      double lat =Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
+                      double lng =Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
+                      String name = currentsnapshot.child(n_key).getValue().toString();
+                      String mobile = currentsnapshot.child(m_key).getValue().toString();
+                      String email = currentsnapshot.child(e_key).getValue().toString();
+                      String uid = currentsnapshot.getKey();
+                        //****************check nearest helping hand********************
+                        float[] results= new float[1];
+                        Location.distanceBetween(mLastLocation.getLatitude(),mLastLocation.getLongitude(),lat,lng,results);
+                        Log.d("Distance", "Result is "+results[0]);
+                        if(results[0]<minDistance){
+                            minDistance=results[0];
+                            Log.d("Distance","min : "+minDistance);
+                            mUseloc[0] =(boolean) currentsnapshot.child(use_loc_key).getValue();
+                            mlat[0] =Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
+                            mlng[0] =Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
+
+                        }
                         if(guarEmail.equals(currentsnapshot.child(e_key).getValue().toString())){
 
-                            placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.getKey(),currentsnapshot.child(e_key).getValue().toString());
+                            placePeopleWindow(name,mobile,slat,slng,uid,email);
                         }else if(pincode.equals(currentpin)&&useLoc)
                         {
-                            placePeopleWindow(currentsnapshot.child(n_key).getValue().toString(),currentsnapshot.child(m_key).getValue().toString(),currentsnapshot.child(lat_key).getValue().toString(),currentsnapshot.child(lng_key).getValue().toString(),currentsnapshot.getKey(),currentsnapshot.child(e_key).getValue().toString());
+
+                            placePeopleWindow(name,mobile,slat,slng,uid,email);
 
                         }
                     }
                 }
+                if(mUseloc[0]){
+
+                    LatLng latlng = new LatLng(mlat[0], mlng[0]);
+                    int color = getResources().getColor(R.color.colorPrimary);
+                    DrawRoute drawRoute = new DrawRoute(mMap,color,getLastLatLng(),latlng);
+                    drawRoute.execute();
+
+                }
+
                 progressBar.setVisibility(View.INVISIBLE);
 
 
@@ -415,28 +433,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         GoogleMap map;
         LatLng start,end;
+        int color;
 
-        public DrawRoute(GoogleMap googleMap,LatLng first, LatLng last){
+        public DrawRoute(GoogleMap googleMap, int color, LatLng first, LatLng last){
             map=googleMap;
             start=first;
             end=last;
+            this.color=color;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
-            float[] results= new float[1];
-            Location.distanceBetween(start.latitude,start.longitude,end.latitude,end.longitude,results);
-            Log.d("Distance", "Result is "+results[0]);
-            Toast.makeText(MapsActivity.this, "Result is "+results[0], Toast.LENGTH_SHORT).show();
-
         }
 
         @Override
         protected Object doInBackground(Object[] objects) {
             final RouteDrawer routeDrawer = new RouteDrawer.RouteDrawerBuilder(map)
-                    .withColor(getResources().getColor(R.color.route_color))
+                    .withColor(color)
                     .withWidth(10)
                     .withAlpha(0.5f)
                     .withMarkerIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
@@ -519,8 +534,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     if(guarEmail!=null&&guarEmail.equals(email))
                                     {
 
+                                        int color = getResources().getColor(R.color.route_color);
                                         markerOptions.title("Guardian: "+name).snippet(titleStr);
-                                        DrawRoute drawRoute = new DrawRoute(mMap,getLastLatLng(),location);
+                                        DrawRoute drawRoute = new DrawRoute(mMap,color,getLastLatLng(),location);
                                         drawRoute.execute();
                                     }
                                     else

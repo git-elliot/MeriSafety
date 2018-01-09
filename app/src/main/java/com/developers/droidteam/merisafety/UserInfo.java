@@ -6,15 +6,15 @@ package com.developers.droidteam.merisafety;
 
 public class UserInfo {
 
-    private String userid;
-    private String name;
     private String email;
     private long lat;
     private long lng;
     private String mobile;
-    private long pincode;
+    private String name;
     private String photoUrl;
+    private long pincode;
     private boolean useloc;
+    private String userid;
 
     public void setUseloc(boolean useloc) {
         this.useloc = useloc;
