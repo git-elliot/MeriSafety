@@ -19,6 +19,8 @@ public class SaveMeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_me);
+
+
       Intent i = getIntent();
 
        int Resid = i.getIntExtra(key,defaultValue);
@@ -28,8 +30,12 @@ public class SaveMeActivity extends AppCompatActivity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+                window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
                 window.setStatusBarColor(Color.RED);
                 window.setNavigationBarColor(Color.RED);
+
             }
             /*
             FragmentManager fm = getSupportFragmentManager();

@@ -395,6 +395,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 progressBar.setVisibility(View.INVISIBLE);
 
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -420,10 +421,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             start=first;
             end=last;
         }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            float[] results= new float[1];
+            Location.distanceBetween(start.latitude,start.longitude,end.latitude,end.longitude,results);
+            Log.d("Distance", "Result is "+results[0]);
+            Toast.makeText(MapsActivity.this, "Result is "+results[0], Toast.LENGTH_SHORT).show();
+
+        }
+
         @Override
         protected Object doInBackground(Object[] objects) {
             final RouteDrawer routeDrawer = new RouteDrawer.RouteDrawerBuilder(map)
-                    .withColor(Color.BLUE)
+                    .withColor(getResources().getColor(R.color.route_color))
                     .withWidth(10)
                     .withAlpha(0.5f)
                     .withMarkerIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
@@ -516,7 +529,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     }
                                     // 2
                                     LatLng l = new LatLng(location.latitude,location.longitude);
-                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(l,12));
                                     mMap.addMarker(markerOptions);
 
                                 } catch (FileNotFoundException e) {
@@ -554,21 +566,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // RESIZE THE BIT MAP
         matrix.postScale(scaleWidth, scaleHeight);
 
-        // "RECREATE" THE NEW BITMAP
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
+        //RETURN THE NEW BITMAP
+
+        return Bitmap.createBitmap(bm, 0, 0, width, height,
                 matrix, false);
-        return resizedBitmap;
     }
 
 
     protected void placeMarkerOnMap(LatLng location) {
         // 1
-        final LatLng loc = location;
         final SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         String userid = sp.getString(l_key,null);
 
 
-        SetImageMarker task = new SetImageMarker(userid,mMap,loc,"You",null);
+        SetImageMarker task = new SetImageMarker(userid,mMap,location,"You",null);
         task.execute();
 
         userEnd = mDatabase.child((d_key)).child(userid).child(userid).child(e_key);
@@ -662,6 +673,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             status.startResolutionForResult(MapsActivity.this, REQUEST_CHECK_SETTINGS);
 
                         } catch (IntentSender.SendIntentException e) {
+                            e.printStackTrace();
                         }
                         break;
                     // 6

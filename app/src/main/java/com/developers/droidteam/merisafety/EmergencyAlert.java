@@ -1,11 +1,13 @@
 package com.developers.droidteam.merisafety;
 
+import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,8 +26,7 @@ public class EmergencyAlert extends BroadcastReceiver {
 
     }
     @Override
-    public void onReceive(Context context, Intent intent) {
-
+    public void onReceive(final Context context, Intent intent) {
         Log.v("onReceive", "Power button is pressed.");
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
@@ -93,7 +94,7 @@ public class EmergencyAlert extends BroadcastReceiver {
             }
             if (countPowerOff >= 4) {
 
-                Intent i = new Intent();
+                final Intent i = new Intent();
                 if(isConnected)
                 {
                     i.putExtra("key", R.id.save_me);
@@ -105,9 +106,17 @@ public class EmergencyAlert extends BroadcastReceiver {
                 i.setClassName("com.developers.droidteam.merisafety","com.developers.droidteam.merisafety.SaveMeActivity");
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 KeyguardManager keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
-                KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
-                lock.disableKeyguard();
-                context.startActivity(i);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    keyguardManager.requestDismissKeyguard((Activity) context, new KeyguardManager.KeyguardDismissCallback() {
+                        @Override
+                        public void onDismissSucceeded() {
+                            super.onDismissSucceeded();
+                        }
+                    });
+                }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                    context.startActivity(i);
+                }
+
                 countPowerOff=0;
                 lastClicktime=0;
            }
