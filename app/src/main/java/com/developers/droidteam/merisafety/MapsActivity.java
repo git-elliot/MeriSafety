@@ -86,14 +86,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private LocationRequest mLocationRequest;
     private boolean mLocationUpdateState;
-    private static final int PLACE_PICKER_REQUEST = 3;
     // 2
     private static final int REQUEST_CHECK_SETTINGS = 2;
     private String guarEmail = null;
     private ProgressBar progressBar;
     private DatabaseReference mDatabase;
-    private DatabaseReference peopleEnd ;
-    private DatabaseReference userEnd ;
     private double minDistance=200000;
     private int mode =0;
 
@@ -377,7 +374,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final double[] mlat = new double[1];
         final double[] mlng = new double[1];
         final boolean[] mUseloc = {false};
-        peopleEnd = mDatabase.child(d_key);
+        DatabaseReference peopleEnd = mDatabase.child(d_key);
 
         peopleEnd.addValueEventListener(new ValueEventListener() {
             @Override
@@ -614,7 +611,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SetImageMarker task = new SetImageMarker(userid,mMap,location,"You",null);
         task.execute();
 
-        userEnd = mDatabase.child((d_key)).child(userid).child(userid).child(e_key);
+        DatabaseReference userEnd = mDatabase.child((d_key)).child(userid).child(userid).child(e_key);
         userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

@@ -13,15 +13,22 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +71,9 @@ public class ProfileActivity extends Activity {
         // Inflate the layout for this fragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        final String[] name = new String[1];
+        final String[] email = new String[1];
+        final String[] number = new String[1];
 
         progressBar = findViewById(R.id.progress_profile_pic);
         imgView = findViewById(R.id.profile_pic);
@@ -71,9 +81,18 @@ public class ProfileActivity extends Activity {
         text_email = findViewById(R.id.p_email);
         text_number = findViewById(R.id.p_number);
 
+        final LinearLayout displayLayout = findViewById(R.id.profile_display_layout);
+        final LinearLayout editLayout= findViewById(R.id.profile_edit_layout);
+
+        final EditText editText_name = findViewById(R.id.edit_name);
+
+        final EditText editText_email = findViewById(R.id.edit_email);
+
+        final EditText editText_number = findViewById(R.id.edit_number);
+
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
+        final boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
 
 
         final SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
@@ -89,6 +108,82 @@ public class ProfileActivity extends Activity {
 
             }});
 
+
+        Button edit_details = findViewById(R.id.edit_details);
+        edit_details.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isConnected){
+
+                    displayLayout.animate().alpha(0.0f).setDuration(500);
+                    displayLayout.setVisibility(View.GONE);
+                    editLayout.animate().alpha(1.0f).setDuration(500);
+                    editLayout.setVisibility(View.VISIBLE);
+                    editText_name.setText(name[0]);
+                    editText_email.setText(email[0]);
+                    editText_number.setText(number[0]);
+
+                }else{
+                    Snackbar.make(view,"Internet Required",Snackbar.LENGTH_SHORT).setAction("Action",null).show();
+                }
+            }
+        });
+        Button back_to_display = findViewById(R.id.back_to_display);
+        back_to_display.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                editLayout.animate().alpha(0.0f).setDuration(500);
+                editLayout.setVisibility(View.GONE);
+                displayLayout.animate().alpha(1.0f).setDuration(500);
+                displayLayout.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        Button submit_details = findViewById(R.id.submit_details);
+        submit_details.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               final String name = editText_name.getText().toString();
+               final String email = editText_email.getText().toString();
+               final String number = editText_number.getText().toString();
+               if(isConnected){
+
+                   mDatabase = FirebaseDatabase.getInstance().getReference();
+                   userEnd = mDatabase.child(d_key).child(user).child(m_key);
+                   userEnd.setValue(number).addOnCompleteListener(new OnCompleteListener<Void>() {
+                       @Override
+                       public void onComplete(@NonNull Task<Void> task) {
+                           Toast.makeText(ProfileActivity.this, "Details changed successfully", Toast.LENGTH_SHORT).show();
+                           userEnd = mDatabase.child(d_key).child(user).child(n_key);
+                           userEnd.setValue(name);
+                           userEnd = mDatabase.child(d_key).child(user).child(e_key);
+                           userEnd.setValue(email);
+
+                           editLayout.animate().alpha(0.0f).setDuration(500);
+                           editLayout.setVisibility(View.GONE);
+                           displayLayout.animate().alpha(1.0f).setDuration(500);
+                           displayLayout.setVisibility(View.VISIBLE);
+                           text_name.setText(name);
+                           text_email.setText(email);
+                           text_number.setText(number);
+
+                       }
+                   }).addOnFailureListener(new OnFailureListener() {
+                       @Override
+                       public void onFailure(@NonNull Exception e) {
+                           Toast.makeText(ProfileActivity.this, "Please try again", Toast.LENGTH_SHORT).show();
+                       }
+                   });
+
+
+               }else {
+                   Snackbar.make(view,"Internet Required",Snackbar.LENGTH_SHORT).setAction("Action",null).show();
+               }
+            }
+        });
+
         if(isConnected){
 
             mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -100,7 +195,8 @@ public class ProfileActivity extends Activity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists())
                     {
-                        text_name.setText(dataSnapshot.getValue().toString());
+                        name[0] =dataSnapshot.getValue().toString();
+                        text_name.setText(name[0]);
 
                         SharedPreferences.Editor et = sp.edit();
                         et.putString(n_key,dataSnapshot.getValue().toString());
@@ -121,7 +217,8 @@ public class ProfileActivity extends Activity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists())
                     {
-                        text_email.setText(dataSnapshot.getValue().toString());
+                        email[0] =dataSnapshot.getValue().toString();
+                        text_email.setText(email[0]);
                         SharedPreferences.Editor et = sp.edit();
                         et.putString(e_key,dataSnapshot.getValue().toString());
                         et.apply();
@@ -143,8 +240,8 @@ public class ProfileActivity extends Activity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists())
                     {
-
-                        text_number.setText(dataSnapshot.getValue().toString());
+                        number[0] =dataSnapshot.getValue().toString();
+                        text_number.setText(number[0]);
                         SharedPreferences.Editor et = sp.edit();
                         et.putString(m_key,dataSnapshot.getValue().toString());
                         et.apply();
