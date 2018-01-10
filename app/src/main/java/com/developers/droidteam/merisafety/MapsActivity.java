@@ -95,6 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DatabaseReference peopleEnd ;
     private DatabaseReference userEnd ;
     private double minDistance=200000;
+    private int mode =0;
 
     private final String l_key = "login_key";
     private final String cur_key="curloc";
@@ -173,9 +174,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText(MapsActivity.this, "Finding nearby peoples", Toast.LENGTH_SHORT).show();
                if(mLastLocation.getLongitude()!=0){
                    placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                   mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
                }
                 placeNearbyPeoples();
-
+                mode=0;
             }
         });
 
@@ -185,11 +187,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
 
                 Toast.makeText(MapsActivity.this, "Finding nearby police stations", Toast.LENGTH_SHORT).show();
+
                 if(mLastLocation.getLongitude()!=0){
                     placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                }
 
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
+
+                }
                 performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+                mode=1;
 
             }
         });
@@ -202,9 +208,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText(MapsActivity.this, "Finding nearby Hospitals", Toast.LENGTH_SHORT).show();
                 if(mLastLocation.getLongitude()!=0){
                     placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                }
-                performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
 
+                }
+
+                performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+               mode=2;
             }
         });
     }
@@ -230,8 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         toPass[0] = googleMap;
         toPass[1] = googlePlacesUrl.toString();
         googlePlacesReadTask.execute(toPass);
-
-
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     private boolean isGooglePlayServicesAvailable() {
@@ -345,8 +353,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.clear();
             progressBar.setVisibility(View.VISIBLE);
 
-            placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-            placeNearbyPeoples();
+            if(mode==0){
+
+                placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                placeNearbyPeoples();
+            }
+            else if(mode==1){
+                placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+            }
+            else{
+                placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+            }
         }
     }
 
@@ -410,14 +429,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     drawRoute.execute();
 
                 }
-
                 progressBar.setVisibility(View.INVISIBLE);
-
-
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                  Log.d("database",databaseError.getMessage());
             }
         });
 
