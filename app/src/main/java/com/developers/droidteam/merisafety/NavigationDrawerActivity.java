@@ -2,8 +2,10 @@ package com.developers.droidteam.merisafety;
 
 import android.app.Activity;
 import android.app.KeyguardManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -38,6 +40,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -62,6 +65,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private static final String m_key = "mobile";
     private static final String e_key = "email";
     private static final String p_key = "photoUrl";
+    private static final String TAG = "NavigationDrawerActivit";
+    BroadcastReceiver br;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +78,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
         FragHome obj = new FragHome();
         ft.add(R.id.newfraglayout, obj, "homepage");
         ft.commit();
+
+        br = new CheckConnectivity();
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        intentFilter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+        this.registerReceiver(br,intentFilter);
+
 
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
@@ -96,9 +107,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
         View hView = navigationView.getHeaderView(0);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
-        //**************************havigation drawer data**********************
+        Log.d(TAG,"Token : "+FirebaseInstanceId.getInstance().getToken());
+        //**************************navigation drawer data**********************
         final TextView tv_name =  hView.findViewById(R.id.nav_drawer_name);
 
         final TextView tv_user =  hView.findViewById(R.id.nav_drawer_user);
@@ -211,6 +221,12 @@ public class NavigationDrawerActivity extends AppCompatActivity
         }
 
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(br);
     }
 
     public void setImageView(ImageView i, String dir, final ProgressBar progressBar)

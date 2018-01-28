@@ -163,6 +163,7 @@ public class MainActivity extends AppCompatActivity  {
         if(status != ConnectionResult.SUCCESS) {
             if(googleApiAvailability.isUserResolvableError(status)) {
                 googleApiAvailability.getErrorDialog(activity, status, 2404).show();
+                googleApiAvailability.makeGooglePlayServicesAvailable(activity);
             }
             return false;
         }

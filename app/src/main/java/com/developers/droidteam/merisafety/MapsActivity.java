@@ -149,19 +149,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Button nearby_people = findViewById(R.id.people);
         Button nearby_police = findViewById(R.id.police);
         Button nearby_hospitals = findViewById(R.id.hospitals);
-        Button rescued = findViewById(R.id.rescued);
-
-        rescued.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Window window = getWindow();
-                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    window.setStatusBarColor(getResources().getColor(R.color.rescued_color));
-                    window.setNavigationBarColor(getResources().getColor(R.color.rescued_color));
-                }
-            }
-        });
+//        Button rescued = findViewById(R.id.rescued);
+//
+//        rescued.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                    Window window = getWindow();
+//                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//                    window.setStatusBarColor(getResources().getColor(R.color.rescued_color));
+//                    window.setNavigationBarColor(getResources().getColor(R.color.rescued_color));
+//                }
+//            }
+//        });
 
         nearby_people.setOnClickListener(new View.OnClickListener() {
             @Override
