@@ -1,14 +1,37 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
 
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+apply plugin: 'io.fabric'
+
 android {
+    signingConfigs {
+        config {
+            keyAlias 'merisafety'
+            keyPassword 'merisafetykey@123'
+            storeFile file('/home/paras/my-release-merisafety.keystore')
+            storePassword 'merisafetykey@123'
+        }
+    }
     compileSdkVersion 27
     buildToolsVersion '27.0.2'
     defaultConfig {
         applicationId "com.developers.droidteam.merisafety"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 2
-        versionName "2.0"
+        versionCode 9
+        versionName "9.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -27,7 +50,6 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
     }
-
 }
 
 dependencies {
@@ -36,13 +58,13 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     //noinspection GradleCompatible
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.android.support:palette-v7:27.0.2'
-    compile 'com.android.support:support-v4:27.0.2'
+    compile 'com.android.support:appcompat-v7:27.1.0'
+    compile 'com.android.support:palette-v7:27.1.0'
+    compile 'com.android.support:support-v4:27.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.android.gms:play-services-location:11.8.0'
     compile 'com.google.android.gms:play-services-maps:11.8.0'
-    compile 'com.android.support:design:27.0.2'
+    compile 'com.android.support:design:27.1.0'
     testCompile 'junit:junit:4.12'
     compile 'com.google.firebase:firebase-storage:11.8.0'
     compile 'com.google.firebase:firebase-database:11.8.0'
@@ -55,13 +77,18 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:11.8.0'
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'com.google.maps.android:android-maps-utils:0.4'
-    compile ('com.github.polok.routedrawer:library:1.0.0',{
+    compile('com.github.polok.routedrawer:library:1.0.0', {
         exclude group: 'com.google.android.gms'
     })
     compile('com.github.danysantiago:sendgrid-android:1', {
         exclude group: 'org.apache.httpcomponents.httpclient-android'
         exclude group: 'org.apache.httpcomponents.httpclient'
     })
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
+        transitive = true
+    }
+    compile 'com.google.firebase:firebase-core:11.8.0'
+
 }
 configurations {
     all {

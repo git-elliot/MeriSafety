@@ -25,7 +25,6 @@ public class CheckConnectivity extends BroadcastReceiver {
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
         if(isConnected){
-            Toast.makeText(context, "You are back to online.", Toast.LENGTH_SHORT).show();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Activity activity = (Activity) context;
                 Window window = activity.getWindow();

@@ -43,7 +43,7 @@ String[] num = {"100","1091","101","103","104","1073","108","1066","1072","1098"
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" +num[position]));
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" +num[position]));
                 startActivity(intent);
 
             }

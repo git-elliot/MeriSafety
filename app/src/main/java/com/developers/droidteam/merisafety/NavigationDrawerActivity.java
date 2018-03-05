@@ -11,8 +11,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -26,6 +28,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -35,12 +39,15 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -58,6 +65,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
     Toolbar toolbar=null;
     TextView textbar = null;
     boolean toggle=true;
+    private static final String appURL = "https://play.google.com/store/apps/details?id=com.developers.droidteam.merisafety";
+
     private static final String sp_db = "account_db";
     private static final String l_key = "login_key";
     private static final String d_key = "users";
@@ -213,6 +222,8 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 Log.i("file","File found");
                 iv.setImageBitmap(BitmapFactory.decodeStream(fileInputStream));
 
+
+
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.i("file","file not found");
@@ -220,13 +231,27 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         }
 
+        FirebaseMessaging.getInstance().subscribeToTopic("alert");
 
     }
 
+    void turnOffGps(){
+        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+
+        if(provider.contains("gps")){ //if gps is enabled
+            final Intent poke = new Intent();
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+            poke.setData(Uri.parse("3"));
+            sendBroadcast(poke);
+        }
+
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
         this.unregisterReceiver(br);
+        //turnOffGps();
     }
 
     public void setImageView(ImageView i, String dir, final ProgressBar progressBar)
@@ -369,7 +394,23 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ft.commit();
 
 
-        } else if (id == R.id.nav_police) {
+        }else if (id == R.id.nav_crash){
+            Button crashButton = findViewById(R.id.nav_crash);
+            Crashlytics.getInstance().crash();
+            addContentView(crashButton,
+                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT));
+        }
+        else if( id == R.id.nav_share) {
+            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+            sharingIntent.setType("text/plain");
+            String shareBody = "Download Droid Watch app from play store "+appURL;
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Droid Watch app by Paras khandelwal");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+            startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+        }
+        else if (id == R.id.nav_police) {
 
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();

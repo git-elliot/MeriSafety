@@ -100,7 +100,7 @@ public class Frag_verification extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            dialog.setMessage("Please wait.....");
+            dialog.setMessage("Verifying your mobile number please wait");
             dialog.show();
         }
 

@@ -28,6 +28,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -108,6 +109,8 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+
 
         mGoogleApiClient = new GoogleApiClient.Builder(con)
                 .addApi(LocationServices.API)
@@ -332,8 +335,13 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-
     public interface SendLocation{
         public void communicate(String address);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
     }
 }

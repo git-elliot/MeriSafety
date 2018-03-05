@@ -121,7 +121,7 @@ public class Frag_guardian extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            dialog.setMessage("Please wait....");
+            dialog.setMessage("Saving your guardian details on server.");
             dialog.show();
         }
 
