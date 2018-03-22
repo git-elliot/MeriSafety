@@ -45,10 +45,6 @@ import java.util.List;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
-/**
- * Created by siddharth on 6/28/2017.
- */
-
 public class FragHome extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private DatabaseReference mDatabase;
@@ -94,7 +90,7 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v= inflater.inflate(R.layout.activity_frag_home,container,false);
 
         lowAlert = v.findViewById(R.id.lowalert);
@@ -126,54 +122,39 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
         super.onStart();
         final Intent i = new Intent(con,SaveMeActivity.class);
 
-        lowAlert.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
+        lowAlert.setOnLongClickListener(v -> {
 
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
-                return false;
-            }
+            i.putExtra(i_key,v.getId());
+            startActivity(i);
+            return false;
         });
 
-        highAlert.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
+        highAlert.setOnLongClickListener(v -> {
+            i.putExtra(i_key,v.getId());
+            startActivity(i);
 
-                return false;
-            }
+            return false;
         });
 
-        adAlert.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
+        adAlert.setOnLongClickListener(v -> {
+            i.putExtra(i_key,v.getId());
+            startActivity(i);
 
-                return false;
-            }
+            return false;
         });
 
-        selfDef.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
+        selfDef.setOnLongClickListener(v -> {
+            i.putExtra(i_key,v.getId());
+            startActivity(i);
 
-                return false;
-            }
+            return false;
         });
 
-        savemeAlert.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                i.putExtra(i_key,v.getId());
-                startActivity(i);
+        savemeAlert.setOnLongClickListener(v -> {
+            i.putExtra(i_key,v.getId());
+            startActivity(i);
 
-                return false;
-            }
+            return false;
         });
 
         Intent intent = new Intent(con, AlertService.class);
@@ -219,28 +200,25 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                 LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
                         builder.build());
 
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(@NonNull LocationSettingsResult result) {
-                final Status status = result.getStatus();
-                switch (status.getStatusCode()) {
-                    // 4
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        mLocationUpdateState = true;
-                        break;
-                    // 5
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        try {
-                            status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
+        result.setResultCallback(result1 -> {
+            final Status status = result1.getStatus();
+            switch (status.getStatusCode()) {
+                // 4
+                case LocationSettingsStatusCodes.SUCCESS:
+                    mLocationUpdateState = true;
+                    break;
+                // 5
+                case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                    try {
+                        status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
 
-                        }catch(IntentSender.SendIntentException e) {
-                         Log.d("sign in",e.getMessage());
-                        }
-                        break;
-                    // 6
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        break;
-                }
+                    }catch(IntentSender.SendIntentException e) {
+                     Log.d("sign in",e.getMessage());
+                    }
+                    break;
+                // 6
+                case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                    break;
             }
         });
 
@@ -336,7 +314,7 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
 
     }
     public interface SendLocation{
-        public void communicate(String address);
+        void communicate(String address);
     }
 
     @Override

@@ -12,16 +12,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-/**
- * Created by paras on 28/1/18.
- */
-
 public class CheckConnectivity extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
         if(isConnected){

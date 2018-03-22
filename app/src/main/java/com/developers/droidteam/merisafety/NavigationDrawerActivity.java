@@ -1,12 +1,15 @@
 package com.developers.droidteam.merisafety;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -15,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -95,6 +99,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
 
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
 
@@ -269,7 +274,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        Log.d("glide",e.getMessage());
+                        Log.d("glide","Photo load failed");
                         progressBar.setVisibility(View.VISIBLE);
                         return false;
                     }
@@ -345,9 +350,35 @@ public class NavigationDrawerActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+            showRateandReview();
         } else {
             super.onBackPressed();
         }
+    }
+    public void showRateandReview(){
+        SharedPreferences sp = getSharedPreferences("ratedb",MODE_PRIVATE);
+        SharedPreferences.Editor et = sp.edit();
+
+        AlertDialog.Builder alertdialog = new AlertDialog.Builder(this);
+        alertdialog.setTitle("Rate and Review");
+        alertdialog.setMessage("Like this app, rate and review our app on the google play store.");
+        alertdialog.setPositiveButton("Rate", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(appURL)));
+        }});
+        alertdialog.setNegativeButton("No", null);
+        alertdialog.setNeutralButton("Never ask me again", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                et.putBoolean("neverask",true);
+                et.apply();
+            }
+        });
+        if(!sp.getBoolean("neverask",false)){
+            alertdialog.show();
+        }
+
     }
 
 
@@ -355,7 +386,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         final SharedPreferences sp = getSharedPreferences("account_db", Context.MODE_PRIVATE);
@@ -392,14 +423,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ft.addToBackStack("stack4");
             ft.replace(R.id.newfraglayout,obj,"guardian");
             ft.commit();
-
-
-        }else if (id == R.id.nav_crash){
-            Button crashButton = findViewById(R.id.nav_crash);
-            Crashlytics.getInstance().crash();
-            addContentView(crashButton,
-                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT));
         }
         else if( id == R.id.nav_share) {
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -418,7 +441,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             FragHelp obj = new FragHelp();
             ft.replace(R.id.newfraglayout,obj,"help");
             ft.commit();
-
 
         }else if(id == R.id.nav_nearby)
         {

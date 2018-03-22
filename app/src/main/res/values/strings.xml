@@ -98,6 +98,17 @@
     <string name="high_alert_toast">This alert will call and message your guardian</string>
     <string name="advance_alert_toast">This alert will call, mail and message your guardian</string>
     <string name="self_defence_toast">This will help you learn some basics moves.</string>
+    <string name="home">Home</string>
+    <string name="gaurdian">Gaurdian</string>
+    <string name="all_police_station">All Police Station</string>
+    <string name="helpine_nos">Helpine Nos</string>
+    <string name="nearby">Nearby</string>
+    <string name="more">More</string>
+    <string name="settings">Settings</string>
+    <string name="share_app">Share App</string>
+    <string name="feedback">Feedback</string>
+    <string name="about_the_app">About the App</string>
+    <string name="team">Team</string>
 
     <string-array name="nearby_users_list_titles">
         <item>Name</item>

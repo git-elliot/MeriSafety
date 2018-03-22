@@ -1,9 +1,5 @@
 package com.developers.droidteam.merisafety;
 
-/**
- * Created by paras on 10/7/17.
- */
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +11,7 @@ public class SmsNotifications extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String name = intent.getAction();
+        assert name != null;
         if(name.equals("in.wptrafficanalyzer.sent")){
             switch(getResultCode()){
                 case Activity.RESULT_OK:

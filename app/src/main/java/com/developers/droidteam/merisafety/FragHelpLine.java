@@ -1,9 +1,11 @@
 package com.developers.droidteam.merisafety;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,6 +21,12 @@ import android.widget.ListView;
  */
 public class FragHelpLine extends Fragment {
 
+   Context con;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        con= context;
+    }
 
     public FragHelpLine() {
         // Required empty public constructor
@@ -27,26 +35,23 @@ String[] src = {"Police call : 100","Women HelpLine numbers: 1091 ","Fire: 101",
 String[] num = {"100","1091","101","103","104","1073","108","1066","1072","1098","112","139","1800-11-0031"};
     ListView list;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View vv =  inflater.inflate(R.layout.fragment_frag_help_line, container, false);
-    list = (ListView)vv.findViewById(R.id.listss);
+    list = vv.findViewById(R.id.listss);
         return vv;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(getActivity(),R.layout.list_item_textview,src);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ArrayAdapter<String> ad = new ArrayAdapter<>(con, R.layout.list_item_textview, src);
+        list.setOnItemClickListener((parent, view, position, id) -> {
 
-                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" +num[position]));
-                startActivity(intent);
+            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" +num[position]));
+            startActivity(intent);
 
-            }
         });
         list.setAdapter(ad);
     }

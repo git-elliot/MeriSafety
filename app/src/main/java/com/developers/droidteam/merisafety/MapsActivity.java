@@ -1,5 +1,6 @@
 package com.developers.droidteam.merisafety;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -44,7 +45,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStatusCodes;;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -120,7 +121,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Intent i = getIntent();
         String saveme=  i.getStringExtra("saveme");
-        if(saveme.equals("yes")&&saveme!=null){
+        if(saveme.equals("yes")){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -163,60 +164,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //            }
 //        });
 
-        nearby_people.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-             mMap.clear();
+        nearby_people.setOnClickListener(v -> {
+         mMap.clear();
 
-                Toast.makeText(MapsActivity.this, "Finding nearby peoples", Toast.LENGTH_SHORT).show();
-               if(mLastLocation.getLongitude()!=0){
-                   placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                   mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
-               }
-                placeNearbyPeoples();
-                mode=0;
-            }
+            Toast.makeText(MapsActivity.this, "Finding nearby peoples", Toast.LENGTH_SHORT).show();
+           if(mLastLocation.getLongitude()!=0){
+               placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+               mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
+           }
+            placeNearbyPeoples();
+            mode=0;
         });
 
-        nearby_police.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMap.clear();
+        nearby_police.setOnClickListener(v -> {
+            mMap.clear();
 
-                Toast.makeText(MapsActivity.this, "Finding nearby police stations", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MapsActivity.this, "Finding nearby police stations", Toast.LENGTH_SHORT).show();
 
-                if(mLastLocation.getLongitude()!=0){
-                    placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            if(mLastLocation.getLongitude()!=0){
+                placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
 
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
-
-                }
-                performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
-                mode=1;
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
 
             }
+            performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(), mMap);
+            mode=1;
+
         });
 
-        nearby_hospitals.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMap.clear();
+        nearby_hospitals.setOnClickListener(v -> {
+            mMap.clear();
 
-                Toast.makeText(MapsActivity.this, "Finding nearby Hospitals", Toast.LENGTH_SHORT).show();
-                if(mLastLocation.getLongitude()!=0){
-                    placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
+            Toast.makeText(MapsActivity.this, "Finding nearby Hospitals", Toast.LENGTH_SHORT).show();
+            if(mLastLocation.getLongitude()!=0){
+                placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
 
-                }
-
-                performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
-               mode=2;
             }
+
+            performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(), mMap);
+           mode=2;
         });
     }
 
 
-    public void performSearch(String type, double latitude, double longitude, int PROXIMITY_RADIUS, GoogleMap googleMap)
+    public void performSearch(String type, double latitude, double longitude, GoogleMap googleMap)
     {
 
 
@@ -224,17 +216,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (!isGooglePlayServicesAvailable()) {
             finish();
         }
-        StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-        googlePlacesUrl.append("location=" + latitude + "," + longitude);
-        googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
-        googlePlacesUrl.append("&types=" + type);
-        googlePlacesUrl.append("&sensor=true");
-        googlePlacesUrl.append("&key=" + GOOGLE_API_KEY);
+        String googlePlacesUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "location=" + latitude + "," + longitude +
+                "&radius=" + 5000 +
+                "&types=" + type +
+                "&sensor=true" +
+                "&key=" + GOOGLE_API_KEY;
 
         GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask(this,type);
         Object[] toPass = new Object[2];
         toPass[0] = googleMap;
-        toPass[1] = googlePlacesUrl.toString();
+        toPass[1] = googlePlacesUrl;
         googlePlacesReadTask.execute(toPass);
         progressBar.setVisibility(View.INVISIBLE);
     }
@@ -357,11 +348,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             else if(mode==1){
                 placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+                performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(), mMap);
             }
             else{
                 placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(),5000,mMap);
+                performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(), mMap);
             }
         }
     }
@@ -384,37 +375,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 {
                     if(!currentsnapshot.getKey().equals(user))
                     {
+                        try{
 
-                      String pincode =currentsnapshot.child(pin_key).getValue().toString();
-                      boolean useLoc = (boolean) currentsnapshot.child(use_loc_key).getValue();
-                      String slat=currentsnapshot.child(lat_key).getValue().toString();
-                      String slng=currentsnapshot.child(lng_key).getValue().toString();
-                      double lat =Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
-                      double lng =Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
-                      String name = currentsnapshot.child(n_key).getValue().toString();
-                      String mobile = currentsnapshot.child(m_key).getValue().toString();
-                      String email = currentsnapshot.child(e_key).getValue().toString();
-                      String uid = currentsnapshot.getKey();
-                        //****************check nearest helping hand********************
-                        float[] results= new float[1];
-                        Location.distanceBetween(mLastLocation.getLatitude(),mLastLocation.getLongitude(),lat,lng,results);
-                        Log.d("Distance", "Result is "+results[0]);
-                        if(results[0]<minDistance){
-                            minDistance=results[0];
-                            Log.d("Distance","min : "+minDistance);
-                            mUseloc[0] =(boolean) currentsnapshot.child(use_loc_key).getValue();
-                            mlat[0] =Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
-                            mlng[0] =Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
+                            String pincode =currentsnapshot.child(pin_key).getValue().toString();
+                            boolean useLoc = (boolean) currentsnapshot.child(use_loc_key).getValue();
+                            String slat=currentsnapshot.child(lat_key).getValue().toString();
+                            String slng=currentsnapshot.child(lng_key).getValue().toString();
+                            double lat =Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
+                            double lng =Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
+                            String name = currentsnapshot.child(n_key).getValue().toString();
+                            String mobile = currentsnapshot.child(m_key).getValue().toString();
+                            String email = currentsnapshot.child(e_key).getValue().toString();
+                            String uid = currentsnapshot.getKey();
+                            //****************check nearest helping hand********************
+                            float[] results= new float[1];
+                            Location.distanceBetween(mLastLocation.getLatitude(),mLastLocation.getLongitude(),lat,lng,results);
+                            Log.d("Distance", "Result is "+results[0]);
+                            if(results[0]<minDistance){
+                                minDistance=results[0];
+                                Log.d("Distance","min : "+minDistance);
+                                mUseloc[0] =(boolean) currentsnapshot.child(use_loc_key).getValue();
+                                mlat[0] =Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
+                                mlng[0] =Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
 
-                        }
-                        if(guarEmail.equals(currentsnapshot.child(e_key).getValue().toString())){
+                            }
+                            if(guarEmail.equals(currentsnapshot.child(e_key).getValue().toString())){
 
-                            placePeopleWindow(name,mobile,slat,slng,uid,email);
-                        }else if(pincode.equals(currentpin)&&useLoc)
-                        {
+                                placePeopleWindow(name,mobile,slat,slng,uid,email);
+                            }else if(pincode.equals(currentpin)&&useLoc)
+                            {
 
-                            placePeopleWindow(name,mobile,slat,slng,uid,email);
+                                placePeopleWindow(name,mobile,slat,slng,uid,email);
 
+                            }
+                        }catch(Exception e){
+                            Log.d("firebase","Unable to retrieve guardian details");
                         }
                     }
                 }
@@ -442,13 +437,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng mylatlng = new LatLng(mylat,mylng);
         placeMarkerOnMapPeople(name,mobile,mylatlng,uid,email);
     }
+    @SuppressLint("StaticFieldLeak")
     public class DrawRoute extends AsyncTask{
 
         GoogleMap map;
         LatLng start,end;
         int color;
 
-        public DrawRoute(GoogleMap googleMap, int color, LatLng first, LatLng last){
+        DrawRoute(GoogleMap googleMap, int color, LatLng first, LatLng last){
             map=googleMap;
             start=first;
             end=last;
@@ -472,23 +468,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             RouteRest routeRest = new RouteRest();
             routeRest.getJsonDirections(start,end, TravelMode.WALKING)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .map(new Func1<String, Routes>() {
-                        @Override
-                        public Routes call(String s) {
-                            return new RouteJsonParser<Routes>().parse(s, Routes.class);
-                        }
-                    })
-                    .subscribe(new Action1<Routes>() {
-                        @Override
-                        public void call(Routes r) {
-                            routeDrawer.drawPath(r);
-                        }
-                    });
+                    .map(s -> new RouteJsonParser<Routes>().parse(s, Routes.class))
+                    .subscribe(routeDrawer::drawPath);
 
             return null;
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     public class SetImageMarker extends AsyncTask{
 
         String UID;
@@ -520,57 +507,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             StorageReference photoRef = storageRef.child("user_photos/"+UID+".jpg");
 
-            File localFile = null;
+            File localFile;
             final FileInputStream[] fileInputStream = {null};
             try {
                 localFile = File.createTempFile(UID, "jpg");
 
                 final File finalLocalFile = localFile;
                 photoRef.getFile(localFile)
-                        .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                // Successfully downloaded data to local file
-                                // ...
+                        .addOnSuccessListener(taskSnapshot -> {
+                            // Successfully downloaded data to local file
+                            // ...
 
-                                Log.d("glide","successfully downloaded : "+UID);
-                                mIconGenerator.setContentView(mImageView);
-                                try {
-                                    fileInputStream[0] = new FileInputStream(finalLocalFile);
+                            Log.d("glide","successfully downloaded : "+UID);
+                            mIconGenerator.setContentView(mImageView);
+                            try {
+                                fileInputStream[0] = new FileInputStream(finalLocalFile);
 
-                                    mImageView.setImageBitmap(BitmapFactory.decodeStream(fileInputStream[0]));
+                                mImageView.setImageBitmap(BitmapFactory.decodeStream(fileInputStream[0]));
 
-                                    Bitmap iconBitmap = mIconGenerator.makeIcon();
+                                Bitmap iconBitmap = mIconGenerator.makeIcon();
 
-                                    MarkerOptions markerOptions = new MarkerOptions().position(location).icon(BitmapDescriptorFactory.fromBitmap(getResizedBitmap(iconBitmap,120,120)));
-                                    String titleStr = getAddress(location);  // add these two lines
-                                    if(guarEmail!=null&&guarEmail.equals(email))
-                                    {
+                                MarkerOptions markerOptions = new MarkerOptions().position(location).icon(BitmapDescriptorFactory.fromBitmap(getResizedBitmap(iconBitmap,120,120)));
+                                String titleStr = getAddress(location);  // add these two lines
+                                if(guarEmail!=null&&guarEmail.equals(email))
+                                {
 
-                                        int color = getResources().getColor(R.color.route_color);
-                                        markerOptions.title("Guardian: "+name).snippet(titleStr);
-                                        DrawRoute drawRoute = new DrawRoute(mMap,color,getLastLatLng(),location);
-                                        drawRoute.execute();
-                                    }
-                                    else
-                                    {
-                                        markerOptions.title(name).snippet(titleStr);
-                                    }
-                                    // 2
-                                    LatLng l = new LatLng(location.latitude,location.longitude);
-                                    mMap.addMarker(markerOptions);
-
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
+                                    int color = getResources().getColor(R.color.route_color);
+                                    markerOptions.title("Guardian: "+name).snippet(titleStr);
+                                    DrawRoute drawRoute = new DrawRoute(mMap,color,getLastLatLng(),location);
+                                    drawRoute.execute();
                                 }
+                                else
+                                {
+                                    markerOptions.title(name).snippet(titleStr);
+                                }
+                                // 2
+                                LatLng l = new LatLng(location.latitude,location.longitude);
+                                mMap.addMarker(markerOptions);
+
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
                             }
-                        }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle failed download
-                        // ...
-                    }
-                });
+                        }).addOnFailureListener(exception -> {
+                            // Handle failed download
+                            // ...
+                        });
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -623,7 +604,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.d("firebase", databaseError.getMessage());
             }
         });
 
@@ -654,6 +635,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         } catch (IOException e) {
+            e.printStackTrace();
         }
         return addressText;
     }

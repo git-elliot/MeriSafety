@@ -1,5 +1,6 @@
 package com.developers.droidteam.merisafety;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -67,7 +68,7 @@ public class Frag_guardian extends Fragment {
 
     View v4;
     @Override
-    public View onCreateView(LayoutInflater l, @Nullable ViewGroup container, @ Nullable Bundle savedInstanceState){
+    public View onCreateView(@NonNull LayoutInflater l, @Nullable ViewGroup container, @ Nullable Bundle savedInstanceState){
          v4=  l.inflate(R.layout.activity_frag_guardian,container,false);
         mAuth = FirebaseAuth.getInstance();
         Button b1 = (Button)v4.findViewById(R.id.b2);
@@ -105,13 +106,14 @@ public class Frag_guardian extends Fragment {
         return v4;
 }
 
+    @SuppressLint("StaticFieldLeak")
     private class BackgroundTask extends AsyncTask<Void, Void, Void> {
         private ProgressDialog dialog;
         String yournumber;
         String yourname;
         String youremail;
         FirebaseUser user;
-        public BackgroundTask(Activity activity, FirebaseUser currentUser, String name, String number, String email) {
+        BackgroundTask(Activity activity, FirebaseUser currentUser, String name, String number, String email) {
             dialog = new ProgressDialog(activity);
             youremail= email;
             yourname=name;
@@ -154,13 +156,11 @@ public class Frag_guardian extends Fragment {
 
         guarEnd = mDatabase.child(d_key).child(currentUser.getUid());
 
-        addGuarToFirebase(name,email,number,currentUser.getUid().toString());
+        addGuarToFirebase(name,email,number,currentUser.getUid());
 
     }
 
     public void addGuarToFirebase(final String name, final String email, final String number, final String uid ){
-        final String guarNum = number;
-        final String guarEmail = email;
         List<GuardianInfo> guardianInfos = getGuarInfo(name,email,number,uid);
 
         for(GuardianInfo guardianInfo : guardianInfos)
@@ -180,14 +180,14 @@ public class Frag_guardian extends Fragment {
 
                     final SmsManager smss = SmsManager.getDefault();
 
-                    final String sms = " I have added you as my guardian on MeriSafety app. Download MeriSafety app on PlayStore to help me when I need you.";
-                    SharedPreferences sp = con.getSharedPreferences(sp_db,con.MODE_PRIVATE);
+                    final String sms = name+" have added you as my guardian on MeriSafety app. Download MeriSafety app on PlayStore to help me when I need you.";
+                    SharedPreferences sp = con.getSharedPreferences(sp_db, Context.MODE_PRIVATE);
                     String name1 = sp.getString(sp_n,null);
 
                     final String mail = name1+" have added you as their guardian on MeriSafety app. Download MeriSafety app on PlayStore to help them when they need you.";
 
 
-                    smss.sendTextMessage(guarNum, null, sms, pi, pin);
+                    smss.sendTextMessage(number, null, sms, pi, pin);
                     apiKey = mDatabase.child("mailapikey");
                     apiKey.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -196,7 +196,7 @@ public class Frag_guardian extends Fragment {
                             String api_key=dataSnapshot.getValue().toString();
 
                             if(!executeOnce){
-                                SendMail sendMail = new SendMail(guarEmail,"Added you as a guardian",mail,api_key);
+                                SendMail sendMail = new SendMail(email,"Added you as a guardian",mail,api_key);
                                 sendMail.execute();
 
                                 executeOnce=true;

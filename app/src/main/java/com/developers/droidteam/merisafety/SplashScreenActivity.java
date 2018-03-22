@@ -16,34 +16,33 @@ public class SplashScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
+
         setContentView(R.layout.activity_splash_screen);
 
 
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Thread.sleep(3000);
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000);
 
-                    SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
-                    String key=sp.getString(l_key,null);
-                    if(key!=null)
-                    {
+                SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
+                String key=sp.getString(l_key,null);
+                if(key!=null)
+                {
 
-                        startActivity(new Intent(SplashScreenActivity.this,NavigationDrawerActivity.class));
-                    }
-                    else
-                    {
-
-                        startActivity(new Intent(SplashScreenActivity.this,MainActivity.class));
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    startActivity(new Intent(SplashScreenActivity.this,NavigationDrawerActivity.class));
                 }
+                else
+                {
 
-
-
-                finish();
+                    startActivity(new Intent(SplashScreenActivity.this,MainActivity.class));
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+
+
+
+            finish();
         }).run();
 
     }

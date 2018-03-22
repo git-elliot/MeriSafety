@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -90,6 +91,7 @@ public class ProfileActivity extends Activity {
         final EditText editText_number = findViewById(R.id.edit_number);
 
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         final boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
 
@@ -102,9 +104,11 @@ public class ProfileActivity extends Activity {
         imgView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent gallery_Intent = new Intent(getApplicationContext(), GalleryUtil.class);
-                startActivityForResult(gallery_Intent, GALLERY_ACTIVITY_CODE);
-
+                Toast.makeText(ProfileActivity.this, "Upload square picture for best fit.", Toast.LENGTH_SHORT).show();
+                  Intent intent = new Intent();
+                  intent.setType("image/*");
+                  intent.setAction(Intent.ACTION_GET_CONTENT);
+                  startActivityForResult(Intent.createChooser(intent,"Choose picture"),0);
             }});
 
 
@@ -273,113 +277,75 @@ public class ProfileActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == GALLERY_ACTIVITY_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                String picturePath = data.getStringExtra("picturePath");
-                //perform Crop on the Image Selected from Gallery
-                performCrop(picturePath);
+       if(requestCode==0){
+            if(data!=null){
+                progressBar.setVisibility(View.VISIBLE);
+                try {
+                    Bitmap b = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(),data.getData());
+                    uploadBitmap(b);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
-        if (requestCode == RESULT_CROP) {
-            if (resultCode == Activity.RESULT_OK) {
-                progressBar.setVisibility(View.VISIBLE);
-                Bundle extras = data.getExtras();
-                final Bitmap bitmap = extras.getParcelable("data");
-                File file = MainActivity.createCacheOfFile(ProfileActivity.this,"user_pic",bitmap);
-                Uri o = Uri.fromFile(file);
+        }
+        public void uploadBitmap(Bitmap bitmap){
 
-                FirebaseStorage storage = FirebaseStorage.getInstance();
+            File file = MainActivity.createCacheOfFile(ProfileActivity.this,"user_pic",bitmap);
+            Uri o = Uri.fromFile(file);
 
-                // Create a storage reference from our app
-                StorageReference storageRef = storage.getReference();
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+
+            // Create a storage reference from our app
+            StorageReference storageRef = storage.getReference();
 
 
-                StorageReference photoRef = storageRef.child("user_photos/"+UID+".jpg");
+            StorageReference photoRef = storageRef.child("user_photos/"+UID+".jpg");
 
-                photoRef.putFile( o)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                // Get a URL to the uploaded content
-                                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+            photoRef.putFile( o)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded content
+                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
-                                progressBar.setVisibility(View.INVISIBLE);
-                                imgView.setImageBitmap(bitmap);
-                                deleteCache(ProfileActivity.this);
-                                Toast.makeText(ProfileActivity.this, "Changed successfully", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Handle unsuccessful uploads
-                                // ...
-                                progressBar.setVisibility(View.INVISIBLE);
-                                Toast.makeText(ProfileActivity.this, "Unable to change, try again", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-            }
-
-            }
+                            progressBar.setVisibility(View.INVISIBLE);
+                            imgView.setImageBitmap(bitmap);
+                            deleteCache(ProfileActivity.this);
+                            Toast.makeText(ProfileActivity.this, "Changed successfully", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            // ...
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Toast.makeText(ProfileActivity.this, "Unable to change, try again", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
     public static void deleteCache(Context context) {
         try {
             File dir = context.getCacheDir();
             deleteDir(dir);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static boolean deleteDir(File dir) {
         if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
+            for (String aChildren : children) {
+                boolean success = deleteDir(new File(dir, aChildren));
                 if (!success) {
                     return false;
                 }
             }
             return dir.delete();
-        } else if(dir!= null && dir.isFile()) {
-            return dir.delete();
-        } else {
-            return false;
-        }
+        } else
+            return dir != null && dir.isFile() && dir.delete();
     }
-
-
-    private void performCrop(String picUri) {
-        try {
-            //Start Crop Activity
-
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            // indicate image type and Uri
-            File f = new File(picUri);
-            Uri contentUri = Uri.fromFile(f);
-
-            cropIntent.setDataAndType(contentUri, "image/*");
-            // set crop properties
-            cropIntent.putExtra("crop", "true");
-            // indicate aspect of desired crop
-            cropIntent.putExtra("aspectX", 1);
-            cropIntent.putExtra("aspectY", 1);
-            // indicate output X and Y
-            cropIntent.putExtra("outputX", 280);
-            cropIntent.putExtra("outputY", 280);
-
-            // retrieve data on return
-            cropIntent.putExtra("return-data", true);
-            // start the activity - we handle returning in onActivityResult
-            startActivityForResult(cropIntent, RESULT_CROP);
-        }
-        // respond to users whose devices do not support the crop action
-        catch (ActivityNotFoundException anfe) {
-            // display an error message
-            String errorMessage = "your device doesn't support the crop action!";
-            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    }
-
 }

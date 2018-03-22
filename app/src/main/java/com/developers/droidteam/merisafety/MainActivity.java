@@ -1,6 +1,7 @@
 package com.developers.droidteam.merisafety;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.ResultCodes;
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        con = this;
         setContentView(R.layout.activity_main);
        //hiding action bar
         getSupportActionBar().hide();
@@ -114,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         //        View Flipper
 
         simpleViewFlipper = (ViewFlipper) findViewById(R.id.main_view_pager);
-        for (int i = 0; i < images.length; i++) {
+        for (int image : images) {
             ImageView imageView = new ImageView(this);
-            imageView.setImageResource(images[i]);
+            imageView.setImageResource(image);
             simpleViewFlipper.addView(imageView);
         }
         final Animation in = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
@@ -207,11 +209,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         } else {
             updateUI(false);
             // Signed out, show unauthenticated UI.
+            Toast.makeText(this, "unable to sign in to app : "+result.getStatus().toString(), Toast.LENGTH_LONG).show();
         }
 
     }
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+
+        Crashlytics.log("crashed when authenticating with firebase");
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
@@ -309,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 {
                     Log.d("OAuth","User does not exists");
                     Toast.makeText(MainActivity.this, "Sigining in you to MeriSafety.. Please wait..", Toast.LENGTH_SHORT).show();
-                    createUser(name, email, user.getUid().toString(),pUrl);
+                    createUser(name, email, user.getUid(),pUrl);
 
                 }
                 else
@@ -380,8 +385,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         String UID;
         String URL;
+        @SuppressLint("StaticFieldLeak")
         Context con;
-        public DownloadAndUpload(Context context, String uid,String url){
+        DownloadAndUpload(Context context, String uid, String url){
             UID=uid;
             URL=url;
             con=context;
@@ -395,7 +401,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         @Override
         protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
 
@@ -507,7 +512,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
 
-                    l.removeAllViews();;
+                    l.removeAllViews();
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction ft = fm.beginTransaction();
                     Frag_verification obj = new Frag_verification();

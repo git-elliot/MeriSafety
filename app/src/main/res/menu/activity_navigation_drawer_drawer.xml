@@ -5,51 +5,47 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/homebl"
-            android:title="Home" />
+            android:title="@string/home" />
         <item
             android:id="@+id/nav_gaudian"
             android:icon="@drawable/ic_group_black_24dp"
-            android:title="Gaurdian" />
+            android:title="@string/gaurdian" />
         <item
             android:id="@+id/nav_police"
             android:icon="@drawable/ic_security_black_24dp"
-            android:title="All Police Station" />
+            android:title="@string/all_police_station" />
         <item
             android:id="@+id/nav_contact"
             android:icon="@drawable/ic_contact_mail_black_24dp"
-            android:title="Helpine Nos" />
+            android:title="@string/helpine_nos" />
         <item
             android:id="@+id/nav_nearby"
             android:icon="@drawable/ic_location_on_black_24dp"
-            android:title="Nearby" />
+            android:title="@string/nearby" />
     </group>
 
-    <item android:title="More">
+    <item android:title="@string/more">
         <menu>
             <item
                 android:id="@+id/nav_settings"
                 android:icon="@drawable/ic_settings_black_24dp"
-                android:title="Settings" />
-            <item
-                android:id="@+id/nav_crash"
-                android:icon="@drawable/ic_bug_report_black_24dp"
-                android:title="crash button" />
+                android:title="@string/settings" />
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share App" />
+                android:title="@string/share_app" />
 
             <item
                 android:id="@+id/nav_feedback"
                 android:icon="@drawable/ic_feedback_black_24dp"
-                android:title="Feedback" />
+                android:title="@string/feedback" />
 
             <item android:id="@+id/aboutapp"
                 android:icon="@drawable/ic_details_black_24dp"
-                android:title="About the App"/>
+                android:title="@string/about_the_app"/>
             <item android:id="@+id/team"
                 android:icon="@drawable/ic_group_black_24dp"
-                android:title="Team"/>
+                android:title="@string/team"/>
         </menu>
     </item>
 

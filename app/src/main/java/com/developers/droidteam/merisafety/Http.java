@@ -9,9 +9,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class Http {
+class Http {
 
-    public String read(String httpUrl) throws IOException {
+    String read(String httpUrl) throws IOException {
         String httpData = "";
         InputStream inputStream = null;
         HttpURLConnection httpURLConnection = null;
@@ -21,8 +21,8 @@ public class Http {
             httpURLConnection.connect();
             inputStream = httpURLConnection.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuffer stringBuffer = new StringBuffer();
-            String line = "";
+            StringBuilder stringBuffer = new StringBuilder();
+            String line;
             while ((line = bufferedReader.readLine()) != null) {
                 stringBuffer.append(line);
             }
@@ -31,6 +31,7 @@ public class Http {
         } catch (Exception e) {
             Log.d("nearby", e.toString());
         } finally {
+            assert inputStream != null;
             inputStream.close();
             httpURLConnection.disconnect();
         }

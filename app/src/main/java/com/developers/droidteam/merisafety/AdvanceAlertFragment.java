@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.SmsManager;
@@ -59,7 +60,7 @@ public class AdvanceAlertFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         v=inflater.inflate(R.layout.fragment_advance_alert, container, false);
@@ -78,6 +79,7 @@ public class AdvanceAlertFragment extends Fragment {
             }
         }); */
         ConnectivityManager cm = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         final boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
 
@@ -90,6 +92,7 @@ public class AdvanceAlertFragment extends Fragment {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        assert user != null;
         guarEnd = mDatabase.child(d_key).child(user).child(user);
 
         guarEnd.addValueEventListener(new ValueEventListener() {
@@ -130,10 +133,10 @@ public class AdvanceAlertFragment extends Fragment {
         final PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.sent"), 0);
         final PendingIntent pin = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
         final SmsManager smss = SmsManager.getDefault();
-        sp = con.getSharedPreferences(cur_db, con.MODE_PRIVATE);
+        sp = con.getSharedPreferences(cur_db, Context.MODE_PRIVATE);
         String loc = sp.getString(cur_key,null);
 
-        final String sms = name+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
+        final String sms = name+" needs you!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
 
         //************************SENDING CALL INTENT***************************
         if(call){

@@ -71,7 +71,7 @@ public class GuardianFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_guardian, container, false);
@@ -92,6 +92,7 @@ public class GuardianFragment extends Fragment {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        assert user != null;
         guarEnd = mDatabase.child(d_key).child(user).child(user);
 
         guarEnd.addValueEventListener(new ValueEventListener() {
@@ -138,6 +139,7 @@ public class GuardianFragment extends Fragment {
                         });
 
                         FragmentManager fm = getFragmentManager();
+                        assert fm != null;
                         FragmentTransaction ft = fm.beginTransaction();
                         Frag_guardian obj = new Frag_guardian();
                         ft.addToBackStack("stack2");
@@ -159,7 +161,6 @@ public class GuardianFragment extends Fragment {
     public void setGuardianPhoto(String email1, String firebaseUser, final ImageView imageView) {
         final String user = firebaseUser;
         final String email = email1;
-        final ImageView img = imageView;
         guarEnd = mDatabase.child(d_key);
 
         guarEnd.addValueEventListener(new ValueEventListener() {
@@ -173,7 +174,7 @@ public class GuardianFragment extends Fragment {
 
                             Log.d(TAG, "guardian matches");
                             progressBar = v.findViewById(R.id.prog_user);
-                            new NavigationDrawerActivity().setImageView(img,"user_photos/"+currentsnapshot.getKey()+".jpg",progressBar);
+                            new NavigationDrawerActivity().setImageView(imageView,"user_photos/"+currentsnapshot.getKey()+".jpg",progressBar);
                         }
                     }
                 }

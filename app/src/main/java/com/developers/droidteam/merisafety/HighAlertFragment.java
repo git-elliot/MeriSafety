@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.SmsManager;
@@ -59,7 +60,7 @@ public class HighAlertFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_high_alert, container, false);
         // Inflate the layout for this fragment
@@ -80,6 +81,7 @@ public class HighAlertFragment extends Fragment {
         });*/
 
         ConnectivityManager cm = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         final boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
 
@@ -132,9 +134,9 @@ public class HighAlertFragment extends Fragment {
         final PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.sent"), 0);
         final PendingIntent pin = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
         final SmsManager smss = SmsManager.getDefault();
-        sp = con.getSharedPreferences(cur_db, con.MODE_PRIVATE);
+        sp = con.getSharedPreferences(cur_db, Context.MODE_PRIVATE);
         String loc = sp.getString(cur_key,null);
-        final String sms = name+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
+        final String sms = name+" needs you!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";
 
 
         if(call){
@@ -157,38 +159,6 @@ public class HighAlertFragment extends Fragment {
                 }
             }.start();
         }
-/*
-        BackgroundMail.newBuilder(con).withUsername("merisafety@gmail.com")
-                .withPassword("WRTB@droid")
-                .withMailto(mail)
-                .withType(BackgroundMail.TYPE_PLAIN)
-                .withSubject("Mail from MeriSafety")
-                .withBody(sms)
-                .withOnSuccessCallback(new BackgroundMail.OnSuccessCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //do some magic
-//                        SmsManager smsManager = SmsManager.getDefault();
-//                        smsManager.sendTextMessage(number, null, "Help! Call me urgently. Please save me", null, null);
-//                        Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
-
-
-
-                    }
-                })
-                .withOnFailCallback(new BackgroundMail.OnFailCallback() {
-                    @Override
-                    public void onFail() {
-                        //do some magic
-                        /*
-                        SmsManager smsManager = SmsManager.getDefault();
-                        smsManager.sendTextMessage(number, null, "Help! Call me urgently. Please save me", null, null);
-                        Toast.makeText(getActivity(), "Message sent successfully.", Toast.LENGTH_SHORT).show();
-
-                    }
-                })
-                .send();
-*/
        if(msg){
 
            smss.sendTextMessage(mobile, null, sms, pi, pin);

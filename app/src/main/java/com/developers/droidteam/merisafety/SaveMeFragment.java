@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.telephony.SmsManager;
@@ -55,7 +56,7 @@ public class SaveMeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
          savemeinflater = inflater.inflate(R.layout.fragment_save_me, container, false);
         // Inflate the layout for this fragment
@@ -67,6 +68,7 @@ public class SaveMeFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         ConnectivityManager cm = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         final boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
 
@@ -114,7 +116,7 @@ public class SaveMeFragment extends Fragment {
         final PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.sent"), 0);
         final PendingIntent pin = PendingIntent.getBroadcast(getActivity(), 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
         final SmsManager smss = SmsManager.getDefault();
-        sp = con.getSharedPreferences(cur_db, con.MODE_PRIVATE);
+        sp = con.getSharedPreferences(cur_db, Context.MODE_PRIVATE);
         String loc = sp.getString(cur_key,null);
 
         final String sms = name+" Help me!, i'm in emergency. My Location is "+loc+". You received this alert because you are the guardian";

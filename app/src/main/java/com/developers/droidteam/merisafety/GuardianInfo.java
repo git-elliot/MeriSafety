@@ -1,9 +1,5 @@
 package com.developers.droidteam.merisafety;
 
-/**
- * Created by paras on 10/11/17.
- */
-
 public class GuardianInfo {
 
     private String guardianid;
@@ -11,7 +7,7 @@ public class GuardianInfo {
     private String email;
     private String mobile;
 
-    public void setGuardianid(String guardianid) {
+    void setGuardianid(String guardianid) {
         this.guardianid = guardianid;
     }
 

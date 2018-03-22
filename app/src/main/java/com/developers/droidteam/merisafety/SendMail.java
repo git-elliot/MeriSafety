@@ -5,22 +5,19 @@ import android.util.Log;
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGridException;
 
-/**
- * Created by paras on 23/11/17.
- */
-
 public class SendMail extends AsyncTask<Void, Void, Void> {
 
     private String mTo;
     private String mFrom;
     private String mText;
-    private String donotreply = "This is an automated mail from MeriSafety.Do not reply to this email,";
     private String mSubject;
     private String api_key;
-    public SendMail(String to, String subject, String text,String api){
+    SendMail(String to, String subject, String text, String api){
+
         mTo=to;
         mFrom="noreply@MeriSafety";
-        mText=text+donotreply;
+        String donotreply = "This is an automated mail from MeriSafety.Do not reply to this email,";
+        mText=text+ donotreply;
         mSubject=subject;
         api_key=api;
 

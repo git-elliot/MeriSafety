@@ -1,16 +1,15 @@
 package com.developers.droidteam.merisafety;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-/**
- * Created by paras on 23/11/17.
- */
 
 public class BootComplete extends BroadcastReceiver {
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     @Override
     public void onReceive(Context context, Intent intent) {
 

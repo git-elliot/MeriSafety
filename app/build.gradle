@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.25.1'
     }
 }
 apply plugin: 'com.android.application'
@@ -16,11 +16,21 @@ repositories {
 apply plugin: 'io.fabric'
 
 android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     signingConfigs {
         config {
             keyAlias 'merisafety'
             keyPassword 'merisafetykey@123'
             storeFile file('/home/paras/my-release-merisafety.keystore')
+            storePassword 'merisafetykey@123'
+        }
+        config_release {
+            keyAlias 'merisafety'
+            keyPassword 'merisafetykey@123'
+            storeFile file('/home/paras/my-release-merisafety_old.keystore')
             storePassword 'merisafetykey@123'
         }
     }
@@ -30,8 +40,8 @@ android {
         applicationId "com.developers.droidteam.merisafety"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 9
-        versionName "9.0"
+        versionCode 15
+        versionName "15.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -40,6 +50,10 @@ android {
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config_release
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
     packagingOptions {
@@ -88,7 +102,6 @@ dependencies {
         transitive = true
     }
     compile 'com.google.firebase:firebase-core:11.8.0'
-
 }
 configurations {
     all {

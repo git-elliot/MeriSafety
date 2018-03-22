@@ -1,5 +1,6 @@
 package com.developers.droidteam.merisafety;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -7,11 +8,12 @@ import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
 
 public class GooglePlacesReadTask extends AsyncTask<Object, Integer, String> {
-    String googlePlacesData = null;
-    GoogleMap googleMap;
+    private String googlePlacesData = null;
+    private GoogleMap googleMap;
+    @SuppressLint("StaticFieldLeak")
     Context con;
-    String sType;
-    public  GooglePlacesReadTask(Context context,String type){
+    private String sType;
+    GooglePlacesReadTask(Context context, String type){
         con=context;
         sType=type;
     }

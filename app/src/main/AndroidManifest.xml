@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>
+    <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
 
     <application
         android:allowBackup="true"
@@ -24,7 +24,8 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:testOnly="false"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_descriptor">
         <activity
             android:name=".SaveMeActivity"
             android:screenOrientation="portrait" />
@@ -37,58 +38,75 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-          </activity>
-        <activity android:name=".GalleryUtil"/>
-        <activity android:name=".ProfileActivity"/>
-        <receiver android:name=".SmsNotifications" android:exported="false">
+        </activity>
+        <activity android:name=".ProfileActivity" />
+
+        <receiver
+            android:name=".SmsNotifications"
+            android:exported="false">
             <intent-filter>
                 <action android:name="in.wptrafficanalyzer.sent" />
                 <action android:name="in.wptrafficanalyzer.delivered" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".BootComplete" android:exported="false">
+        <receiver
+            android:name=".BootComplete"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".AlertService" android:exported="false">
+        <service
+            android:name=".AlertService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </service>
         <service android:name=".myFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         <service android:name=".myFirebaseInstanceIdService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
         <!-- crashlytics meta data -->
-        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="true" />
-        <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
-     See README(https://goo.gl/l4GJaQ) for more. -->
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="true" />
+        <!--
+     Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_name" />
-        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <!--
+             Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more.
+        -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="default_channel_id"/>
+            android:value="default_channel_id" />
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".NavigationDrawerActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" >
+            <intent-filter >
+                <action android:name="android.intent.action.VIEW"/>
+            </intent-filter>
+        </activity>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -115,7 +133,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <receiver android:name=".NewAppWidget" android:exported="false">
+
+        <receiver
+            android:name=".NewAppWidget"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -124,9 +145,11 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/new_app_widget_info" />
         </receiver>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="387184a4ead0bd9446480871e151adb64f62c015" />
+
     </application>
 
 </manifest>

@@ -11,11 +11,9 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
-import static android.content.Context.KEYGUARD_SERVICE;
+import java.util.Objects;
 
-/**
- * Created by paras on 21/11/17.
- */
+import static android.content.Context.KEYGUARD_SERVICE;
 
 public class EmergencyAlert extends BroadcastReceiver {
     static int countPowerOff = 0;
@@ -29,10 +27,11 @@ public class EmergencyAlert extends BroadcastReceiver {
     public void onReceive(final Context context, Intent intent) {
         Log.v("onReceive", "Power button is pressed.");
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
 
-        if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+        if (Objects.equals(intent.getAction(), Intent.ACTION_SCREEN_OFF)) {
            if(lastClicktime==0)
            {
                lastClicktime =System.currentTimeMillis() ;
@@ -65,7 +64,7 @@ public class EmergencyAlert extends BroadcastReceiver {
             }
 
         }
-        else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+        else if (Objects.equals(intent.getAction(), Intent.ACTION_SCREEN_ON)) {
             if(lastClicktime==0)
             {
                 lastClicktime = System.currentTimeMillis();
@@ -107,12 +106,14 @@ public class EmergencyAlert extends BroadcastReceiver {
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 KeyguardManager keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    keyguardManager.requestDismissKeyguard((Activity) context, new KeyguardManager.KeyguardDismissCallback() {
-                        @Override
-                        public void onDismissSucceeded() {
-                            super.onDismissSucceeded();
-                        }
-                    });
+                    if (keyguardManager != null) {
+                        keyguardManager.requestDismissKeyguard((Activity) context, new KeyguardManager.KeyguardDismissCallback() {
+                            @Override
+                            public void onDismissSucceeded() {
+                                super.onDismissSucceeded();
+                            }
+                        });
+                    }
                 }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                     context.startActivity(i);
                 }

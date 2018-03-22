@@ -1,5 +1,6 @@
 package com.developers.droidteam.merisafety;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -51,7 +52,7 @@ public class Frag_verification extends Fragment {
         con= context;
     }
 
-    public View onCreateView(LayoutInflater l, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater l, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         v = l.inflate(R.layout.activity_frag_verification, container,false);
 
@@ -90,10 +91,11 @@ public class Frag_verification extends Fragment {
     }
 
 
+    @SuppressLint("StaticFieldLeak")
     private class BackgroundTask extends AsyncTask<Void, Void, Void> {
         private ProgressDialog dialog;
         String number;
-        public BackgroundTask(Activity activity,String num) {
+        BackgroundTask(Activity activity,String num) {
             dialog = new ProgressDialog(activity);
            number = num;
         }
@@ -145,6 +147,7 @@ public class Frag_verification extends Fragment {
 
                mDatabase = FirebaseDatabase.getInstance().getReference();
 
+               assert currentUser != null;
                userEnd = mDatabase.child(d_key).child(currentUser.getUid()).child(m_key);
                userEnd.setValue(num).addOnCompleteListener(new OnCompleteListener<Void>() {
                    @Override
@@ -152,6 +155,7 @@ public class Frag_verification extends Fragment {
                        Toast.makeText(con, "Mobile number added successfully", Toast.LENGTH_SHORT).show();
 
                        FragmentManager fm = getFragmentManager();
+                       assert fm != null;
                        FragmentTransaction ft = fm.beginTransaction();
                        Frag_guardian obj = new Frag_guardian();
                        ft.replace(R.id.l2,obj,"guardian");
@@ -177,9 +181,11 @@ public class Frag_verification extends Fragment {
                if (e instanceof FirebaseAuthInvalidCredentialsException) {
                    // Invalid request
                    // ...
+                   Log.d("firebase verification","Invalid Request");
                } else if (e instanceof FirebaseTooManyRequestsException) {
                    // The SMS quota for the project has been exceeded
                    // ...
+                   Log.d("firebase verification","Contact admin,The SMS quota for the project has been exceeded.");
                }
 
                // Show a message and update the UI

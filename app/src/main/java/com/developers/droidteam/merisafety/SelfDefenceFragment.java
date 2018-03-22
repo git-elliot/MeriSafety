@@ -2,6 +2,7 @@ package com.developers.droidteam.merisafety;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -20,7 +21,6 @@ public class SelfDefenceFragment extends Fragment {
 
 
     View v;
-    private ViewFlipper simpleViewFlipper;
     int[] images = {R.drawable.p1, R.drawable.p2, R.drawable.p3, R.drawable.p4, R.drawable.p5};
 
     public SelfDefenceFragment() {
@@ -29,7 +29,7 @@ public class SelfDefenceFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
        v= inflater.inflate(R.layout.fragment_self_defence, container, false);
@@ -40,10 +40,10 @@ public class SelfDefenceFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        simpleViewFlipper = (ViewFlipper) v.findViewById(R.id.simpleViewFlipper);
-        for (int i = 0; i < images.length; i++) {
+        ViewFlipper simpleViewFlipper =  v.findViewById(R.id.simpleViewFlipper);
+        for (int image : images) {
             ImageView imageView = new ImageView(getActivity());
-            imageView.setImageResource(images[i]);
+            imageView.setImageResource(image);
             simpleViewFlipper.addView(imageView);
         }
         Animation in = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left);
