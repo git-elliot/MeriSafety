@@ -16,7 +16,7 @@ public class NewAppWidget extends AppWidgetProvider {
                                 int appWidgetId) {
 
         CharSequence widgetText = context.getString(R.string.app_widget_text);
-        Intent intent = new Intent(context, SaveMeActivity.class).putExtra("key", R.id.save_me);
+        Intent intent = new Intent(context,MapsActivity.class).putExtra("saveme","yes");
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
         // Construct the RemoteViews object

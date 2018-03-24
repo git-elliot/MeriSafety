@@ -94,15 +94,8 @@ public class EmergencyAlert extends BroadcastReceiver {
             if (countPowerOff >= 4) {
 
                 final Intent i = new Intent();
-                if(isConnected)
-                {
-                    i.putExtra("key", R.id.save_me);
-                }else
-                {
-                    i.putExtra("key", R.id.highalert);
-                }
-
-                i.setClassName("com.developers.droidteam.merisafety","com.developers.droidteam.merisafety.SaveMeActivity");
+                i.setClassName("com.developers.droidteam.merisafety","com.developers.droidteam.merisafety.MapsActivity");
+                i.putExtra("saveme","yes");
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 KeyguardManager keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

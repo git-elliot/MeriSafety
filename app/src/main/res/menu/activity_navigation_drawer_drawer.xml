@@ -22,6 +22,11 @@
             android:id="@+id/nav_nearby"
             android:icon="@drawable/ic_location_on_black_24dp"
             android:title="@string/nearby" />
+        <item
+            android:id="@+id/nav_self_defence"
+            android:icon="@drawable/ic_fitness_center_black_24dp"
+            android:title="@string/self" />
+
     </group>
 
     <item android:title="@string/more">

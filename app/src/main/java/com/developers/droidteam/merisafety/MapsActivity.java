@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.polok.routedrawer.RouteDrawer;
@@ -111,7 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final String use_loc_key = "useloc";
     private boolean nearbySet=false;
     private final String ge_key="gemail";
-
+    TextView text_info;
 
 
     @Override
@@ -119,17 +120,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        text_info = findViewById(R.id.text_info);
+
         Intent i = getIntent();
         String saveme=  i.getStringExtra("saveme");
-        if(saveme.equals("yes")){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.setStatusBarColor(Color.RED);
-                window.setNavigationBarColor(Color.RED);
-            }
-
-        }
         progressBar = findViewById(R.id.updateMap);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -146,6 +140,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         createLocationRequest();
+
+        if(saveme.equals("yes")){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(Color.RED);
+                window.setNavigationBarColor(Color.RED);
+            }
+            SendAlert sendAlert = new SendAlert(this,text_info);
+            sendAlert.execute();
+
+        }
+
 
         Button nearby_people = findViewById(R.id.people);
         Button nearby_police = findViewById(R.id.police);
@@ -699,7 +706,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onPause() {
         super.onPause();
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+       if(mGoogleApiClient.isConnected()){
+           LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+       }
     }
 
     // 3

@@ -41,9 +41,9 @@ public class SelfDefenceFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         ViewFlipper simpleViewFlipper =  v.findViewById(R.id.simpleViewFlipper);
-        for (int image : images) {
+        for (int i=0;i<4;i++) {
             ImageView imageView = new ImageView(getActivity());
-            imageView.setImageResource(image);
+            imageView.setImageResource(images[i]);
             simpleViewFlipper.addView(imageView);
         }
         Animation in = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left);

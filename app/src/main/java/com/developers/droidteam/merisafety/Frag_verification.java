@@ -69,23 +69,21 @@ public class Frag_verification extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        b1.setOnClickListener(v -> {
 
-                if (editText.getText().toString().trim().length() != 10) {
-                    editText.setError("Phone Number is invalid");
-                    editText.requestFocus();
-                }
-                else {
+            if (editText.getText().toString().trim().length() != 10) {
+                editText.setError("Phone Number is invalid");
+                editText.requestFocus();
+            }
+            else {
 
-                    Toast.makeText(con, "Please Wait Automatically Detecting OTP.", Toast.LENGTH_LONG).show();
-                    BackgroundTask task = new BackgroundTask(getActivity(),editText.getText().toString());
-                    task.execute();
+                Toast.makeText(con, "Please Wait Automatically Detecting OTP.", Toast.LENGTH_LONG).show();
+                BackgroundTask task = new BackgroundTask(getActivity(),editText.getText().toString());
+                task.execute();
 
-                }
+            }
 
-            }});
+        });
 
 
     }
@@ -149,25 +147,17 @@ public class Frag_verification extends Fragment {
 
                assert currentUser != null;
                userEnd = mDatabase.child(d_key).child(currentUser.getUid()).child(m_key);
-               userEnd.setValue(num).addOnCompleteListener(new OnCompleteListener<Void>() {
-                   @Override
-                   public void onComplete(@NonNull Task<Void> task) {
-                       Toast.makeText(con, "Mobile number added successfully", Toast.LENGTH_SHORT).show();
+               userEnd.setValue(num).addOnCompleteListener(task -> {
+                   Toast.makeText(con, "Mobile number added successfully", Toast.LENGTH_SHORT).show();
 
-                       FragmentManager fm = getFragmentManager();
-                       assert fm != null;
-                       FragmentTransaction ft = fm.beginTransaction();
-                       Frag_guardian obj = new Frag_guardian();
-                       ft.replace(R.id.l2,obj,"guardian");
-                       ft.commit();
+                   FragmentManager fm = getFragmentManager();
+                   assert fm != null;
+                   FragmentTransaction ft = fm.beginTransaction();
+                   Frag_guardian obj = new Frag_guardian();
+                   ft.replace(R.id.l2,obj,"guardian");
+                   ft.commit();
 
-                   }
-               }).addOnFailureListener(new OnFailureListener() {
-                   @Override
-                   public void onFailure(@NonNull Exception e) {
-                       Toast.makeText(con, "Unable to add mobile number, try again", Toast.LENGTH_SHORT).show();
-                   }
-               });
+               }).addOnFailureListener(e -> Toast.makeText(con, "Unable to add mobile number, try again", Toast.LENGTH_SHORT).show());
 
 
            }

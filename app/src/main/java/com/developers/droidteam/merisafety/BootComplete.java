@@ -22,5 +22,8 @@ public class BootComplete extends BroadcastReceiver {
             context.startService(i);
 
         }
+        else {
+            context.stopService(i);
+        }
     }
 }

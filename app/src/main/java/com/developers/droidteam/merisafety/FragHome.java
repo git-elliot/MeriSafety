@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,10 +81,6 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     Context con;
 
     Button savemeAlert;
-    Button selfDef;
-    Button adAlert;
-    Button highAlert;
-    Button lowAlert;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -93,10 +92,6 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v= inflater.inflate(R.layout.activity_frag_home,container,false);
 
-        lowAlert = v.findViewById(R.id.lowalert);
-        highAlert = v.findViewById(R.id.highalert);
-        adAlert = v.findViewById(R.id.advancealert);
-        selfDef = v.findViewById(R.id.self_defence);
         savemeAlert = v.findViewById(R.id.save_me);
 
         return v;
@@ -120,40 +115,12 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
     @Override
     public void onStart() {
         super.onStart();
-        final Intent i = new Intent(con,SaveMeActivity.class);
 
-        lowAlert.setOnLongClickListener(v -> {
-
-            i.putExtra(i_key,v.getId());
-            startActivity(i);
-            return false;
-        });
-
-        highAlert.setOnLongClickListener(v -> {
-            i.putExtra(i_key,v.getId());
-            startActivity(i);
-
-            return false;
-        });
-
-        adAlert.setOnLongClickListener(v -> {
-            i.putExtra(i_key,v.getId());
-            startActivity(i);
-
-            return false;
-        });
-
-        selfDef.setOnLongClickListener(v -> {
-            i.putExtra(i_key,v.getId());
-            startActivity(i);
-
-            return false;
-        });
 
         savemeAlert.setOnLongClickListener(v -> {
-            i.putExtra(i_key,v.getId());
-            startActivity(i);
 
+
+            con.startActivity(new Intent(con,MapsActivity.class).putExtra("saveme","yes"));
             return false;
         });
 

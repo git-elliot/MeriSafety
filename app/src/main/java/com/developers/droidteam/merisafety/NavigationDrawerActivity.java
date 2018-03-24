@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -33,6 +34,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -102,8 +105,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         assert cm != null;
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
-
-        Toast.makeText(this, "Long press these alert buttons to activate them", Toast.LENGTH_LONG).show();
 
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -306,43 +307,20 @@ public class NavigationDrawerActivity extends AppCompatActivity
             toggle = true;
         }
     }
+    public void fun(View v)
+    {
+        Context con = getApplicationContext();
 
-        public void fun(View v)
-       {
-
-           Toast t = null;
-        if(R.id.lowalert==v.getId()){
-
-            t= Toast.makeText(getApplicationContext(), R.string.low_alert_toast,Toast.LENGTH_SHORT);
-            t.setGravity(Gravity.END|Gravity.TOP,0,0);
-            t.show();
-        }
         if(R.id.save_me==v.getId())
         {
-            t= Toast.makeText(getApplicationContext(), R.string.save_me_toast,Toast.LENGTH_SHORT);
-            t.setGravity(Gravity.CENTER,0,0);
-            t.show();
+            Button savemeAlert = findViewById(R.id.save_me);
+            final Animation myAnim = AnimationUtils.loadAnimation(con,R.anim.bounce);
+            MyBounceInterpolator bounceInterpolator = new MyBounceInterpolator(0.2,10);
+              myAnim.setInterpolator(bounceInterpolator);
+            savemeAlert.startAnimation(myAnim);
 
+            Snackbar.make(findViewById(R.id.newfraglayout),"Long press to activate it.",Toast.LENGTH_SHORT).show();
         }
-        if(R.id.highalert==v.getId())
-        {
-            t= Toast.makeText(getApplicationContext(), R.string.high_alert_toast,Toast.LENGTH_SHORT);
-            t.setGravity(Gravity.END|Gravity.CENTER_HORIZONTAL,0,0);
-            t.show();
-        }
-        if(R.id.advancealert==v.getId())
-        {
-            t= Toast.makeText(getApplicationContext(), R.string.advance_alert_toast,Toast.LENGTH_SHORT);
-            t.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.END,0,200);
-            t.show();
-        }
-        if(R.id.self_defence==v.getId())
-        {
-            t= Toast.makeText(getApplicationContext(), R.string.self_defence_toast,Toast.LENGTH_SHORT);
-            t.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.END,0,400);
-            t.show();
-        }
-
     }
 
     @Override
@@ -407,7 +385,17 @@ public class NavigationDrawerActivity extends AppCompatActivity
             ft.replace(R.id.newfraglayout,obj,"guardian");
             ft.commit();
 
-        } else if (id == R.id.aboutapp) {
+        }else if(R.id.nav_self_defence==id) {
+
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            SelfDefenceFragment obj = new SelfDefenceFragment();
+            ft.addToBackStack("stack2");
+            ft.replace(R.id.newfraglayout,obj,"guardian");
+            ft.commit();
+
+        }
+        else if (id == R.id.aboutapp) {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             Frag_aboutapp obj = new Frag_aboutapp();

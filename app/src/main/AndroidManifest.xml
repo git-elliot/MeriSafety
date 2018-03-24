@@ -27,9 +27,6 @@
         android:theme="@style/AppTheme"
         android:fullBackupContent="@xml/backup_descriptor">
         <activity
-            android:name=".SaveMeActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".SplashScreenActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MySplashTheme">

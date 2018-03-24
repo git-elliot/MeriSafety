@@ -14,27 +14,31 @@ import android.widget.Toast;
 
 public class CheckConnectivity extends BroadcastReceiver {
 
+    private boolean offline = false;
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        Activity activity = (Activity) context;
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         assert cm != null;
         NetworkInfo activeNetwork =  cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork!=null&&activeNetwork.isConnectedOrConnecting();
         if(isConnected){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Activity activity = (Activity) context;
                 Window window = activity.getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.setStatusBarColor(activity.getResources().getColor(R.color.colorPrimaryDark));
                 window.setNavigationBarColor(activity.getResources().getColor(R.color.black));
             }
-
+           if(offline){
+                Snackbar.make(activity.findViewById(R.id.newfraglayout),"You are back to Online",Snackbar.LENGTH_SHORT).show();
+                offline=false;
+           }
         }
         else{
-            Toast.makeText(context, "You are offline.", Toast.LENGTH_SHORT).show();
+            offline=true;
+            Snackbar.make(activity.findViewById(R.id.newfraglayout),"You are offline",Snackbar.LENGTH_SHORT).show();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Activity activity = (Activity) context;
                     Window window = activity.getWindow();
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                     window.setStatusBarColor(activity.getResources().getColor(R.color.offline_color));

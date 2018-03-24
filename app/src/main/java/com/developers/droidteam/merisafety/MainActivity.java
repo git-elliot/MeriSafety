@@ -329,8 +329,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         Intent it3=new Intent(MainActivity.this,NavigationDrawerActivity.class);
                         startActivity(it3);
 
-                        MainActivity.this.finish();
-
                     }
                     else
                     {
@@ -338,11 +336,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         FragmentManager fm = getSupportFragmentManager();
                         FragmentTransaction ft = fm.beginTransaction();
                         Frag_verification obj = new Frag_verification();
-                        ft.addToBackStack("stack2");
                         ft.replace(R.id.l2,obj,"verify");
                         ft.commit();
 
-                        MainActivity.this.finish();
 
                     }
                 }
@@ -516,7 +512,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction ft = fm.beginTransaction();
                     Frag_verification obj = new Frag_verification();
-                    ft.addToBackStack("stack2");
                     ft.replace(R.id.l2,obj,"Verify");
                     ft.commit();
                 }
