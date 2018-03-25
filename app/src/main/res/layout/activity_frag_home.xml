@@ -2,24 +2,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/colorPrimaryDark"
+        android:orientation="vertical"
         android:layout_weight="9">
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_weight="6"
-            android:background="@color/colorPrimaryDark"
+        <FrameLayout
+            android:layout_width="match_parent"
             android:orientation="horizontal"
+            android:layout_gravity="center"
             android:layout_height="match_parent"
             >
             <Button
-                android:layout_width="250dp"
+                android:layout_width="280dp"
                 android:background="@drawable/button"
+                android:typeface="sans"
+                android:id="@+id/anim_button"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:longClickable="true"
+                android:textColor="@color/Light_grey_text"
+                android:textSize="30dp"
+                android:layout_centerInParent="true"
+                android:layout_height="280dp"
+                />
+            <Button
+                android:layout_width="250dp"
+                android:background="@drawable/ripple_background"
                 android:id="@+id/save_me"
                 android:typeface="sans"
                 android:textStyle="bold"
+                android:layout_gravity="center"
                 android:longClickable="true"
                 android:textColor="@color/Light_grey_text"
                 android:textSize="30dp"
@@ -28,6 +43,7 @@
                 android:onClick="fun"
                 android:layout_height="250dp"
                 />
-        </RelativeLayout>
-    </LinearLayout>
+
+        </FrameLayout>
+    </RelativeLayout>
 </LinearLayout>

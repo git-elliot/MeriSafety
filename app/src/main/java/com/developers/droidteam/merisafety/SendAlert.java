@@ -127,7 +127,7 @@ public class SendAlert extends AsyncTask {
             return;
         }
         con.startActivity(intent);
-        textView.setText(" Call done ->");
+        textView.setText(" Call sent -> ");
 
         smss.sendTextMessage(mobile, null, sms, pi, pin);
 

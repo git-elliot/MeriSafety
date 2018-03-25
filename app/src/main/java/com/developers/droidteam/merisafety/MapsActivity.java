@@ -148,8 +148,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 window.setStatusBarColor(Color.RED);
                 window.setNavigationBarColor(Color.RED);
             }
-            SendAlert sendAlert = new SendAlert(this,text_info);
-            sendAlert.execute();
+//            SendAlert sendAlert = new SendAlert(this,text_info);
+//            sendAlert.execute();
 
         }
 

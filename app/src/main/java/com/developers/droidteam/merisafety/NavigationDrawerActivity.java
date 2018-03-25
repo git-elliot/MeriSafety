@@ -34,8 +34,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -240,6 +242,19 @@ public class NavigationDrawerActivity extends AppCompatActivity
         FirebaseMessaging.getInstance().subscribeToTopic("alert");
 
     }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        final Button btn =  findViewById(R.id.save_me);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+
+                Snackbar.make(findViewById(R.id.newfraglayout),"Long press to activate it.",Toast.LENGTH_SHORT).show();
+                view.clearAnimation();
+            }
+        });
+    }
 
     void turnOffGps(){
         String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
@@ -305,21 +320,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
         {
             textbar.setText("");
             toggle = true;
-        }
-    }
-    public void fun(View v)
-    {
-        Context con = getApplicationContext();
-
-        if(R.id.save_me==v.getId())
-        {
-            Button savemeAlert = findViewById(R.id.save_me);
-            final Animation myAnim = AnimationUtils.loadAnimation(con,R.anim.bounce);
-            MyBounceInterpolator bounceInterpolator = new MyBounceInterpolator(0.2,10);
-              myAnim.setInterpolator(bounceInterpolator);
-            savemeAlert.startAnimation(myAnim);
-
-            Snackbar.make(findViewById(R.id.newfraglayout),"Long press to activate it.",Toast.LENGTH_SHORT).show();
         }
     }
 

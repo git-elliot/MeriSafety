@@ -1,27 +1,35 @@
 package com.developers.droidteam.merisafety;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -117,12 +125,60 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
         super.onStart();
 
 
-        savemeAlert.setOnLongClickListener(v -> {
+        final Button btn = v.findViewById(R.id.save_me);
+        final Button anim_btn = v.findViewById(R.id.anim_button);
+        final Animation animation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+        animation.setDuration(500); // duration - half a second
+        animation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+        animation.setRepeatCount(Animation.INFINITE); // Repeat animation infinitely
+        animation.setRepeatMode(Animation.REVERSE); // Reverse animation at the end so the button will fade back in
+        anim_btn.startAnimation(animation);
 
+        btn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
 
-            con.startActivity(new Intent(con,MapsActivity.class).putExtra("saveme","yes"));
-            return false;
+                final Animation myAnim = AnimationUtils.loadAnimation(con,R.anim.bounce);
+                MyBounceInterpolator bounceInterpolator = new MyBounceInterpolator(0.1,10);
+                myAnim.setInterpolator(bounceInterpolator);
+                anim_btn.startAnimation(myAnim);
+                myAnim.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        anim_btn.animate().alpha(0.0f).setDuration(300);
+                        anim_btn.setVisibility(View.INVISIBLE);
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        anim_btn.animate().alpha(1.0f).setDuration(300);
+                        anim_btn.setVisibility(View.VISIBLE);
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(300);
+                            con.startActivity(new Intent(con,MapsActivity.class).putExtra("saveme","yes"));
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+                view.clearAnimation();
+                return false;
+            }
         });
+
+
 
         Intent intent = new Intent(con, AlertService.class);
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(con);
@@ -136,6 +192,16 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
         }
 
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+       }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
