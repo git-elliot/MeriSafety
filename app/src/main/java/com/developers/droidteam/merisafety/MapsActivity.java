@@ -112,15 +112,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final String use_loc_key = "useloc";
     private boolean nearbySet=false;
     private final String ge_key="gemail";
-    TextView text_info;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-        text_info = findViewById(R.id.text_info);
 
         Intent i = getIntent();
         String saveme=  i.getStringExtra("saveme");
@@ -148,8 +145,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 window.setStatusBarColor(Color.RED);
                 window.setNavigationBarColor(Color.RED);
             }
-//            SendAlert sendAlert = new SendAlert(this,text_info);
-//            sendAlert.execute();
+            SendAlert sendAlert = new SendAlert(this);
+            sendAlert.execute();
 
         }
 

@@ -1,6 +1,8 @@
 package com.developers.droidteam.merisafety;
 
+import android.app.Activity;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -52,17 +55,44 @@ public class SendAlert extends AsyncTask {
     String sms;
     SharedPreferences sp;
     Context con;
-    TextView textView;
+    ProgressDialog progressDialog;
 
-    SendAlert(Context context,TextView text_info) {
-        textView=text_info;
+    SendAlert(Context context) {
         con = context;
+        Activity activity = (Activity) con;
+        progressDialog = new ProgressDialog(activity);
         pin = PendingIntent.getBroadcast(con, 0, new Intent("in.wptrafficanalyzer.delivered"), 0);
         pi = PendingIntent.getBroadcast(con, 0, new Intent("in.wptrafficanalyzer.sent"), 0);
         smss = SmsManager.getDefault();
         sp = con.getSharedPreferences(cur_db, Context.MODE_PRIVATE);
         loc = sp.getString(cur_key, null);
 
+    }
+
+    @Override
+    protected void onPreExecute() {
+        progressDialog.setMessage("Generating text, email and call");
+        progressDialog.show();
+    }
+
+    @Override
+    protected void onPostExecute(Object o) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(4000);
+
+                    if(progressDialog.isShowing()){
+                        progressDialog.dismiss();
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -92,10 +122,10 @@ public class SendAlert extends AsyncTask {
                 if (isConnected) {
 
 
-                    sendAlert(textView,dataSnapshot.child(n_key).getValue().toString(), dataSnapshot.child(m_key).getValue().toString(), dataSnapshot.child(e_key).getValue().toString());
+                    sendAlert(dataSnapshot.child(n_key).getValue().toString(), dataSnapshot.child(m_key).getValue().toString(), dataSnapshot.child(e_key).getValue().toString());
 
                 } else {
-                    sendAlert(textView,gname, gmobile, gemail);
+                    sendAlert(gname, gmobile, gemail);
                 }
 
             }
@@ -109,29 +139,38 @@ public class SendAlert extends AsyncTask {
         return null;
     }
 
-    private void sendAlert(TextView tv, String name, final String mobile, final String email) {
+    private void sendAlert( String name, final String mobile, final String email) {
 
 
         sms = name + " Help me!, i'm in emergency. My Location is " + loc + ". You received this alert because you are the guardian";
 
 
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mobile));
-        if (ActivityCompat.checkSelfPermission(con, android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        con.startActivity(intent);
-        textView.setText(" Call sent -> ");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(4000);
+                    if (ActivityCompat.checkSelfPermission(con, android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
 
+                    con.startActivity(intent);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
         smss.sendTextMessage(mobile, null, sms, pi, pin);
 
-        tv.append(" Sms sent ->");
 
         apiKey = mDatabase.child("mailapikey");
         apiKey.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -143,7 +182,6 @@ public class SendAlert extends AsyncTask {
                     SendMail sendMail = new SendMail(email,"Save Me Alert",sms,api_key);
                     sendMail.execute();
                     executeOnce=true;
-                    tv.append(" Email sent");
                 }
             }
 
