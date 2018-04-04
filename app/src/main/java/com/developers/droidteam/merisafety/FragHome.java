@@ -246,7 +246,7 @@ public class FragHome extends Fragment implements GoogleApiClient.ConnectionCall
                         status.startResolutionForResult(getActivity(), REQUEST_CHECK_SETTINGS);
 
                     }catch(IntentSender.SendIntentException e) {
-                     Log.d("sign in",e.getMessage());
+                     Log.d("Location updates",e.getMessage());
                     }
                     break;
                 // 6

@@ -75,7 +75,7 @@
         android:id="@+id/add_new_guar"
         android:textSize="25sp"
         android:text="  Choose new guardian  "
-        android:background="@drawable/button"
+        android:background="@drawable/buttonb"
         />
 </LinearLayout>
 

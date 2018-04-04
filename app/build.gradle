@@ -35,13 +35,13 @@ android {
         }
     }
     compileSdkVersion 27
-    buildToolsVersion '27.0.2'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.developers.droidteam.merisafety"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 21
-        versionName "21.0"
+        versionCode 22
+        versionName "22.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -67,6 +67,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-appindexing:12.0.1'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -76,19 +77,19 @@ dependencies {
     compile 'com.android.support:palette-v7:27.1.0'
     compile 'com.android.support:support-v4:27.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.google.android.gms:play-services-location:11.8.0'
-    compile 'com.google.android.gms:play-services-maps:11.8.0'
+    compile 'com.google.android.gms:play-services-location:12.0.1'
+    compile 'com.google.android.gms:play-services-maps:12.0.1'
     compile 'com.android.support:design:27.1.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.google.firebase:firebase-storage:11.8.0'
-    compile 'com.google.firebase:firebase-database:11.8.0'
-    compile 'com.google.firebase:firebase-messaging:11.8.0'
-    compile 'com.google.firebase:firebase-auth:11.8.0'
+    compile 'com.google.firebase:firebase-storage:12.0.1'
+    compile 'com.google.firebase:firebase-database:12.0.1'
+    compile 'com.google.firebase:firebase-messaging:12.0.1'
+    compile 'com.google.firebase:firebase-auth:12.0.1'
     compile 'com.firebaseui:firebase-ui-auth:3.1.0'
     compile 'com.firebaseui:firebase-ui-storage:3.1.0'
     compile 'com.github.bumptech.glide:glide:4.1.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.1.1'
-    compile 'com.google.android.gms:play-services-auth:11.8.0'
+    compile 'com.google.android.gms:play-services-auth:12.0.1'
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'com.google.maps.android:android-maps-utils:0.4'
     compile('com.github.polok.routedrawer:library:1.0.0', {
@@ -101,7 +102,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
         transitive = true
     }
-    compile 'com.google.firebase:firebase-core:11.8.0'
+    compile 'com.google.firebase:firebase-core:12.0.1'
 }
 configurations {
     all {

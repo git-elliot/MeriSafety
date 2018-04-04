@@ -41,6 +41,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -93,11 +94,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String guarEmail = null;
     private ProgressBar progressBar;
     private DatabaseReference mDatabase;
-    private double minDistance=200000;
-    private int mode =0;
+    private double minDistance = 200000;
+    private int mode = 0;
 
     private final String l_key = "login_key";
-    private final String cur_key="curloc";
+    private final String cur_key = "curloc";
     private final String cur_db = "currentloc";
     private final String sp_db = "account_db";
     private final String d_key = "users";
@@ -107,11 +108,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final String e_key = "email";
     private final String lng_key = "lng";
     private final String pin_key = "pincode";
-    private final String uid_key= "uid";
+    private final String uid_key = "uid";
     private final String p_key = "photoUrl";
     private final String use_loc_key = "useloc";
-    private boolean nearbySet=false;
-    private final String ge_key="gemail";
+    private boolean nearbySet = false;
+    private final String ge_key = "gemail";
 
 
     @Override
@@ -120,7 +121,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
         Intent i = getIntent();
-        String saveme=  i.getStringExtra("saveme");
+        String saveme = i.getStringExtra("saveme");
         progressBar = findViewById(R.id.updateMap);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -138,7 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         createLocationRequest();
 
-        if(saveme.equals("yes")){
+        if (saveme.equals("yes")) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -169,15 +170,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        });
 
         nearby_people.setOnClickListener(v -> {
-         mMap.clear();
+            mMap.clear();
 
             Toast.makeText(MapsActivity.this, "Finding nearby peoples", Toast.LENGTH_SHORT).show();
-           if(mLastLocation.getLongitude()!=0){
-               placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-               mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
-           }
+            if (mLastLocation.getLongitude() != 0) {
+                placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(), 13));
+            }
             placeNearbyPeoples();
-            mode=0;
+            mode = 0;
         });
 
         nearby_police.setOnClickListener(v -> {
@@ -185,14 +186,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             Toast.makeText(MapsActivity.this, "Finding nearby police stations", Toast.LENGTH_SHORT).show();
 
-            if(mLastLocation.getLongitude()!=0){
+            if (mLastLocation.getLongitude() != 0) {
                 placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
 
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(), 13));
 
             }
-            performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(), mMap);
-            mode=1;
+            performSearch("police", mLastLocation.getLatitude(), mLastLocation.getLongitude(), mMap);
+            mode = 1;
 
         });
 
@@ -200,20 +201,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.clear();
 
             Toast.makeText(MapsActivity.this, "Finding nearby Hospitals", Toast.LENGTH_SHORT).show();
-            if(mLastLocation.getLongitude()!=0){
+            if (mLastLocation.getLongitude() != 0) {
                 placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(),13));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastLatLng(), 13));
 
             }
 
-            performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(), mMap);
-           mode=2;
+            performSearch("hospital", mLastLocation.getLatitude(), mLastLocation.getLongitude(), mMap);
+            mode = 2;
         });
     }
 
 
-    public void performSearch(String type, double latitude, double longitude, GoogleMap googleMap)
-    {
+    public void performSearch(String type, double latitude, double longitude, GoogleMap googleMap) {
 
 
         //show error dialog if GoolglePlayServices not available
@@ -226,7 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 "&sensor=true" +
                 "&key=" + GOOGLE_API_KEY;
 
-        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask(this,type);
+        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask(this, type);
         Object[] toPass = new Object[2];
         toPass[0] = googleMap;
         toPass[1] = googlePlacesUrl;
@@ -243,7 +243,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return false;
         }
     }
-
 
 
     /**
@@ -328,7 +327,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .getLongitude());
                     //add pin at user's location
                     placeMarkerOnMap(currentLocation);
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,13));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 13));
                 }
             }
         }
@@ -340,32 +339,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mLastLocation = location;
 
-        if(mLastLocation!=null)
-        {
+        if (mLastLocation != null) {
             mMap.clear();
             progressBar.setVisibility(View.VISIBLE);
 
-            if(mode==0){
+            if (mode == 0) {
 
                 placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
                 placeNearbyPeoples();
-            }
-            else if(mode==1){
+            } else if (mode == 1) {
                 placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                performSearch("police",mLastLocation.getLatitude(),mLastLocation.getLongitude(), mMap);
-            }
-            else{
+                performSearch("police", mLastLocation.getLatitude(), mLastLocation.getLongitude(), mMap);
+            } else {
                 placeMarkerOnMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-                performSearch("hospital",mLastLocation.getLatitude(),mLastLocation.getLongitude(), mMap);
+                performSearch("hospital", mLastLocation.getLatitude(), mLastLocation.getLongitude(), mMap);
             }
         }
     }
 
-    public void placeNearbyPeoples()
-    {
+    public void placeNearbyPeoples() {
         SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
         final String user = sp.getString(l_key, null);
-        final String currentpin = sp.getString(pin_key,null);
+        final String currentpin = sp.getString(pin_key, null);
         final double[] mlat = new double[1];
         final double[] mlng = new double[1];
         final boolean[] mUseloc = {false};
@@ -375,198 +370,73 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot currentsnapshot : dataSnapshot.getChildren())
-                {
-                    if(!currentsnapshot.getKey().equals(user))
-                    {
-                        try{
+                for (DataSnapshot currentsnapshot : dataSnapshot.getChildren()) {
+                    if (!currentsnapshot.getKey().equals(user)) {
+                        try {
 
-                            String pincode =currentsnapshot.child(pin_key).getValue().toString();
+                            String pincode = currentsnapshot.child(pin_key).getValue().toString();
                             boolean useLoc = (boolean) currentsnapshot.child(use_loc_key).getValue();
-                            String slat=currentsnapshot.child(lat_key).getValue().toString();
-                            String slng=currentsnapshot.child(lng_key).getValue().toString();
-                            double lat =Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
-                            double lng =Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
+                            String slat = currentsnapshot.child(lat_key).getValue().toString();
+                            String slng = currentsnapshot.child(lng_key).getValue().toString();
+                            double lat = Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
+                            double lng = Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
                             String name = currentsnapshot.child(n_key).getValue().toString();
                             String mobile = currentsnapshot.child(m_key).getValue().toString();
                             String email = currentsnapshot.child(e_key).getValue().toString();
                             String uid = currentsnapshot.getKey();
                             //****************check nearest helping hand********************
-                            float[] results= new float[1];
-                            Location.distanceBetween(mLastLocation.getLatitude(),mLastLocation.getLongitude(),lat,lng,results);
-                            Log.d("Distance", "Result is "+results[0]);
-                            if(results[0]<minDistance){
-                                minDistance=results[0];
-                                Log.d("Distance","min : "+minDistance);
-                                mUseloc[0] =(boolean) currentsnapshot.child(use_loc_key).getValue();
-                                mlat[0] =Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
-                                mlng[0] =Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
+                            float[] results = new float[1];
+                            Location.distanceBetween(mLastLocation.getLatitude(), mLastLocation.getLongitude(), lat, lng, results);
+                            Log.d("Distance", "Result is " + results[0]);
+                            if (results[0] < minDistance) {
+                                minDistance = results[0];
+                                Log.d("Distance", "min : " + minDistance);
+                                mUseloc[0] = (boolean) currentsnapshot.child(use_loc_key).getValue();
+                                mlat[0] = Double.parseDouble(currentsnapshot.child(lat_key).getValue().toString());
+                                mlng[0] = Double.parseDouble(currentsnapshot.child(lng_key).getValue().toString());
 
                             }
-                            if(guarEmail.equals(currentsnapshot.child(e_key).getValue().toString())){
+                            if (guarEmail.equals(currentsnapshot.child(e_key).getValue().toString())) {
+                                Log.d("firebase", "Guardian found");
+                                placePeopleWindow(name, mobile, slat, slng, uid, email);
+                            } else if (pincode.equals(currentpin) && useLoc) {
 
-                                placePeopleWindow(name,mobile,slat,slng,uid,email);
-                            }else if(pincode.equals(currentpin)&&useLoc)
-                            {
-
-                                placePeopleWindow(name,mobile,slat,slng,uid,email);
+                                placePeopleWindow(name, mobile, slat, slng, uid, email);
 
                             }
-                        }catch(Exception e){
-                            Log.d("firebase","Unable to retrieve guardian details");
+                        } catch (Exception e) {
+                            Log.d("firebase", "Unable to retrieve guardian details. Error is " + e.getMessage());
                         }
                     }
                 }
-                if(mUseloc[0]){
+                if (mUseloc[0]) {
 
                     LatLng latlng = new LatLng(mlat[0], mlng[0]);
                     int color = getResources().getColor(R.color.colorPrimary);
-                    DrawRoute drawRoute = new DrawRoute(mMap,color,getLastLatLng(),latlng);
+                    DrawRoute drawRoute = new DrawRoute(mMap, color, getLastLatLng(), latlng);
                     drawRoute.execute();
 
                 }
                 progressBar.setVisibility(View.INVISIBLE);
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                  Log.d("database",databaseError.getMessage());
+                Log.d("database", databaseError.getMessage());
             }
         });
 
     }
-    public void placePeopleWindow(String name, String mobile,String lat, String lng,String uid,String email)
-    {
+
+    public void placePeopleWindow(String name, String mobile, String lat, String lng, String uid, String email) {
         double mylat = Double.parseDouble(lat);
         double mylng = Double.parseDouble(lng);
-        LatLng mylatlng = new LatLng(mylat,mylng);
-        placeMarkerOnMapPeople(name,mobile,mylatlng,uid,email);
-    }
-    @SuppressLint("StaticFieldLeak")
-    public class DrawRoute extends AsyncTask{
-
-        GoogleMap map;
-        LatLng start,end;
-        int color;
-
-        DrawRoute(GoogleMap googleMap, int color, LatLng first, LatLng last){
-            map=googleMap;
-            start=first;
-            end=last;
-            this.color=color;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            final RouteDrawer routeDrawer = new RouteDrawer.RouteDrawerBuilder(map)
-                    .withColor(color)
-                    .withWidth(10)
-                    .withAlpha(0.5f)
-                    .withMarkerIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                    .build();
-            RouteRest routeRest = new RouteRest();
-            routeRest.getJsonDirections(start,end, TravelMode.WALKING)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .map(s -> new RouteJsonParser<Routes>().parse(s, Routes.class))
-                    .subscribe(routeDrawer::drawPath);
-
-            return null;
-        }
+        LatLng mylatlng = new LatLng(mylat, mylng);
+        placeMarkerOnMapPeople(name, mobile, mylatlng, uid, email);
     }
 
-    @SuppressLint("StaticFieldLeak")
-    public class SetImageMarker extends AsyncTask{
-
-        String UID;
-        GoogleMap mMap;
-        LatLng location;
-        String name;
-        String email;
-     SetImageMarker(String UID, GoogleMap mMap, LatLng location, String name, String email){
-            this.UID=UID;
-         this.mMap=mMap;
-         this.location=location;
-         this.name=name;
-         this.email=email;
-
-    }
-
-        @Override
-        protected Object doInBackground(Object[] objects) {
-
-            Log.d("glide","entered glide");
-
-            final ImageView mImageView = new ImageView(getApplicationContext());
-            final IconGenerator mIconGenerator = new IconGenerator(getApplicationContext());
-
-            // Reference to an image file in Cloud Storage
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-
-            StorageReference storageRef = storage.getReference();
-
-            StorageReference photoRef = storageRef.child("user_photos/"+UID+".jpg");
-
-            File localFile;
-            final FileInputStream[] fileInputStream = {null};
-            try {
-                localFile = File.createTempFile(UID, "jpg");
-
-                final File finalLocalFile = localFile;
-                photoRef.getFile(localFile)
-                        .addOnSuccessListener(taskSnapshot -> {
-                            // Successfully downloaded data to local file
-                            // ...
-
-                            Log.d("glide","successfully downloaded : "+UID);
-                            mIconGenerator.setContentView(mImageView);
-                            try {
-                                fileInputStream[0] = new FileInputStream(finalLocalFile);
-
-                                mImageView.setImageBitmap(BitmapFactory.decodeStream(fileInputStream[0]));
-
-                                Bitmap iconBitmap = mIconGenerator.makeIcon();
-
-                                MarkerOptions markerOptions = new MarkerOptions().position(location).icon(BitmapDescriptorFactory.fromBitmap(getResizedBitmap(iconBitmap,120,120)));
-                                String titleStr = getAddress(location);  // add these two lines
-                                if(guarEmail!=null&&guarEmail.equals(email))
-                                {
-
-                                    int color = getResources().getColor(R.color.route_color);
-                                    markerOptions.title("Guardian: "+name).snippet(titleStr);
-                                    DrawRoute drawRoute = new DrawRoute(mMap,color,getLastLatLng(),location);
-                                    drawRoute.execute();
-                                }
-                                else
-                                {
-                                    markerOptions.title(name).snippet(titleStr);
-                                }
-                                // 2
-                                LatLng l = new LatLng(location.latitude,location.longitude);
-                                mMap.addMarker(markerOptions);
-
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                        }).addOnFailureListener(exception -> {
-                            // Handle failed download
-                            // ...
-                        });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-    }
-    public LatLng getLastLatLng()
-    {
-        return new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+    public LatLng getLastLatLng() {
+        return new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
     }
 
 
@@ -586,22 +456,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 matrix, false);
     }
 
+    private void setImageMarker(Context con, String UID, GoogleMap mMap, LatLng location, String name, String email) {
+
+        final ImageView mImageView = new ImageView(con);
+        final IconGenerator mIconGenerator = new IconGenerator(con);
+
+        mIconGenerator.setContentView(mImageView);
+
+        SetImageMarker task = new SetImageMarker(UID, mMap, location, name, email);
+        task.execute();
+        task.setOnDownloadListener(bitmap -> {
+
+            mImageView.setImageBitmap(bitmap);
+
+            Bitmap iconBitmap = mIconGenerator.makeIcon();
+
+            MarkerOptions markerOptions = new MarkerOptions().position(location).icon(BitmapDescriptorFactory.fromBitmap(getResizedBitmap(iconBitmap, 120, 120)));
+            String titleStr = getAddress(location);  // add these two lines
+            if (guarEmail != null && guarEmail.equals(email)) {
+
+                int color = getResources().getColor(R.color.route_color);
+                markerOptions.title("Guardian: " + name).snippet(titleStr);
+                DrawRoute drawRoute = new DrawRoute(mMap, color, getLastLatLng(), location);
+                drawRoute.execute();
+            } else {
+                markerOptions.title(name).snippet(titleStr);
+            }
+            // 2
+            LatLng l = new LatLng(location.latitude, location.longitude);
+            mMap.addMarker(markerOptions);
+        });
+
+
+    }
 
     protected void placeMarkerOnMap(LatLng location) {
         // 1
         final SharedPreferences sp = getSharedPreferences(sp_db, Context.MODE_PRIVATE);
-        String userid = sp.getString(l_key,null);
+        String userid = sp.getString(l_key, null);
 
-
-        SetImageMarker task = new SetImageMarker(userid,mMap,location,"You",null);
-        task.execute();
+        setImageMarker(this, userid, mMap, location, "You", null);
 
         DatabaseReference userEnd = mDatabase.child((d_key)).child(userid).child(userid).child(e_key);
         userEnd.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists())
-                {
+                if (dataSnapshot.exists()) {
                     guarEmail = dataSnapshot.getValue().toString();
                 }
             }
@@ -616,10 +516,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    protected void placeMarkerOnMapPeople(String name, String mobile, LatLng location, String uid,String email) {
+    protected void placeMarkerOnMapPeople(String name, String mobile, LatLng location, String uid, String email) {
         // 1
-        SetImageMarker task = new SetImageMarker(uid,mMap,location,name,email);
-        task.execute();
+        setImageMarker(this, uid, mMap, location, name, email);
+
     }
 
     private String getAddress(LatLng latLng) {
@@ -643,10 +543,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         return addressText;
     }
+
     protected void startLocationUpdates() {
         //1
         if (ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
@@ -658,7 +559,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
+        mLocationRequest = LocationRequest.create();
         // 2
         mLocationRequest.setInterval(500000);
         // 3

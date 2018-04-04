@@ -100,12 +100,7 @@ public class EmergencyAlert extends BroadcastReceiver {
                 KeyguardManager keyguardManager = (KeyguardManager)context.getSystemService(KEYGUARD_SERVICE);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     if (keyguardManager != null) {
-                        keyguardManager.requestDismissKeyguard((Activity) context, new KeyguardManager.KeyguardDismissCallback() {
-                            @Override
-                            public void onDismissSucceeded() {
-                                super.onDismissSucceeded();
-                            }
-                        });
+                        keyguardManager.requestDismissKeyguard((Activity) context, null);
                     }
                 }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                     context.startActivity(i);

@@ -143,6 +143,10 @@ public class Frag_verification extends Fragment {
                Toast.makeText(con, "Verification successfull", Toast.LENGTH_SHORT).show();
                FirebaseUser currentUser = mAuth.getCurrentUser();
 
+               FragmentManager fm = getChildFragmentManager();
+               FragmentTransaction ft = fm.beginTransaction();
+               Frag_guardian obj = new Frag_guardian();
+
                mDatabase = FirebaseDatabase.getInstance().getReference();
 
                assert currentUser != null;
@@ -150,10 +154,6 @@ public class Frag_verification extends Fragment {
                userEnd.setValue(num).addOnCompleteListener(task -> {
                    Toast.makeText(con, "Mobile number added successfully", Toast.LENGTH_SHORT).show();
 
-                   FragmentManager fm = getFragmentManager();
-                   assert fm != null;
-                   FragmentTransaction ft = fm.beginTransaction();
-                   Frag_guardian obj = new Frag_guardian();
                    ft.replace(R.id.l2,obj,"guardian");
                    ft.commit();
 

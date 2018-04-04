@@ -377,7 +377,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         task.execute();
 
     }
-    public static class DownloadAndUpload extends AsyncTask{
+
+    public static class DownloadAndUpload extends AsyncTask {
 
         String UID;
         String URL;
@@ -412,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             // Get a URL to the uploaded content
                             Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                            Toast.makeText(con, "Upload successfull", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(con, "Upload successfully", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -420,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         public void onFailure(@NonNull Exception exception) {
                             // Handle unsuccessful uploads
                             // ...
-                            Toast.makeText(con, "Upload unsucessfull", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(con, "Upload unsucessfully", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -525,10 +526,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         if(requestCode==REQUEST_PERMISSIONS){
             if((grantResults.length>0)&&(grantResults[0]+grantResults[1]+grantResults[2]+grantResults[3]+grantResults[4]+grantResults[5])==PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(this, "Permissions successfully granted  .", Toast.LENGTH_SHORT).show();
+                Log.d("Permissions-merisafety","Permissions successfully granted.");
 
             }else {
-                Toast.makeText(this, "permission was not granted", Toast.LENGTH_SHORT).show();
+                Log.d("Permissions-merisafety","Permission request has been denied.");
             }
         }
         else

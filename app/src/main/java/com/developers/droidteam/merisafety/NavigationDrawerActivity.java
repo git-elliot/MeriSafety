@@ -44,6 +44,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
@@ -274,7 +275,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         this.unregisterReceiver(br);
         //turnOffGps();
     }
-
+    
     public void setImageView(ImageView i, String dir, final ProgressBar progressBar)
     {
 

@@ -138,8 +138,7 @@ public class GuardianFragment extends Fragment {
                             }
                         });
 
-                        FragmentManager fm = getFragmentManager();
-                        assert fm != null;
+                        FragmentManager fm = getChildFragmentManager();
                         FragmentTransaction ft = fm.beginTransaction();
                         Frag_guardian obj = new Frag_guardian();
                         ft.addToBackStack("stack2");
@@ -162,6 +161,7 @@ public class GuardianFragment extends Fragment {
         final String user = firebaseUser;
         final String email = email1;
         guarEnd = mDatabase.child(d_key);
+        final NavigationDrawerActivity navigationDrawerActivity = new NavigationDrawerActivity();
 
         guarEnd.addValueEventListener(new ValueEventListener() {
             @Override
@@ -174,7 +174,7 @@ public class GuardianFragment extends Fragment {
 
                             Log.d(TAG, "guardian matches");
                             progressBar = v.findViewById(R.id.prog_user);
-                            new NavigationDrawerActivity().setImageView(imageView,"user_photos/"+currentsnapshot.getKey()+".jpg",progressBar);
+                           navigationDrawerActivity.setImageView(imageView,"user_photos/"+currentsnapshot.getKey()+".jpg",progressBar);
                         }
                     }
                 }
@@ -182,7 +182,7 @@ public class GuardianFragment extends Fragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.d("Firebase",databaseError.getMessage());
             }
         });
 
