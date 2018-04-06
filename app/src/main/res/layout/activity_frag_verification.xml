@@ -42,6 +42,8 @@
                     android:id="@+id/enternum"
                     android:layout_width="300dp"
                     android:gravity="center"
+                    android:text="+"
+                    android:inputType="number"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:hint="@string/enter_mobile_number_here"

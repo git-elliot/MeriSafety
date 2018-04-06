@@ -45,6 +45,7 @@ public class Frag_verification extends Fragment {
     Button b1;
     EditText editText;
     View v;
+    private ProgressDialog dialog;
 
     @Override
     public void onAttach(Context context) {
@@ -71,15 +72,18 @@ public class Frag_verification extends Fragment {
 
         b1.setOnClickListener(v -> {
 
-            if (editText.getText().toString().trim().length() != 10) {
+            if (editText.getText().toString().trim().length() < 10) {
                 editText.setError("Phone Number is invalid");
                 editText.requestFocus();
             }
             else {
-
                 Toast.makeText(con, "Please Wait Automatically Detecting OTP.", Toast.LENGTH_LONG).show();
-                BackgroundTask task = new BackgroundTask(getActivity(),editText.getText().toString());
-                task.execute();
+
+                dialog = new ProgressDialog(con);
+                dialog.setMessage("Verifying your mobile number please wait");
+                dialog.show();
+
+                verifyUser(editText.getText().toString());
 
             }
 
@@ -88,43 +92,6 @@ public class Frag_verification extends Fragment {
 
     }
 
-
-    @SuppressLint("StaticFieldLeak")
-    private class BackgroundTask extends AsyncTask<Void, Void, Void> {
-        private ProgressDialog dialog;
-        String number;
-        BackgroundTask(Activity activity,String num) {
-            dialog = new ProgressDialog(activity);
-           number = num;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            dialog.setMessage("Verifying your mobile number please wait");
-            dialog.show();
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-            }
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                Thread.sleep(2000);
-                verifyUser(number);
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-    }
 
    public void verifyUser(final String num)
    {
@@ -143,7 +110,7 @@ public class Frag_verification extends Fragment {
                Toast.makeText(con, "Verification successfull", Toast.LENGTH_SHORT).show();
                FirebaseUser currentUser = mAuth.getCurrentUser();
 
-               FragmentManager fm = getChildFragmentManager();
+               FragmentManager fm = getFragmentManager();
                FragmentTransaction ft = fm.beginTransaction();
                Frag_guardian obj = new Frag_guardian();
 
@@ -153,6 +120,10 @@ public class Frag_verification extends Fragment {
                userEnd = mDatabase.child(d_key).child(currentUser.getUid()).child(m_key);
                userEnd.setValue(num).addOnCompleteListener(task -> {
                    Toast.makeText(con, "Mobile number added successfully", Toast.LENGTH_SHORT).show();
+
+                   if (dialog.isShowing()) {
+                       dialog.dismiss();
+                   }
 
                    ft.replace(R.id.l2,obj,"guardian");
                    ft.commit();
@@ -167,11 +138,15 @@ public class Frag_verification extends Fragment {
                // This callback is invoked in an invalid request for verification is made,
                // for instance if the the phone number format is not valid.
                Log.w("OAuth", "onVerificationFailed", e);
+               if (dialog.isShowing()) {
+                   dialog.dismiss();
+               }
 
                if (e instanceof FirebaseAuthInvalidCredentialsException) {
                    // Invalid request
                    // ...
-                   Log.d("firebase verification","Invalid Request");
+
+                   Log.d("firebase verification","Invalid Request due to credentials : "+e.getMessage() );
                } else if (e instanceof FirebaseTooManyRequestsException) {
                    // The SMS quota for the project has been exceeded
                    // ...
@@ -185,8 +160,8 @@ public class Frag_verification extends Fragment {
        };
 
        PhoneAuthProvider.getInstance().verifyPhoneNumber(
-               editText.getText().toString(),
-               60,
+               num,
+               30,
                TimeUnit.SECONDS,
                (Activity) con,
                mCallbacks);

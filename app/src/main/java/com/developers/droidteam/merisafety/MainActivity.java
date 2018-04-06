@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     Bundle bs= new Bundle();
     private FirebaseAuth mAuth;
 
+    ProgressDialog progressDialog;
     ProgressBar progressBar;
     SignInButton signInButton;
     @Override
@@ -201,8 +202,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             Snackbar.make(findViewById(R.id.l2),"Signed in with  " + acct.getEmail(), Snackbar.LENGTH_SHORT).show();
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            BackgroundTask task2 = new BackgroundTask(MainActivity.this,acct);
-            task2.execute();
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Checking your details with server...");
+            progressDialog.show();
+            firebaseAuthWithGoogle(acct);
 
 //           tv.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
 
@@ -241,43 +244,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 });
     }
 
-    private class BackgroundTask extends AsyncTask<Void, Void, Void> {
-        private ProgressDialog dialog;
-        GoogleSignInAccount user;
-        public BackgroundTask(MainActivity activity, GoogleSignInAccount user) {
-            this.user = user;
-            dialog = new ProgressDialog(activity);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            dialog.setMessage("Checking your details with server...");
-            dialog.show();
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            if (dialog.isShowing()) {
-                dialog.dismiss();
-                updateUI(true);
-            }
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                Thread.sleep(2000);
-
-               firebaseAuthWithGoogle(user);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-    }
-
     public void updateUI(Boolean value)
     {
         if(value)
@@ -312,6 +278,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(!dataSnapshot.exists())
                 {
+                    if(progressDialog.isShowing()){
+                        progressDialog.dismiss();
+                    }
                     Log.d("OAuth","User does not exists");
                     Toast.makeText(MainActivity.this, "Sigining in you to MeriSafety.. Please wait..", Toast.LENGTH_SHORT).show();
                     createUser(name, email, user.getUid(),pUrl);
@@ -319,6 +288,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
                 else
                 {
+
+                    if(progressDialog.isShowing()){
+                        progressDialog.dismiss();
+                    }
 
                     if(dataSnapshot.child(user.getUid()).exists())
                     {

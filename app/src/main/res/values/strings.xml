@@ -111,8 +111,8 @@
     <string name="team">Team</string>
     <string name="we_need_some_extra_information">We need some extra information</string>
     <string name="contact_details">Contact Details</string>
-    <string name="enter_mobile_number_here">Enter mobile number here</string>
-    <string name="if_not_receiving_otp_then_check_network_strenth">If you are not receiving OTP then check network strenth</string>
+    <string name="enter_mobile_number_here">Enter your number here</string>
+    <string name="if_not_receiving_otp_then_check_network_strenth">If you are not receiving OTP then make sure you entered number with country code and have good network strength</string>
     <string name="we_don_t_share_your_information_with_any_third_party_organizations">We don\'t share your information with any third party organizations.</string>
     <string name="proceed">Proceed</string>
     <string name="self">Self Defence</string>
