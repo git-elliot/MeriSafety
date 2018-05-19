@@ -17,6 +17,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -239,8 +240,6 @@ public class NavigationDrawerActivity extends AppCompatActivity
             }
 
         }
-
-        FirebaseMessaging.getInstance().subscribeToTopic("alert");
 
     }
     @Override
